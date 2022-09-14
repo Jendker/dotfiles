@@ -18,12 +18,13 @@ vim.api.nvim_create_autocmd("BufWritePost", {
 -- Install packages
 return require('packer').startup(function(use)
   use 'wbthomason/packer.nvim'
-  -- Lightspeed and dependency
+  -- Leap and dependency
   use 'tpope/vim-repeat'
-  use 'ggandor/lightspeed.nvim'
+  use 'ggandor/leap.nvim'
+  -- clever-f
+  use 'rhysd/clever-f.vim'
 
   if packer_bootstrap then
     require("packer").sync()
   end
 end)
-
