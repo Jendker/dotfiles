@@ -1,3 +1,5 @@
+require "common"
+
 -- Indicate first time installation
 local packer_bootstrap = false
 
@@ -23,6 +25,41 @@ return require('packer').startup(function(use)
   use 'ggandor/leap.nvim'
   -- clever-f
   use 'rhysd/clever-f.vim'
+  -- move lines with Alt arrows
+  use 'matze/vim-move'
+  -- random
+  use 'tpope/vim-commentary'
+  use {
+    "kylechui/nvim-surround",
+    tag = "*", -- Use for stability; omit to use `main` branch for the latest features
+    config = function()
+      require("nvim-surround").setup({
+        -- Configuration here, or leave empty to use defaults
+      })
+    end
+  }
+  -- without VSCode
+      -- auto trail whitespace
+      use {
+          'lewis6991/spaceless.nvim',
+          config = function()
+              require'spaceless'.setup()
+          end,
+          cond = { nocode }
+      }
+      use {'tpope/vim-fugitive', cond = { nocode }}
+      use {
+        'nvim-lualine/lualine.nvim',
+        requires = { 'kyazdani42/nvim-web-devicons', opt = true},
+        config = function() require("lualine").setup(
+          {sections = {lualine_x = {'filetype'}}, options = {theme = 'wombat', section_separators = '', component_separators = ''}})
+        end
+      }
+      use {
+        'nvim-telescope/telescope.nvim', tag = '0.1.0',
+        requires = { {'nvim-lua/plenary.nvim'} },
+        cond = { nocode }
+      }
 
   if packer_bootstrap then
     require("packer").sync()

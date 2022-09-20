@@ -1,3 +1,5 @@
+require "common"
+
 local function map(mode, key, action, opts)
   local options = { noremap = true, silent = true }
   if opts then
@@ -11,6 +13,8 @@ map('n', '<S-CR>', 'O<Esc>')
 
 -- Esc in insert mode
 map('i', 'jk', '<Esc>')
+map('i', 'jj', '<Esc>')
+map('i', 'kk', '<Esc>')
 
 -- Move text (doesn't work, check it)
 map('v', '<A-j>', ":m '>+1<CR>gv=gv")
@@ -22,4 +26,12 @@ map("n", "<A-k>", ":m .-2<CR>==")
 
 if vim.g.vscode == 1 then
   map('n', '?', "<Cmd>call VSCodeNotify('workbench.action.findInFiles', { 'query': expand('<cword>')})<CR>")
+end
+
+-- telescope
+if nocode then
+  map('n', '<leader>ff', "<cmd>lua require('telescope.builtin').find_files()<cr>")
+  map('n', '<leader>fg', "<cmd>lua require('telescope.builtin').live_grep()<cr>")
+  map('n', '<leader>fb', "<cmd>lua require('telescope.builtin').buffers()<cr>")
+  map('n', '<leader>fh', "<cmd>lua require('telescope.builtin').help_tags()<cr>")
 end
