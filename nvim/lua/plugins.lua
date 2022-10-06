@@ -41,11 +41,11 @@ return require('packer').startup(function(use)
   -- without VSCode
       -- auto trail whitespace
       use {
-          'lewis6991/spaceless.nvim',
-          config = function()
-              require'spaceless'.setup()
-          end,
-          cond = { nocode }
+        'lewis6991/spaceless.nvim',
+        config = function()
+          require'spaceless'.setup()
+        end,
+        cond = { nocode }
       }
       use {'tpope/vim-fugitive', cond = { nocode }}
       use {
@@ -58,6 +58,14 @@ return require('packer').startup(function(use)
       use {
         'nvim-telescope/telescope.nvim', tag = '0.1.0',
         requires = { {'nvim-lua/plenary.nvim'} },
+        cond = { nocode }
+      }
+      use {'farmergreg/vim-lastplace', cond = { nocode }}
+      use {
+        'karb94/neoscroll.nvim',
+        config = function()
+          require('neoscroll').setup()
+        end,
         cond = { nocode }
       }
 
