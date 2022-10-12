@@ -26,3 +26,4 @@ require('nvim-treesitter.configs').setup({
     enable = nocode(),
   },
 })
+vim.api.nvim_create_autocmd("FileType", {pattern = "cpp" , command = "setlocal commentstring=//\\ %s"})
