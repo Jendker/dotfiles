@@ -26,5 +26,3 @@ require('nvim-treesitter.configs').setup({
     enable = nocode(),
   },
 })
-vim.g['vim_current_word#highlight_only_in_focused_window'] = 1
-vim.g['vim_current_word#highlight_delay'] = 100

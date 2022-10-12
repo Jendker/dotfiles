@@ -79,14 +79,6 @@ return require('packer').startup(function(use)
         config = function() require('nvim-autopairs').setup {} end,
         cond = { nocode }
       }
-      use {
-        'myusuf3/numbers.vim',
-        cond = { nocode }
-      }
-      use {
-        'dominikduda/vim_current_word',
-        cond = { nocode }
-      }
 
   if packer_bootstrap then
     require("packer").sync()
