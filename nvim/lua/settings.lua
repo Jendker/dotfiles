@@ -14,6 +14,8 @@ vim.opt.tabstop = 2
 vim.opt.softtabstop = 2
 vim.opt.smartindent = true
 vim.opt.wrap = true
+vim.opt.ignorecase = true
+vim.opt.smartcase = true
 
 -- Prefer ripgrep if it exists
 -- if fn.executable("rg") > 0 then
@@ -28,3 +30,5 @@ vim.cmd([[
     autocmd TextYankPost * silent! lua vim.highlight.on_yank()
   augroup end
 ]])
+-- auto clear
+vim.cmd [[au CursorHold,CursorHoldI * set nohls | set tw=100]]

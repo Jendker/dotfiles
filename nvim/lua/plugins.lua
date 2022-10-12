@@ -38,14 +38,20 @@ return require('packer').startup(function(use)
       })
     end
   }
+  use {
+    'nvim-treesitter/nvim-treesitter',
+    run = function() require('nvim-treesitter.install').update({ with_sync = true }) end,
+  }
+  use 'nvim-treesitter/nvim-treesitter-textobjects'
+  use 'inkarkat/vim-ReplaceWithRegister'
   -- without VSCode
       -- auto trail whitespace
       use {
-        'lewis6991/spaceless.nvim',
-        config = function()
-          require'spaceless'.setup()
-        end,
-        cond = { nocode }
+          'lewis6991/spaceless.nvim',
+          config = function()
+              require'spaceless'.setup()
+          end,
+          cond = { nocode }
       }
       use {'tpope/vim-fugitive', cond = { nocode }}
       use {
@@ -66,6 +72,19 @@ return require('packer').startup(function(use)
         config = function()
           require('neoscroll').setup()
         end,
+        cond = { nocode }
+      }
+      use {
+        'windwp/nvim-autopairs',
+        config = function() require('nvim-autopairs').setup {} end,
+        cond = { nocode }
+      }
+      use {
+        'myusuf3/numbers.vim',
+        cond = { nocode }
+      }
+      use {
+        'dominikduda/vim_current_word',
         cond = { nocode }
       }
 
