@@ -24,7 +24,7 @@ EOT
 fi
 
 # .tmux.conf
-grep -qxF 'set-option -g default-shell /bin/zsh' $HOME/.tmux.conf || echo 'set-option -g history-limit 125000\nset-option -g default-shell /bin/zsh' >> $HOME/.tmux.conf
+grep -qxF 'set-option -g default-shell /bin/zsh' $HOME/.tmux.conf || printf "set-option -g history-limit 125000\nset-option -g default-shell /bin/zsh" >> $HOME/.tmux.conf
 
 # set up nvim
 if ! [ -x "$(command -v nvim)" ]; then
