@@ -26,24 +26,30 @@ require('nvim-treesitter.configs').setup({
       set_jumps = true, -- whether to set jumps in the jumplist
       goto_next_start = {
         ["]m"] = "@function.outer",
-        ["]]"] = { query = "@class.outer", desc = "Next class start" },
       },
       goto_next_end = {
         ["]M"] = "@function.outer",
-        ["]["] = "@class.outer",
       },
       goto_previous_start = {
         ["[m"] = "@function.outer",
-        ["[["] = "@class.outer",
       },
       goto_previous_end = {
         ["[M"] = "@function.outer",
-        ["[]"] = "@class.outer",
+      },
+    },
+    swap = {
+      enable = true,
+      swap_next = {
+        ["<leader>a"] = "@parameter.inner",
+      },
+      swap_previous = {
+        ["<leader>A"] = "@parameter.inner",
       },
     },
   },
   highlight = {
     enable = nocode(),
+    disable = { "lua" },
   },
 })
 vim.api.nvim_create_autocmd("FileType", {pattern = "cpp" , command = "setlocal commentstring=//\\ %s"})
