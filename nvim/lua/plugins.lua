@@ -44,6 +44,8 @@ return require('packer').startup(function(use)
   }
   use 'nvim-treesitter/nvim-treesitter-textobjects'
   use 'inkarkat/vim-ReplaceWithRegister'
+  use 'mg979/vim-visual-multi'
+
   -- without VSCode
       -- auto trail whitespace
       use {
