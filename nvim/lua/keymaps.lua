@@ -11,11 +11,6 @@ end
 map('n', '<CR>', 'o<Esc>')
 map('n', '<S-CR>', 'O<Esc>')
 
--- Esc in insert mode
-map('i', 'jk', '<Esc>')
-map('i', 'jj', '<Esc>')
-map('i', 'kk', '<Esc>')
-
 -- Move text (doesn't work, check it)
 map('v', '<A-j>', ":m '>+1<CR>gv=gv")
 map('v', '<A-k>', ":m '<-2<CR>gv=gv")
