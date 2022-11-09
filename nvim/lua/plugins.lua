@@ -79,6 +79,21 @@ return require('packer').startup(function(use)
         config = function() require('nvim-autopairs').setup {} end,
         cond = { nocode }
       }
+      use {'neovim/nvim-lspconfig', cond = { nocode }}
+      use {
+        'ms-jpq/coq_nvim',
+        branch = 'coq',
+        requires = {
+          { 'ms-jpq/coq.artifacts', branch = 'artifacts' },
+          { 'ms-jpq/coq.thirdparty', branch = '3p' },
+        },
+        setup = function()
+          vim.g.coq_settings = {
+            auto_start = 'shut-up',
+          }
+        end,
+        cond = { nocode }
+      }
 
   if packer_bootstrap then
     require("packer").sync()

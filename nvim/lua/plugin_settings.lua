@@ -53,7 +53,6 @@ require('nvim-treesitter.configs').setup({
   },
   highlight = {
     enable = nocode(),
-    disable = { "lua" },
   },
 })
 vim.api.nvim_create_autocmd("FileType", {pattern = "cpp" , command = "setlocal commentstring=//\\ %s"})
