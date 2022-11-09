@@ -1,5 +1,8 @@
 require "common"
 
+-- Disable mouse
+vim.opt.mouse = ""
+
 -- Clipboard
 vim.opt.clipboard = "unnamedplus"
 
