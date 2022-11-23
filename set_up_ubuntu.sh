@@ -2,6 +2,10 @@
 set -x
 set -e
 
+function is_installed() {
+     dpkg --verify "$1" 2>/dev/null
+}
+
 function install_nvim_source() {
   sudo apt-get install ninja-build gettext libtool libtool-bin autoconf automake cmake g++ pkg-config unzip curl doxygen -y
   cd /tmp && git clone https://github.com/neovim/neovim.git --branch release-0.8
@@ -11,7 +15,7 @@ function install_nvim_source() {
 }
 
 function update_nvim() {
-  cd /tmp/ && git clone https://github.com/Jendker/dotfiles.git
+  cd /tmp/ && rm -rf dotfiles && git clone https://github.com/Jendker/dotfiles.git
   cp -r dotfiles/nvim $HOME/.config
   run_times=4
   for i in $(seq $run_times); do
@@ -25,10 +29,9 @@ if [[ ! $# -eq 0 ]]; then
   if [[ $1 == "--update-nvim" ]]; then
     echo "Updating nvim..."
     update_nvim
-    if [[ $(lsb_release -cs) == "bionic" ]]
-      sudo apt-get install libffi-dev
-      pyenv install 3.8.15
-      pyenv global 3.8.15
+    if [[ $(lsb_release -cs) == "bionic" ]]; then
+      is_installed "libffi-dev" || sudo apt-get install libffi-dev
+      pyenv global 3.8.15 || pyenv install 3.8.15 && pyenv global 3.8.15
       grep -qxF "python3_host_prog=vim.env.HOME .. '/...'" $HOME/.config/nvim/lua/plugin_settings.lua || printf "python3_host_prog=vim.env.HOME .. '/...'" >> $HOME/.config/nvim/lua/plugin_settings.lua
     fi
     exit 0
