@@ -38,6 +38,7 @@ return require('packer').startup(function(use)
       })
     end
   }
+  use 'lewis6991/impatient.nvim'
   use {
     'nvim-treesitter/nvim-treesitter',
     run = ':TSUpdate'
@@ -45,7 +46,6 @@ return require('packer').startup(function(use)
   use 'nvim-treesitter/nvim-treesitter-textobjects'
   use 'inkarkat/vim-ReplaceWithRegister'
   use 'mg979/vim-visual-multi'
-
   -- without VSCode
       -- auto trail whitespace
       use {
@@ -57,11 +57,20 @@ return require('packer').startup(function(use)
       }
       use {'tpope/vim-fugitive', cond = { nocode }}
       use {
+        'rose-pine/neovim',
+        as = 'rose-pine',
+        config = function()
+          vim.cmd('colorscheme rose-pine')
+        end,
+        cond = { nocode }
+      }
+      use {
         'nvim-lualine/lualine.nvim',
         requires = { 'kyazdani42/nvim-web-devicons', opt = true},
         config = function() require("lualine").setup(
           {sections = {lualine_x = {'filetype'}}, options = {theme = 'wombat', section_separators = '', component_separators = ''}})
-        end
+        end,
+        cond = { nocode }
       }
       use {
         'nvim-telescope/telescope.nvim', tag = '0.1.0',
@@ -118,9 +127,9 @@ return require('packer').startup(function(use)
       use {
         'lewis6991/gitsigns.nvim',
         tag = 'release',
-        config = function()
-          require('gitsigns').setup()
-        end,
+        -- config = function()
+        --   require('gitsigns').setup()
+        -- end,
         cond = { nocode }
       }
 

@@ -1,3 +1,5 @@
+-- Speed up by caching
+require('impatient')
 -- Global functions
 require "globals"
 -- Sensible defaults
