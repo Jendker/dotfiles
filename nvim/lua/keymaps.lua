@@ -14,14 +14,13 @@ map('n', '<S-CR>', 'O<Esc>')
 -- select last pasted text
 map('n', 'gV', '`[v`]')
 
-if vim.g.vscode == 1 then
-  map('n', '?', "<Cmd>call VSCodeNotify('workbench.action.findInFiles', { 'query': expand('<cword>')})<CR>")
-end
-
 -- telescope
 if nocode then
   map('n', '<leader>ff', "<cmd>lua require('telescope.builtin').find_files()<cr>")
   map('n', '<leader>fg', "<cmd>lua require('telescope.builtin').live_grep()<cr>")
   map('n', '<leader>fb', "<cmd>lua require('telescope.builtin').buffers()<cr>")
   map('n', '<leader>fh', "<cmd>lua require('telescope.builtin').help_tags()<cr>")
+  map('n', 'gf', "<cmd>lua vim.lsp.buf.declaration()<cr>")
+else
+  map('n', '?', "<Cmd>call VSCodeNotify('workbench.action.findInFiles', { 'query': expand('<cword>')})<CR>")
 end

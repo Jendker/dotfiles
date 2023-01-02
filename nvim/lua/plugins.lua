@@ -40,7 +40,7 @@ return require('packer').startup(function(use)
   }
   use {
     'nvim-treesitter/nvim-treesitter',
-    run = function() require('nvim-treesitter.install').update({ with_sync = true }) end,
+    run = ':TSUpdate'
   }
   use 'nvim-treesitter/nvim-treesitter-textobjects'
   use 'inkarkat/vim-ReplaceWithRegister'
@@ -81,18 +81,37 @@ return require('packer').startup(function(use)
         config = function() require('nvim-autopairs').setup {} end,
         cond = { nocode }
       }
-      use {'neovim/nvim-lspconfig', cond = { nocode }}
       use {
-        'ms-jpq/coq_nvim',
-        branch = 'coq',
+        'VonHeikemen/lsp-zero.nvim',
         requires = {
-          { 'ms-jpq/coq.artifacts', branch = 'artifacts' },
-          { 'ms-jpq/coq.thirdparty', branch = '3p' },
+          -- LSP Support
+          {'neovim/nvim-lspconfig'},
+          {'williamboman/mason.nvim'},
+          {'williamboman/mason-lspconfig.nvim'},
+
+          -- Autocompletion
+          {'hrsh7th/nvim-cmp'},
+          {'hrsh7th/cmp-buffer'},
+          {'hrsh7th/cmp-path'},
+          {'saadparwaiz1/cmp_luasnip'},
+          {'hrsh7th/cmp-nvim-lsp'},
+          {'hrsh7th/cmp-nvim-lua'},
+
+          -- Snippets
+          {'L3MON4D3/LuaSnip'},
+          {'rafamadriz/friendly-snippets'},
         },
-        setup = function()
-          vim.g.coq_settings = {
-            auto_start = 'shut-up',
-          }
+        config = function()
+          local lsp = require('lsp-zero')
+          lsp.preset('recommended')
+          lsp.ensure_installed({
+            'bashls',
+            'clangd',
+            'pyright',
+            'vimls'
+          })
+          lsp.nvim_workspace()
+          lsp.setup()
         end,
         cond = { nocode }
       }
