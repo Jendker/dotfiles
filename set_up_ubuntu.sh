@@ -17,12 +17,17 @@ function install_nvim_source() {
 function update_nvim() {
   cd /tmp/ && rm -rf dotfiles && git clone https://github.com/Jendker/dotfiles.git
   cp -r dotfiles/nvim $HOME/.config
-  run_times=4
+  run_times=1
   for i in $(seq $run_times); do
     nvim --headless -c 'autocmd User PackerComplete quitall' -c 'PackerSync'
   done
   # repeat again until successful
   while [ $? -ne 0 ]; do !!; done
+}
+
+function install_nvim_binary() {
+  wget https://github.com/neovim/neovim/releases/download/v0.8.2/nvim-linux64.deb --directory-prefix=/tmp
+  sudo apt install /tmp/nvim-linux64.deb -y || install_nvim_source
 }
 
 if [[ ! $# -eq 0 ]]; then
@@ -34,6 +39,10 @@ if [[ ! $# -eq 0 ]]; then
       pyenv global 3.8.15 || pyenv install 3.8.15 && pyenv global 3.8.15
       grep -qxF "python3_host_prog=vim.env.HOME .. '/...'" $HOME/.config/nvim/lua/plugin_settings.lua || printf "python3_host_prog=vim.env.HOME .. '/...'" >> $HOME/.config/nvim/lua/plugin_settings.lua
     fi
+    exit 0
+  elif [[ $1 == "--update-nvim-bin" ]]; then
+    echo "Updating nvim binary..."
+    install_nvim_binary
     exit 0
   else
     echo "Option \"$1\" not recognized."
@@ -62,9 +71,7 @@ grep -qxF 'set-option -g default-shell /bin/zsh' $HOME/.tmux.conf || printf "set
 # set up nvim
 if ! [ -x "$(command -v nvim)" ]; then
   echo 'nvim is not installed. installing'
-  wget https://github.com/neovim/neovim/releases/download/v0.8.0/nvim-linux64.deb --directory-prefix=/tmp
-  sudo apt install /tmp/nvim-linux64.deb -y || install_nvim_source
-
+  install_nvim_binary
   update_nvim
 fi
 

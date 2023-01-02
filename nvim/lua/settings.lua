@@ -40,3 +40,4 @@ vim.cmd([[
 vim.cmd [[au CursorHold,CursorHoldI * set nohls | set tw=100]]
 -- don't continue comment on newline
 vim.cmd("autocmd BufEnter * setlocal formatoptions-=cro")
+vim.g.mapleader = " "

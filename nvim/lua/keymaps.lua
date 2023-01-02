@@ -18,9 +18,12 @@ map('n', 'gV', '`[v`]')
 if nocode then
   map('n', '<leader>ff', "<cmd>lua require('telescope.builtin').find_files()<cr>")
   map('n', '<leader>fg', "<cmd>lua require('telescope.builtin').live_grep()<cr>")
+  map('n', '<leader>fs', "<cmd>lua require('telescope.builtin').git_files()<cr>")
+  -- map('n', '<leader>fg', function() require('telescope.builtin').grep_string({ search = vim.fn.input("Grep > ") }) end)
   map('n', '<leader>fb', "<cmd>lua require('telescope.builtin').buffers()<cr>")
   map('n', '<leader>fh', "<cmd>lua require('telescope.builtin').help_tags()<cr>")
   map('n', 'gf', "<cmd>lua vim.lsp.buf.declaration()<cr>")
 else
   map('n', '?', "<Cmd>call VSCodeNotify('workbench.action.findInFiles', { 'query': expand('<cword>')})<CR>")
 end
+vim.g.mapleader = " "

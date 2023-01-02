@@ -108,7 +108,7 @@ return require('packer').startup(function(use)
             'bashls',
             'clangd',
             'pyright',
-            'vimls'
+            'sumneko_lua'
           })
           lsp.nvim_workspace()
           lsp.setup()
