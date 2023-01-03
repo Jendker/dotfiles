@@ -1,5 +1,3 @@
--- Speed up by caching
-pcall(require, 'impatient')
 -- Global functions
 require "globals"
 -- Sensible defaults
