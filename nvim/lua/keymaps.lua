@@ -15,7 +15,7 @@ map('n', '<S-CR>', 'O<Esc>')
 map('n', 'gV', '`[v`]')
 
 -- telescope
-if nocode then
+if nocode() then
   map('n', '<leader>ff', "<cmd>lua require('telescope.builtin').find_files()<cr>")
   map('n', '<leader>fg', "<cmd>lua require('telescope.builtin').live_grep()<cr>")
   map('n', '<leader>fs', "<cmd>lua require('telescope.builtin').git_files()<cr>")
