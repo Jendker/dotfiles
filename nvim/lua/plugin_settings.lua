@@ -6,7 +6,7 @@ vim.g.clever_f_smart_case = 1
 require('leap').set_default_keymaps()
 require('leap').opts.safe_labels = {}
 require('nvim-treesitter.configs').setup({
-  ensure_installed = { "cpp", "python", "bash", "json", "yaml", "markdown" },
+  ensure_installed = { "cpp", "python", "bash", "json", "yaml", "markdown", "lua"},
   sync_install = true,
   textobjects = {
     select = {

@@ -62,7 +62,11 @@ return require('packer').startup(function(use)
         config = function()
           vim.cmd('colorscheme rose-pine')
           require'rose-pine'.setup({
-            disable_background = true
+            disable_background = true,
+            disable_italics = true,
+            groups = {
+              comment = 'Subtle'
+            }
           })
         vim.cmd.colorscheme("rose-pine")
 
@@ -133,10 +137,8 @@ return require('packer').startup(function(use)
       }
       use {
         'lewis6991/gitsigns.nvim',
-        tag = 'release',
-        -- config = function()
-        --   require('gitsigns').setup()
-        -- end,
+        commit = "bb808fc",
+        -- tag = 'release',
         cond = { nocode }
       }
 
