@@ -21,10 +21,25 @@ vim.api.nvim_create_autocmd("BufWritePost", {
 return require('packer').startup(function(use)
   use 'wbthomason/packer.nvim'
   -- Leap and dependency
-  use 'tpope/vim-repeat'
-  use 'ggandor/leap.nvim'
-  -- clever-f
+  use {
+    'ggandor/leap.nvim',
+    requires = {{'tpope/vim-repeat'}},
+  }
+  use {
+    'ggandor/leap-spooky.nvim',
+    config = function()
+      require'leap-spooky'.setup()
+    end
+  }
   use 'rhysd/clever-f.vim'
+  -- Waiting for this to be fixed: https://github.com/neovim/neovim/pull/19035
+  -- use {
+  --   'ggandor/flit.nvim',
+  --   config = function()
+  --     require'flit'.setup()
+  --   end
+  -- }
+  use 'tpope/vim-sleuth' -- automatically detect tabwidth
   -- move lines with Alt arrows
   use 'matze/vim-move'
   -- random
@@ -59,7 +74,6 @@ return require('packer').startup(function(use)
         'rose-pine/neovim',
         as = 'rose-pine',
         config = function()
-          vim.cmd('colorscheme rose-pine')
           require'rose-pine'.setup({
             disable_background = true,
             disable_italics = true,
@@ -67,10 +81,9 @@ return require('packer').startup(function(use)
               comment = 'Subtle'
             }
           })
-        vim.cmd.colorscheme("rose-pine")
-
-        vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
-        vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
+          vim.cmd.colorscheme("rose-pine")
+          vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
+          vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
         end,
         cond = { nocode }
       }
@@ -79,6 +92,15 @@ return require('packer').startup(function(use)
         requires = { 'kyazdani42/nvim-web-devicons', opt = true},
         config = function() require("lualine").setup(
           {sections = {lualine_x = {'filetype'}}, options = {theme = 'wombat', section_separators = '', component_separators = ''}})
+        end,
+        cond = { nocode }
+      }
+      use {
+        'lukas-reineke/indent-blankline.nvim',
+        config = function()
+          require("indent_blankline").setup {
+            char = '┊',
+          }
         end,
         cond = { nocode }
       }
