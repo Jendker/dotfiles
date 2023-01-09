@@ -71,19 +71,9 @@ return require('packer').startup(function(use)
       }
       use {'tpope/vim-fugitive', cond = { nocode }}
       use {
-        'rose-pine/neovim',
-        as = 'rose-pine',
+        'navarasu/onedark.nvim',
         config = function()
-          require'rose-pine'.setup({
-            disable_background = true,
-            disable_italics = true,
-            groups = {
-              comment = 'Subtle'
-            }
-          })
-          vim.cmd.colorscheme("rose-pine")
-          vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
-          vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
+          require('onedark').load()
         end,
         cond = { nocode }
       }
