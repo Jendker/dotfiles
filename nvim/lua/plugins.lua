@@ -135,6 +135,9 @@ return require('packer').startup(function(use)
         config = function()
           local lsp = require('lsp-zero')
           lsp.preset('recommended')
+          lsp.set_preferences({
+            suggest_lsp_servers = false
+          })
           lsp.ensure_installed({
             'bashls',
             'clangd',
