@@ -34,11 +34,6 @@ if [[ ! $# -eq 0 ]]; then
   if [[ $1 == "--update-nvim" ]]; then
     echo "Updating nvim..."
     update_nvim
-    if [[ $(lsb_release -cs) == "bionic" ]]; then
-      is_installed "libffi-dev" || sudo apt-get install libffi-dev
-      pyenv global 3.8.15 || pyenv install 3.8.15 && pyenv global 3.8.15
-      grep -qxF "python3_host_prog=vim.env.HOME .. '/...'" $HOME/.config/nvim/lua/plugin_settings.lua || printf "python3_host_prog=vim.env.HOME .. '/...'" >> $HOME/.config/nvim/lua/plugin_settings.lua
-    fi
     exit 0
   elif [[ $1 == "--update-nvim-bin" ]]; then
     echo "Updating nvim binary..."
@@ -86,4 +81,8 @@ eval "$(pyenv init -)"
 
 # Load pyenv-virtualenv automatically
 eval "$(pyenv virtualenv-init -)"' >> $HOME/.zshrc
+fi
+
+if [[ $(lsb_release -cs) == "bionic" ]]; then
+  pyenv global 3.8.15 || pyenv install 3.8.15 && pyenv global 3.8.15
 fi
