@@ -58,7 +58,16 @@ return require('packer').startup(function(use)
     run = ':TSUpdate'
   }
   use 'nvim-treesitter/nvim-treesitter-textobjects'
-  use 'inkarkat/vim-ReplaceWithRegister'
+  use 'AndrewRadev/splitjoin.vim'
+  use({
+    "gbprod/substitute.nvim",
+    config = function()
+      vim.keymap.set("n", "<leader>r", "<cmd>lua require('substitute').operator()<cr>", { noremap = true })
+      vim.keymap.set("n", "<leader>rr", "<cmd>lua require('substitute').line()<cr>", { noremap = true })
+      vim.keymap.set("n", "<leader>R", "<cmd>lua require('substitute').eol()<cr>", { noremap = true })
+      vim.keymap.set("x", "<leader>r", "<cmd>lua require('substitute').visual()<cr>", { noremap = true })
+    end
+  })
   use 'mg979/vim-visual-multi'
   -- without VSCode
       -- auto trail whitespace
@@ -73,6 +82,9 @@ return require('packer').startup(function(use)
       use {
         'navarasu/onedark.nvim',
         config = function()
+          require('onedark').setup{
+            transparent = true
+          }
           require('onedark').load()
         end,
         cond = { nocode }
@@ -136,8 +148,22 @@ return require('packer').startup(function(use)
           local lsp = require('lsp-zero')
           lsp.preset('recommended')
           lsp.set_preferences({
-            suggest_lsp_servers = false
+            suggest_lsp_servers = false,
           })
+
+          local cmp = require('cmp')
+          local cmp_mappings = lsp.defaults.cmp_mappings({
+            ['<C-Space>'] = cmp.mapping.complete(),
+            ['<C-e>'] = cmp.mapping.abort(),
+            ['<Tab>'] = cmp.mapping.confirm(),
+          })
+          -- disable completion with tab
+          cmp_mappings['<S-Tab>'] = nil
+
+          lsp.setup_nvim_cmp({
+            mapping = cmp_mappings
+          })
+
           lsp.ensure_installed({
             'bashls',
             'clangd',
