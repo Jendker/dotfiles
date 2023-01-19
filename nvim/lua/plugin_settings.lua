@@ -60,3 +60,5 @@ require('nvim-treesitter.configs').setup({
 })
 -- Reserve space for diagnostic icons for plugins which need it
 vim.opt.signcolumn = 'yes'
+-- Comment c, cpp, cs, java with //
+vim.api.nvim_command([[autocmd FileType c,cpp,cs,java setlocal commentstring=//\ %s]])
