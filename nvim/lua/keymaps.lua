@@ -25,6 +25,25 @@ if nocode() then
   map('n', 'gf', "<cmd>lua vim.lsp.buf.declaration()<cr>")
 else
   map('n', '?', "<Cmd>call VSCodeNotify('workbench.action.findInFiles', { 'query': expand('<cword>')})<CR>")
+  -- Get folding working with vscode neovim plugin
+  map('n', 'zM', ":call VSCodeNotify('editor.foldAll')<CR>")
+  map('n', 'zR', ":call VSCodeNotify('editor.unfoldAll')<CR>")
+  map('n', 'zc', ":call VSCodeNotify('editor.fold')<CR>")
+  map('n', 'zC', ":call VSCodeNotify('editor.foldRecursively')<CR>")
+  map('n', 'zo', ":call VSCodeNotify('editor.unfold')<CR>")
+  map('n', 'zO', ":call VSCodeNotify('editor.unfoldRecursively')<CR>")
+  map('n', 'za', ":call VSCodeNotify('editor.toggleFold')<CR>")
+  local function moveCursor(direction)
+    if (vim.fn.reg_recording() == '' and vim.fn.reg_executing() == '') then
+      return ('g' .. direction)
+    else
+      return direction
+    end
+  end
+  map('n', 'k', function() return moveCursor('k') end, { expr = true, remap = true })
+  map('n', 'j', function() return moveCursor('j') end, { expr = true, remap = true })
+  -- end folds helpers. Comes from https://github.com/vscode-neovim/vscode-neovim/issues/58#issuecomment-989481648
+  -- and https://github.com/vscode-neovim/vscode-neovim/issues/58#issuecomment-1053940452
 end
 vim.g.mapleader = " "
 map("n", "<leader>s", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]])
