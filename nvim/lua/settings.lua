@@ -20,7 +20,6 @@ vim.opt.wrap = false
 vim.opt.ignorecase = true
 vim.opt.smartcase = true
 vim.opt.textwidth = 0
-
 vim.opt.scrolloff = 4
 
 -- Prefer ripgrep if it exists
@@ -41,3 +40,8 @@ vim.cmd [[au CursorHold,CursorHoldI * set nohls | set tw=100]]
 -- don't continue comment on newline
 vim.cmd("autocmd BufEnter * setlocal formatoptions-=cro")
 vim.g.mapleader = " "
+-- use tree-sitter for folding. If needed to use normal folding, run :set foldmethod=syntax
+vim.opt.fillchars = "fold: "
+vim.opt.foldmethod = "expr"
+vim.opt.foldexpr = "nvim_treesitter#foldexpr()"
+vim.opt.foldlevelstart = 99 -- don't fold by default

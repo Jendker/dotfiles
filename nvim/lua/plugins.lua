@@ -58,6 +58,7 @@ return require('packer').startup(function(use)
     run = ':TSUpdate'
   }
   use 'nvim-treesitter/nvim-treesitter-textobjects'
+  use 'nvim-treesitter/nvim-treesitter-context'
   use 'AndrewRadev/splitjoin.vim'
   use({
     "gbprod/substitute.nvim",
@@ -143,12 +144,15 @@ return require('packer').startup(function(use)
           -- Snippets
           {'L3MON4D3/LuaSnip'},
           {'rafamadriz/friendly-snippets'},
+
+          -- Added by me
+          {'ray-x/lsp_signature.nvim'},
         },
         config = function()
-          local lsp = require('lsp-zero')
-          lsp.preset('recommended')
-          lsp.set_preferences({
+          local lsp = require('lsp-zero').preset({
+            name = 'recommended',
             suggest_lsp_servers = false,
+            set_lsp_keymaps = {preserve_mappings = false}
           })
 
           local cmp = require('cmp')
@@ -156,29 +160,53 @@ return require('packer').startup(function(use)
             ['<C-Space>'] = cmp.mapping.complete(),
             ['<C-e>'] = cmp.mapping.abort(),
             ['<Tab>'] = cmp.mapping.confirm(),
+            ['<S-Tab>'] = nil,
           })
-          -- disable completion with tab
-          cmp_mappings['<S-Tab>'] = nil
-
           lsp.setup_nvim_cmp({
             mapping = cmp_mappings
           })
 
           lsp.ensure_installed({
+            -- list of servers in
+            -- https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md
             'bashls',
             'clangd',
             'pyright',
-            'sumneko_lua'
+            'lua_ls',
+            'yamlls',
           })
+          local lsp_signature_config = {
+            toggle_key = '<C-h>'
+          }
+          lsp.on_attach(function(_, bufnr)
+            require('lsp_signature').on_attach(lsp_signature_config, bufnr)
+          end)
           lsp.nvim_workspace()
           lsp.setup()
+          -- If you want to insert `(` after selected function
+          local ok, cmp_autopairs = pcall(require, 'nvim-autopairs.completion.cmp')
+          if ok then
+            cmp.event:on('confirm_done', cmp_autopairs.on_confirm_done())
+          end
         end,
         cond = { nocode }
       }
       use {
         'lewis6991/gitsigns.nvim',
-        commit = "bb808fc",
-        -- tag = 'release',
+        tag = 'release',
+        cond = { nocode }
+      }
+      use {
+        "folke/which-key.nvim",
+        config = function()
+          vim.o.timeout = true
+          vim.o.timeoutlen = 500
+          require("which-key").setup {
+            -- your configuration comes here
+            -- or leave it empty to use the default settings
+            -- refer to the configuration section below
+          }
+        end,
         cond = { nocode }
       }
 

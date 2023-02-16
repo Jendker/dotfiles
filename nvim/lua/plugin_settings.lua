@@ -6,7 +6,7 @@ vim.g.clever_f_smart_case = 1
 require('leap').set_default_keymaps()
 require('leap').opts.safe_labels = {}
 require('nvim-treesitter.configs').setup({
-  ensure_installed = { "cpp", "python", "bash", "json", "yaml", "markdown", "lua"},
+  ensure_installed = { "cpp", "python", "bash", "json", "yaml", "markdown", "lua", "vim"},
   sync_install = true,
   textobjects = {
     select = {
@@ -58,6 +58,9 @@ require('nvim-treesitter.configs').setup({
     enable = nocode(),
   },
 })
+require'treesitter-context'.setup{
+  enable = nocode()
+}
 -- Reserve space for diagnostic icons for plugins which need it
 vim.opt.signcolumn = 'yes'
 -- Comment c, cpp, cs, java with //
