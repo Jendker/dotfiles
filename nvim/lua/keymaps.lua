@@ -14,17 +14,7 @@ map('n', '<S-CR>', 'O<Esc>')
 -- select last pasted text
 map('n', 'gV', '`[v`]')
 
-if nocode() then
-  -- telescope
-  map('n', '<leader>ff', "<cmd>lua require('telescope.builtin').find_files()<cr>")
-  map('n', '<leader>fg', "<cmd>lua require('telescope.builtin').live_grep()<cr>")
-  map('n', '<leader>fs', "<cmd>lua require('telescope.builtin').git_files()<cr>")
-  -- map('n', '<leader>fg', function() require('telescope.builtin').grep_string({ search = vim.fn.input("Grep > ") }) end)
-  map('n', '<leader>fb', "<cmd>lua require('telescope.builtin').buffers()<cr>")
-  map('n', '<leader>fh', "<cmd>lua require('telescope.builtin').help_tags()<cr>")
-  map('n', 'gf', "<cmd>lua vim.lsp.buf.declaration()<cr>")
-
-else
+if vscode then
   map('n', '?', "<Cmd>call VSCodeNotify('workbench.action.findInFiles', { 'query': expand('<cword>')})<CR>")
   -- Get folding working with vscode neovim plugin
   map('n', 'zM', ":call VSCodeNotify('editor.foldAll')<CR>")
@@ -45,6 +35,15 @@ else
   map('n', 'j', function() return moveCursor('j') end, { expr = true, remap = true })
   -- end folds helpers. Comes from https://github.com/vscode-neovim/vscode-neovim/issues/58#issuecomment-989481648
   -- and https://github.com/vscode-neovim/vscode-neovim/issues/58#issuecomment-1053940452
+else
+  -- telescope
+  map('n', '<leader>ff', "<cmd>lua require('telescope.builtin').find_files()<cr>")
+  map('n', '<leader>fg', "<cmd>lua require('telescope.builtin').live_grep()<cr>")
+  map('n', '<leader>fs', "<cmd>lua require('telescope.builtin').git_files()<cr>")
+  -- map('n', '<leader>fg', function() require('telescope.builtin').grep_string({ search = vim.fn.input("Grep > ") }) end)
+  map('n', '<leader>fb', "<cmd>lua require('telescope.builtin').buffers()<cr>")
+  map('n', '<leader>fh', "<cmd>lua require('telescope.builtin').help_tags()<cr>")
+  map('n', 'gf', "<cmd>lua vim.lsp.buf.declaration()<cr>")
 end
 vim.g.mapleader = " "
 map("n", "<leader>s", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]])

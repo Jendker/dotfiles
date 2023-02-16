@@ -1,4 +1,5 @@
 -- set up vscode-neovim helpers
-nocode = function()
+not_vscode = function()
   return vim.fn.exists('g:vscode') == 0
 end
+vscode = vim.fn.exists('g:vscode') ~= 0

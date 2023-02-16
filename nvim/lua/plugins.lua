@@ -77,9 +77,9 @@ return require('packer').startup(function(use)
           config = function()
               require'spaceless'.setup()
           end,
-          cond = { nocode }
+          cond = not_vscode
       }
-      use {'tpope/vim-fugitive', cond = { nocode }}
+      use {'tpope/vim-fugitive', cond = not_vscode}
       use {
         'navarasu/onedark.nvim',
         config = function()
@@ -88,7 +88,7 @@ return require('packer').startup(function(use)
           }
           require('onedark').load()
         end,
-        cond = { nocode }
+        cond = not_vscode
       }
       use {
         'nvim-lualine/lualine.nvim',
@@ -96,7 +96,7 @@ return require('packer').startup(function(use)
         config = function() require("lualine").setup(
           {sections = {lualine_x = {'filetype'}}, options = {theme = 'wombat', section_separators = '', component_separators = ''}})
         end,
-        cond = { nocode }
+        cond = not_vscode
       }
       use {
         'lukas-reineke/indent-blankline.nvim',
@@ -105,25 +105,25 @@ return require('packer').startup(function(use)
             char = '┊',
           }
         end,
-        cond = { nocode }
+        cond = not_vscode
       }
       use {
         'nvim-telescope/telescope.nvim', tag = '0.1.0',
         requires = { {'nvim-lua/plenary.nvim'} },
-        cond = { nocode }
+        cond = not_vscode
       }
-      use {'farmergreg/vim-lastplace', cond = { nocode }}
+      use {'farmergreg/vim-lastplace', cond = not_vscode}
       use {
         'karb94/neoscroll.nvim',
         config = function()
           require('neoscroll').setup()
         end,
-        cond = { nocode }
+        cond = not_vscode
       }
       use {
         'windwp/nvim-autopairs',
         config = function() require('nvim-autopairs').setup {} end,
-        cond = { nocode }
+        cond = not_vscode
       }
       use {
         'VonHeikemen/lsp-zero.nvim',
@@ -148,6 +148,7 @@ return require('packer').startup(function(use)
           -- Added by me
           {'ray-x/lsp_signature.nvim'},
         },
+        after = 'nvim-autopairs',
         config = function()
           local lsp = require('lsp-zero').preset({
             name = 'recommended',
@@ -189,12 +190,12 @@ return require('packer').startup(function(use)
             cmp.event:on('confirm_done', cmp_autopairs.on_confirm_done())
           end
         end,
-        cond = { nocode }
+        cond = not_vscode
       }
       use {
         'lewis6991/gitsigns.nvim',
         tag = 'release',
-        cond = { nocode }
+        cond = not_vscode
       }
       use {
         "folke/which-key.nvim",
@@ -207,7 +208,7 @@ return require('packer').startup(function(use)
             -- refer to the configuration section below
           }
         end,
-        cond = { nocode }
+        cond = not_vscode
       }
 
   if packer_bootstrap then

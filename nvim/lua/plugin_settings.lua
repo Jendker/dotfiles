@@ -55,11 +55,11 @@ require('nvim-treesitter.configs').setup({
     },
   },
   highlight = {
-    enable = nocode(),
+    enable = not vscode,
   },
 })
 require'treesitter-context'.setup{
-  enable = nocode()
+  enable = not vscode
 }
 -- Reserve space for diagnostic icons for plugins which need it
 vim.opt.signcolumn = 'yes'
