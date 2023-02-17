@@ -18,9 +18,7 @@ function update_nvim() {
   cd /tmp/ && rm -rf dotfiles && git clone https://github.com/Jendker/dotfiles.git
   cp -r dotfiles/nvim $HOME/.config
   run_times=1
-  for i in $(seq $run_times); do
-    nvim --headless -c 'autocmd User PackerComplete quitall' -c 'PackerSync'
-  done
+  nvim --headless "+Lazy! sync" +qa
   # repeat again until successful
   while [ $? -ne 0 ]; do !!; done
 }
