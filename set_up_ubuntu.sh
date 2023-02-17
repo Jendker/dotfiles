@@ -23,9 +23,41 @@ function update_nvim() {
   while [ $? -ne 0 ]; do !!; done
 }
 
+function install_node() {
+  installed=false
+  if ! [ -x "$(command -v nvm)" ]; then
+    echo "Installing nvm."
+    wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
+    set +x
+    export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
+    set -x
+    installed=true
+  fi
+  set +x
+  if [[ $(lsb_release -cs) == "bionic" ]]; then
+    nvm install 16
+  else
+    nvm install --lts
+  fi
+  set -x
+  if [ $installed = true ]; then
+    echo "Please source ~/.zshrc or ~/.bashrc"
+  fi
+}
+
+function install_cargo() {
+  if ! [ -x "$(command -v cargo)" ]; then
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+    grep -qxF 'source "$HOME/.cargo/env"' $HOME/.zshrc || printf "source "$HOME/.cargo/env"" >> $HOME/.zshrc
+    echo "Please source ~/.zshrc or ~/.bashrc"
+  fi
+}
+
 function install_nvim_binary() {
-  wget https://github.com/neovim/neovim/releases/download/v0.8.2/nvim-linux64.deb --directory-prefix=/tmp
+  wget https://github.com/neovim/neovim/releases/download/v0.8.3/nvim-linux64.deb --directory-prefix=/tmp
   sudo apt install /tmp/nvim-linux64.deb -y || install_nvim_source
+  install_node
 }
 
 if [[ ! $# -eq 0 ]]; then
@@ -36,6 +68,14 @@ if [[ ! $# -eq 0 ]]; then
   elif [[ $1 == "--update-nvim-bin" ]]; then
     echo "Updating nvim binary..."
     install_nvim_binary
+    exit 0
+  elif [[ $1 == "--install-node" ]]; then
+    echo "Installing node js over nvm..."
+    install_node
+    exit 0
+  elif [[ $1 == "--install-cargo" ]]; then
+    echo "Installing cargo and rust..."
+    install_cargo
     exit 0
   else
     echo "Option \"$1\" not recognized."
