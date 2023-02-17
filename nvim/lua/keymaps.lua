@@ -1,12 +1,5 @@
 require "common"
 
-local function map(mode, key, action, opts)
-  local options = { noremap = true, silent = true }
-  if opts then
-    options = vim.tbl_extend("force", options, opts)
-  end
-  vim.keymap.set(mode, key, action, options)
-end
 -- new line with enter
 map('n', '<CR>', 'o<Esc>')
 map('n', '<S-CR>', 'O<Esc>')
@@ -44,11 +37,15 @@ else
   map('n', '<leader>fb', "<cmd>lua require('telescope.builtin').buffers()<cr>")
   map('n', '<leader>fh', "<cmd>lua require('telescope.builtin').help_tags()<cr>")
   map('n', 'gf', "<cmd>lua vim.lsp.buf.declaration()<cr>")
+  map('i', '<C-c>', "<Esc>")
 end
 vim.g.mapleader = " "
 map("n", "<leader>s", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]])
 map("n", "<leader>x", "<cmd>!chmod +x %<CR>", { silent = true })
-map("n", "<leader>f", vim.lsp.buf.format)
+map("n", "<leader>bf", vim.lsp.buf.format)
+map({"n", "v"}, "<leader>d", [["_d]])
+map({"n", "v"}, "<leader>D", [["_D]])
+map("n", "<leader>pv", vim.cmd.Ex)
 
 -- don't enter command history
 map("n", "Q", "<nop>")
