@@ -16,6 +16,11 @@ vim.opt.rtp:prepend(lazypath)
 local plugins = {
   {
     'ggandor/leap.nvim',
+    config = function ()
+      local leap = require('leap')
+      leap.set_default_keymaps()
+      leap.opts.safe_labels = {}
+    end,
     dependencies = {{'tpope/vim-repeat'}},
   },
   {
@@ -24,7 +29,12 @@ local plugins = {
       require'leap-spooky'.setup()
     end
   },
-  'rhysd/clever-f.vim',
+  {
+    'rhysd/clever-f.vim',
+    config = function ()
+      vim.g.clever_f_smart_case = 1
+    end
+  },
   -- Waiting for this to be fixed: https://github.com/neovim/neovim/pull/19035
   -- {
   --   'ggandor/flit.nvim',
@@ -34,7 +44,13 @@ local plugins = {
   -- },
   'tpope/vim-sleuth', -- automatically detect tabwidth
   'matze/vim-move',   -- move lines with Alt arrows
-  'tpope/vim-commentary',  -- gcc to comment
+  {
+    'tpope/vim-commentary', -- gcc to comment
+    config = function ()
+      -- Comment c, cpp, cs, java with //
+      vim.api.nvim_command([[autocmd FileType c,cpp,cs,java setlocal commentstring=//\ %s]])
+    end
+  },
   {
     "kylechui/nvim-surround",
     version = "*", -- Use for stability; omit to use `main` branch for the latest features
@@ -147,6 +163,8 @@ local plugins = {
       {
         'lewis6991/gitsigns.nvim',
         tag = 'release',
+        -- Reserve space for diagnostic icons
+        config = function() vim.opt.signcolumn = 'yes' end,
         cond = not_vscode
       },
       {
@@ -166,6 +184,7 @@ local plugins = {
         "mbbill/undotree",
         config = function()
           map("n", "<leader>u", vim.cmd.UndotreeToggle)
+          vim.opt.undofile = true
         end,
         cond = not_vscode
       }

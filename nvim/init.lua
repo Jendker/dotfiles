@@ -4,7 +4,5 @@ require "globals"
 require "settings"
 -- Install plugins
 require "plugins"
--- Plugin settings
-require "plugin_settings"
 -- Key mappings
 require "keymaps"
