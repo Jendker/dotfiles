@@ -1,3 +1,5 @@
+require "common"
+
 local status_ok, lsp = pcall(require, 'lsp-zero')
 if not status_ok then
   return
@@ -41,6 +43,11 @@ local lsp_signature_config = {
 }
 lsp.on_attach(function(_, bufnr)
   require('lsp_signature').on_attach(lsp_signature_config, bufnr)
+  local opts = {buffer = bufnr}
+  map('n', 'gd', "<cmd>Telescope lsp_definitions<cr>", opts)
+  map('n', 'gf', vim.lsp.buf.declaration)
+  map('n', 'gI', "<cmd>Telescope lsp_implementations<cr>", opts)
+  map('n', 'gr', "<cmd>Telescope lsp_references<cr>", opts)
 end)
 lsp.nvim_workspace()
 lsp.setup()

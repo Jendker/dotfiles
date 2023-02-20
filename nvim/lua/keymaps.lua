@@ -1,5 +1,18 @@
 require "common"
 
+vim.g.mapleader = " "
+map("n", "<leader>x", "<cmd>!chmod +x %<CR>", { silent = true })
+map("n", "<leader>bf", vim.lsp.buf.format)
+map({"n", "v"}, "<leader>d", [["_d]])
+map({"n", "v"}, "<leader>D", [["_D]])
+map("n", "<leader>pv", vim.cmd.Ex)
+
+-- don't enter command history
+map("n", "Q", "<nop>")
+map("n", "q:", "<nop>")
+map("n", "q/", "<nop>")
+map("n", "q?", "<nop>")
+
 -- new line with enter
 map('n', '<CR>', 'o<Esc>')
 map('n', '<S-CR>', 'O<Esc>')
@@ -28,27 +41,15 @@ if vscode then
   map('n', 'j', function() return moveCursor('j') end, { expr = true, remap = true })
   -- end folds helpers. Comes from https://github.com/vscode-neovim/vscode-neovim/issues/58#issuecomment-989481648
   -- and https://github.com/vscode-neovim/vscode-neovim/issues/58#issuecomment-1053940452
+  map("n", "<leader>s", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI]])
 else
   -- telescope
   map('n', '<leader>ff', "<cmd>lua require('telescope.builtin').find_files()<cr>")
   map('n', '<leader>fg', "<cmd>lua require('telescope.builtin').live_grep()<cr>")
   map('n', '<leader>fs', "<cmd>lua require('telescope.builtin').git_files()<cr>")
-  -- map('n', '<leader>fg', function() require('telescope.builtin').grep_string({ search = vim.fn.input("Grep > ") }) end)
+  map('n', '<leader>fr', function() require('telescope.builtin').grep_string({ search = vim.fn.input("Grep > ") }) end)
   map('n', '<leader>fb', "<cmd>lua require('telescope.builtin').buffers()<cr>")
   map('n', '<leader>fh', "<cmd>lua require('telescope.builtin').help_tags()<cr>")
-  map('n', 'gf', "<cmd>lua vim.lsp.buf.declaration()<cr>")
   map('i', '<C-c>', "<Esc>")
+  map("n", "<leader>s", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]])
 end
-vim.g.mapleader = " "
-map("n", "<leader>s", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]])
-map("n", "<leader>x", "<cmd>!chmod +x %<CR>", { silent = true })
-map("n", "<leader>bf", vim.lsp.buf.format)
-map({"n", "v"}, "<leader>d", [["_d]])
-map({"n", "v"}, "<leader>D", [["_D]])
-map("n", "<leader>pv", vim.cmd.Ex)
-
--- don't enter command history
-map("n", "Q", "<nop>")
-map("n", "q:", "<nop>")
-map("n", "q/", "<nop>")
-map("n", "q?", "<nop>")
