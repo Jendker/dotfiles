@@ -17,7 +17,14 @@ local cmp_mappings = lsp.defaults.cmp_mappings({
   ['<S-Tab>'] = nil,
 })
 lsp.setup_nvim_cmp({
-  mapping = cmp_mappings
+  mapping = cmp_mappings,
+  formatting = {
+    -- max 100 characters in item abbreviation
+    format = function(_, vim_item)
+      vim_item.abbr = string.sub(vim_item.abbr, 1, 100)
+      return vim_item
+    end
+  },
 })
 
 lsp.ensure_installed({
