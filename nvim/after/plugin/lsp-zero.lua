@@ -74,6 +74,12 @@ lsp.configure('clangd', {
   on_attach = function(_, bufnr)
     vim.keymap.set('n', '<A-u>', vim.cmd.ClangdSwitchSourceHeader, { buffer = bufnr, desc = "Switch between so[u]rce / header" })
   end,
+  cmd = {
+    "clangd",
+    "--background-index",
+    "--suggest-missing-includes",
+    "--compile-commands-dir=build",
+  },
 })
 
 lsp.configure('lua_ls', {

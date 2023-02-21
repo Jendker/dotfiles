@@ -237,9 +237,19 @@ local plugins = {
             },
             notify = {
               enabled = false
+            },
+            views = {
+              mini = {
+                timeout = 3500
+              }
             }
           })
         end,
+        keys = {
+          { "<leader>ol", function() require("noice").cmd("last") end, desc = "N[o]ice [l]ast message" },
+          { "<leader>oh", function() require("noice").cmd("history") end, desc = "N[o]ice [h]istory" },
+          { "<leader>oa", function() require("noice").cmd("all") end, desc = "N[o]ice [a]ll" },
+        },
         cond = not_vscode
       },
       {
