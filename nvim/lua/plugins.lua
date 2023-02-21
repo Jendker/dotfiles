@@ -100,7 +100,21 @@ local plugins = {
         'nvim-lualine/lualine.nvim',
         dependencies = { 'kyazdani42/nvim-web-devicons', lazy = true},
         config = function() require("lualine").setup(
-          {sections = {lualine_x = {'filetype'}}, options = {theme = 'wombat', section_separators = '', component_separators = ''}})
+          {
+            sections = {
+              lualine_x = {
+                {
+                  require("noice").api.status.mode.get,
+                  cond = function()
+                    -- Don't show if status is e.g. -- INSERT -- or -- VISUAL LINE --
+                    return require("noice").api.status.mode.has() and require("noice").api.status.mode.get():find("^-- .+ --$") == nil
+                  end,
+                },
+                {'filetype'},
+              },
+            },
+            options = {theme = 'wombat', section_separators = '', component_separators = ''},
+          })
         end,
         cond = not_vscode
       },
