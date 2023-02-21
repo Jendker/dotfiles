@@ -1,5 +1,3 @@
-require "common"
-
 local status_ok, lsp = pcall(require, 'lsp-zero')
 if not status_ok then
   return
@@ -41,13 +39,38 @@ lsp.ensure_installed({
 local lsp_signature_config = {
   toggle_key = '<C-h>'
 }
+--  This function gets run when an LSP connects to a particular buffer.
 lsp.on_attach(function(_, bufnr)
   require('lsp_signature').on_attach(lsp_signature_config, bufnr)
-  local opts = {buffer = bufnr}
-  map('n', 'gd', "<cmd>Telescope lsp_definitions<cr>", opts)
-  map('n', 'gf', vim.lsp.buf.declaration)
-  map('n', 'gI', "<cmd>Telescope lsp_implementations<cr>", opts)
-  map('n', 'gr', "<cmd>Telescope lsp_references<cr>", opts)
+
+  local nmap = function(keys, func, desc)
+    if desc then
+      desc = 'LSP: ' .. desc
+    end
+    vim.keymap.set('n', keys, func, { buffer = bufnr, desc = desc })
+  end
+
+  nmap('gd', "<cmd>Telescope lsp_definitions<cr>", '[G]oto [D]efinition')
+  nmap('gf', vim.lsp.buf.declaration, '[G]oto Decalaration')
+  nmap('gI', "<cmd>Telescope lsp_implementations<cr>", '[G]oto [I]mplementation')
+  nmap('gr', "<cmd>Telescope lsp_references<cr>", '[G]oto [R]eferences')
+
+    -- See `:help K` for why this keymap
+  nmap('K', vim.lsp.buf.hover, 'Hover Documentation')
+  nmap('<C-k>', vim.lsp.buf.signature_help, 'Signature Documentation')
+
+  -- Lesser used LSP functionality
+  nmap('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
+  nmap('<leader>wa', vim.lsp.buf.add_workspace_folder, '[W]orkspace [A]dd Folder')
+  nmap('<leader>wr', vim.lsp.buf.remove_workspace_folder, '[W]orkspace [R]emove Folder')
+  nmap('<leader>wl', function()
+    print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
+  end, '[W]orkspace [L]ist Folders')
+
+  -- Create a command `:Format` local to the LSP buffer
+  vim.api.nvim_buf_create_user_command(bufnr, 'Format', function(_)
+    vim.lsp.buf.format()
+  end, { desc = 'Format current buffer with LSP' })
 end)
 lsp.nvim_workspace()
 lsp.setup()

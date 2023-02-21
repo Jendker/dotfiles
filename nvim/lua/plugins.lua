@@ -1,5 +1,3 @@
-require "common"
-
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not vim.loop.fs_stat(lazypath) then
   vim.fn.system({
@@ -183,7 +181,7 @@ local plugins = {
       {
         "mbbill/undotree",
         config = function()
-          map("n", "<leader>u", "<cmd>UndotreeToggle<CR><C-w>h<CR>")
+          vim.keymap.set("n", "<leader>u", "<cmd>UndotreeToggle<CR><C-w>h<CR>")
           vim.opt.undofile = true
         end,
         cond = not_vscode
