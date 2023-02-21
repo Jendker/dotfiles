@@ -54,10 +54,7 @@ lsp.on_attach(function(_, bufnr)
   nmap('gf', vim.lsp.buf.declaration, '[G]oto Decalaration')
   nmap('gI', "<cmd>Telescope lsp_implementations<cr>", '[G]oto [I]mplementation')
   nmap('gr', "<cmd>Telescope lsp_references<cr>", '[G]oto [R]eferences')
-
-    -- See `:help K` for why this keymap
-  nmap('K', vim.lsp.buf.hover, 'Hover Documentation')
-  nmap('<C-k>', vim.lsp.buf.signature_help, 'Signature Documentation')
+  nmap('gh', vim.lsp.buf.hover, '[G][H]over documentation')
 
   -- Lesser used LSP functionality
   nmap('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
@@ -72,8 +69,27 @@ lsp.on_attach(function(_, bufnr)
     vim.lsp.buf.format()
   end, { desc = 'Format current buffer with LSP' })
 end)
+
+lsp.configure('clangd', {
+  on_attach = function(_, bufnr)
+    vim.keymap.set('n', '<A-u>', vim.cmd.ClangdSwitchSourceHeader, { buffer = bufnr, desc = "Switch between so[u]rce / header" })
+  end,
+})
+
+lsp.configure('lua_ls', {
+  Lua = {
+    workspace = { checkThirdParty = false },
+    telemetry = { enable = false },
+  },
+})
+
 lsp.nvim_workspace()
 lsp.setup()
+
+-- vim.diagnostic.config({
+--   virtual_text = true,
+-- })
+
 -- If you want to insert `(` after selected function
 local ok, cmp_autopairs = pcall(require, 'nvim-autopairs.completion.cmp')
 if ok then

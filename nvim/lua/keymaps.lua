@@ -10,7 +10,7 @@ end
 
 vim.g.mapleader = " "
 map("n", "<leader>x", "<cmd>!chmod +x %<CR>", { silent = true })
-map("n", "<leader>bf", vim.lsp.buf.format)
+map("n", "<leader>bf", vim.lsp.buf.format, { desc = "Run [b]uffer [f]ormatting" })
 map({"n", "v"}, "<leader>d", [["_d]])
 map({"n", "v"}, "<leader>D", [["_D]])
 map("n", "<leader>pv", vim.cmd.Ex)
@@ -60,6 +60,7 @@ else
   map('n', '<leader>sh', require('telescope.builtin').help_tags, { desc = '[S]earch [h]elp' })
   map('n', '<leader>sd', require('telescope.builtin').diagnostics, { desc = '[S]earch [d]iagnostics' })
   map('n', '<leader>so', require('telescope.builtin').oldfiles, { desc = '[S]earch recently [o]pened files' })
+  map('n', '<leader>?', require('telescope.builtin').grep_string, { desc = '[?] search for word under cursor'})
   map('n', '<leader>/', function()
     -- You can pass additional configuration to telescope to change theme, layout, etc.
     require('telescope.builtin').current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
