@@ -235,13 +235,36 @@ local plugins = {
               enabled = true,
               view_search = "mini",
             },
-            notify = {
-              enabled = false
-            },
             views = {
               mini = {
                 timeout = 3500
               }
+            },
+            commands = {
+              history = {
+                filter = {
+                  any = {
+                    { event = "notify" },
+                    { error = true },
+                    { warning = true },
+                    { event = "msg_show" },
+                    { event = "lsp", kind = "message" },
+                  },
+                },
+              },
+              -- :Noice last
+              last = {
+                filter = {
+                  any = {
+                    { event = "notify" },
+                    { error = true },
+                    { warning = true },
+                    { event = "msg_show" },
+                    { event = "lsp", kind = "message" },
+                  },
+                },
+                filter_opts = { count = 1 },
+              },
             }
           })
         end,
