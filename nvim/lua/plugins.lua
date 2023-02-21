@@ -99,19 +99,27 @@ local plugins = {
       {
         'nvim-lualine/lualine.nvim',
         dependencies = { 'kyazdani42/nvim-web-devicons', lazy = true},
-        config = function() require("lualine").setup(
+        config = function()
+          -- specify lualine_x depending on existance of Noice plugin
+          local lualine_x = {}
+          local is_ok, noice = pcall(require, 'noice')
+          if is_ok then
+            lualine_x = {
+              {
+                noice.api.status.mode.get,
+                cond = function()
+                  -- Don't show if status is e.g. -- INSERT -- or -- VISUAL LINE --
+                  return noice.api.status.mode.has() and noice.api.status.mode.get():find("^-- .+ --$") == nil
+                end,
+              },
+            }
+          end
+          table.insert(lualine_x, {'filetype'})
+          -- lualine_x definition done
+          require("lualine").setup(
           {
             sections = {
-              lualine_x = {
-                {
-                  require("noice").api.status.mode.get,
-                  cond = function()
-                    -- Don't show if status is e.g. -- INSERT -- or -- VISUAL LINE --
-                    return require("noice").api.status.mode.has() and require("noice").api.status.mode.get():find("^-- .+ --$") == nil
-                  end,
-                },
-                {'filetype'},
-              },
+              lualine_x = lualine_x,
             },
             options = {theme = 'wombat', section_separators = '', component_separators = ''},
           })
@@ -231,6 +239,15 @@ local plugins = {
               enabled = false
             }
           })
+        end,
+        cond = not_vscode
+      },
+      {
+        "907th/vim-auto-save",
+        config = function()
+          vim.g.auto_save = 0
+          vim.g.auto_save_silent = 1
+          vim.keymap.set("n", "<leader>n", vim.cmd.AutoSaveToggle, { desc = "[n] Toggle autosave", silent = true})
         end,
         cond = not_vscode
       }
