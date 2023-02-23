@@ -6,7 +6,7 @@ end
 lsp.preset({
   name = 'recommended',
   suggest_lsp_servers = false,
-  set_lsp_keymaps = {preserve_mappings = false}
+  set_lsp_keymaps = {omit = {'gr'}, preserve_mappings = false},
 })
 
 local cmp = require('cmp')
@@ -52,9 +52,15 @@ lsp.on_attach(function(_, bufnr)
 
   nmap('gd', "<cmd>Telescope lsp_definitions<cr>", '[G]oto [D]efinition')
   nmap('gf', vim.lsp.buf.declaration, '[G]oto Decalaration')
-  nmap('gI', "<cmd>Telescope lsp_implementations<cr>", '[G]oto [I]mplementation')
-  nmap('gr', "<cmd>Telescope lsp_references<cr>", '[G]oto [R]eferences')
+  nmap('gi', "<cmd>Telescope lsp_implementations<cr>", '[G]oto [I]mplementation')
+  nmap('gH', "<cmd>Telescope lsp_references<cr>", 'Goto references')
+  nmap('go', "<cmd>Telescope lsp_type_definitions<cr>", 'Goto type lsp_definitions')
   nmap('gh', vim.lsp.buf.hover, '[G][H]over documentation')
+  nmap('<leader>bs', require('telescope.builtin').lsp_document_symbols, '[B]uffer [s]ymbols')
+  nmap('<leader>ws', require('telescope.builtin').lsp_dynamic_workspace_symbols, '[W]orkspace [s]ymbols')
+
+  nmap('<leader>rn', vim.lsp.buf.rename, '[R]e[n]ame')
+  nmap('<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction')
 
   -- Lesser used LSP functionality
   nmap('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')

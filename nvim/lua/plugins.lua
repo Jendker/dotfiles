@@ -68,10 +68,10 @@ local plugins = {
   {
     "gbprod/substitute.nvim",
     config = function()
-      vim.keymap.set("n", "<leader>r", "<cmd>lua require('substitute').operator()<cr>", { noremap = true })
-      vim.keymap.set("n", "<leader>rr", "<cmd>lua require('substitute').line()<cr>", { noremap = true })
-      vim.keymap.set("n", "<leader>R", "<cmd>lua require('substitute').eol()<cr>", { noremap = true })
-      vim.keymap.set("x", "<leader>r", "<cmd>lua require('substitute').visual()<cr>", { noremap = true })
+      vim.keymap.set("n", "gr", "<cmd>lua require('substitute').operator()<cr>", { noremap = true })
+      vim.keymap.set("n", "grr", "<cmd>lua require('substitute').line()<cr>", { noremap = true })
+      vim.keymap.set("n", "gR", "<cmd>lua require('substitute').eol()<cr>", { noremap = true })
+      vim.keymap.set("x", "gr", "<cmd>lua require('substitute').visual()<cr>", { noremap = true })
     end
   },
   'mg979/vim-visual-multi',
@@ -119,6 +119,13 @@ local plugins = {
           require("lualine").setup(
           {
             sections = {
+              lualine_c = {
+                {
+                  'filename',
+                  file_status = true, -- displays file status (readonly status, modified status)
+                  path = 1 -- 0 = just filename, 1 = relative path, 2 = absolute path
+                }
+              },
               lualine_x = lualine_x,
             },
             options = {theme = 'wombat', section_separators = '', component_separators = ''},
@@ -136,8 +143,33 @@ local plugins = {
         cond = not_vscode
       },
       {
+        "MattesGroeger/vim-bookmarks",
+        config = function()
+          vim.g.bookmark_no_default_key_mappings = 1
+          vim.g.bookmark_save_per_working_dir = 1
+          vim.g.bookmark_sign = ""
+          vim.keymap.set('n', '<Leader><Leader>', '<Plug>BookmarkToggle', { desc = "Bookmark toggle" })
+          vim.keymap.set('n', '<Leader>bi', '<Plug>BookmarkAnnotate', { desc = "Bookmark annotate" })
+          vim.keymap.set('n', '<Leader>bj', '<Plug>BookmarkNext', { desc = "Bookmark next" })
+          vim.keymap.set('n', '<Leader>bk', '<Plug>BookmarkPrev', { desc = "Bookmark previous" })
+        end,
+        cond = not_vscode
+      },
+      {
+        "tom-anders/telescope-vim-bookmarks.nvim",
+        cond = not_vscode
+      },
+      {
         'nvim-telescope/telescope.nvim', version = '0.1.1',
-        dependencies = { {'nvim-lua/plenary.nvim'} },
+        dependencies = { 'nvim-lua/plenary.nvim' },
+        config = function()
+          local telescope = require('telescope')
+          telescope.setup()
+          -- vim_booksmarks
+          telescope.load_extension('vim_bookmarks')
+          vim.keymap.set('n', 'ba', telescope.extensions.vim_bookmarks.all, { desc = "Show [b]ookmarks in [a]ll files" })
+          vim.keymap.set('n', 'bc', telescope.extensions.vim_bookmarks.current_file, { desc = "Show [b]ookmarks in [c]urrent file" })
+        end,
         cond = not_vscode
       },
       {'farmergreg/vim-lastplace', cond = not_vscode},
@@ -247,7 +279,8 @@ local plugins = {
                     { event = "notify" },
                     { error = true },
                     { warning = true },
-                    { event = "msg_show" },
+                    { event = "msg_show", kind = "" },
+                    { event = "msg_show", kind = "echo" },
                     { event = "lsp", kind = "message" },
                   },
                 },
@@ -259,7 +292,8 @@ local plugins = {
                     { event = "notify" },
                     { error = true },
                     { warning = true },
-                    { event = "msg_show" },
+                    { event = "msg_show", kind = "" },
+                    { event = "msg_show", kind = "echo" },
                     { event = "lsp", kind = "message" },
                   },
                 },
@@ -283,7 +317,7 @@ local plugins = {
           vim.keymap.set("n", "<leader>n", vim.cmd.AutoSaveToggle, { desc = "[n] Toggle autosave", silent = true})
         end,
         cond = not_vscode
-      }
+      },
 }
 
 require("lazy").setup(plugins)

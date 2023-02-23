@@ -29,7 +29,7 @@ map('n', '<S-CR>', 'O<Esc>')
 map('n', 'gV', '`[v`]')
 
 if vscode then
-  map('n', '?', "<Cmd>call VSCodeNotify('workbench.action.findInFiles', { 'query': expand('<cword>')})<CR>")
+  map('n', '<leader>?', "<Cmd>call VSCodeNotify('workbench.action.findInFiles', { 'query': expand('<cword>')})<CR>")
   -- Get folding working with vscode neovim plugin
   map('n', 'zM', ":call VSCodeNotify('editor.foldAll')<CR>")
   map('n', 'zR', ":call VSCodeNotify('editor.unfoldAll')<CR>")
@@ -50,6 +50,7 @@ if vscode then
   -- end folds helpers. Comes from https://github.com/vscode-neovim/vscode-neovim/issues/58#issuecomment-989481648
   -- and https://github.com/vscode-neovim/vscode-neovim/issues/58#issuecomment-1053940452
   map("n", "<leader>c", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI]], { desc = 'Find and [C]hange word under cursor'})
+  map({'n', 'x'}, 'go', ":call VSCodeNotify('editor.action.goToTypeDefinition')<CR>")
 else
   -- telescope
   map('n', '<leader>sf', require('telescope.builtin').find_files, { desc = '[S]earch [f]iles' })
