@@ -84,7 +84,15 @@ local plugins = {
           end,
           cond = not_vscode
       },
-      {'tpope/vim-fugitive', cond = not_vscode},
+      {
+        'tpope/vim-fugitive',
+        dependencies = {'tpope/vim-rhubarb', 'shumphrey/fugitive-gitlab.vim'},
+        config = function()
+          -- to open Roboception remote url:
+          vim.g.fugitive_gitlab_domains = {'https://gitlab.com', 'https://gitlab.roboception.de'}
+        end,
+        cond = not_vscode
+      },
       {
         'navarasu/onedark.nvim',
         lazy = false, -- make sure we load this during startup, that's main colorscheme
