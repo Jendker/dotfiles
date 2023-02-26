@@ -1,3 +1,7 @@
+if vscode then
+  return
+end
+
 local status_ok, gitsigns = pcall(require, "gitsigns")
 if not status_ok then
   return

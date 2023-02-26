@@ -1,3 +1,7 @@
+if vscode then
+  return
+end
+
 local status_ok, lsp = pcall(require, 'lsp-zero')
 if not status_ok then
   return
