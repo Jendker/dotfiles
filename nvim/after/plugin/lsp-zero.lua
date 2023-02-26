@@ -10,7 +10,7 @@ end
 lsp.preset({
   name = 'recommended',
   suggest_lsp_servers = false,
-  set_lsp_keymaps = {omit = {'gr'}, preserve_mappings = false},
+  set_lsp_keymaps = {omit = {'gr', '<C-k>'}, preserve_mappings = false},
 })
 
 local cmp = require('cmp')

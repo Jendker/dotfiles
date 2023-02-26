@@ -41,7 +41,6 @@ local plugins = {
   --   end
   -- },
   'tpope/vim-sleuth', -- automatically detect tabwidth
-  'matze/vim-move',   -- move lines with Alt arrows
   {
     'tpope/vim-commentary', -- gcc to comment
     config = function ()

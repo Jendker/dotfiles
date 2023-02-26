@@ -1,5 +1,6 @@
 require('nvim-treesitter.configs').setup({
-  ensure_installed = { "cpp", "python", "bash", "json", "yaml", "markdown", "lua", "vim"},
+  ensure_installed = { "cpp", "python", "bash", "html", "json", "yaml",
+    "markdown", "markdown_inline", "lua", "vim", "help"},
   sync_install = true,
   textobjects = {
     select = {
@@ -14,6 +15,7 @@ require('nvim-treesitter.configs').setup({
         ["if"] = "@function.inner",
         ["ac"] = "@class.outer",
         ["ic"] = "@class.inner",
+        ["aw"] = { query = "@scope", query_group = "locals", desc = "Select language scope" },
       },
       include_surrounding_whitespace = true,
     },
@@ -23,18 +25,34 @@ require('nvim-treesitter.configs').setup({
       goto_next_start = {
         [']m'] = '@function.outer',
         [']]'] = '@class.outer',
+        [']o'] = "@loop.*",
+        [']w'] = { query = "@scope", query_group = "locals", desc = "Next scope start" },
+        [']z'] = { query = "@fold", query_group = "folds", desc = "Next fold start" },
+        [']f'] = "@conditional.outer",
       },
       goto_next_end = {
         [']M'] = '@function.outer',
         [']['] = '@class.outer',
+        [']O'] = "@loop.*",
+        [']W'] = { query = "@scope", query_group = "locals", desc = "Next scope end" },
+        [']Z'] = { query = "@fold", query_group = "folds", desc = "Next fold end" },
+        [']F'] = "@conditional.outer",
       },
       goto_previous_start = {
         ['[m'] = '@function.outer',
         ['[['] = '@class.outer',
+        ['[o'] = "@loop.*",
+        ['[w'] = { query = "@scope", query_group = "locals", desc = "Previous scope start" },
+        ['[z'] = { query = "@fold", query_group = "folds", desc = "Previous fold start" },
+        ['[f'] = "@conditional.outer",
       },
       goto_previous_end = {
         ['[M'] = '@function.outer',
         ['[]'] = '@class.outer',
+        ['[O'] = "@loop.*",
+        ['[W'] = { query = "@scope", query_group = "locals", desc = "Previous scope end" },
+        ['[Z'] = { query = "@fold", query_group = "folds", desc = "Previous fold end" },
+        ['[F'] = "@conditional.outer",
       },
     },
     swap = {
@@ -45,6 +63,15 @@ require('nvim-treesitter.configs').setup({
       swap_previous = {
         ["<leader>A"] = "@parameter.inner",
       },
+    },
+  },
+  incremental_selection = {
+    enable = true,
+    keymaps = {
+      init_selection = "<C-space>",
+      node_incremental = "<C-space>",
+      scope_incremental = "<A-w>",
+      node_decremental = "<bs>",
     },
   },
   highlight = {
