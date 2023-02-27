@@ -174,8 +174,8 @@ local plugins = {
           telescope.setup()
           -- vim_booksmarks
           telescope.load_extension('vim_bookmarks')
-          vim.keymap.set('n', 'ba', telescope.extensions.vim_bookmarks.all, { desc = "Show [b]ookmarks in [a]ll files" })
-          vim.keymap.set('n', 'bc', telescope.extensions.vim_bookmarks.current_file, { desc = "Show [b]ookmarks in [c]urrent file" })
+          vim.keymap.set('n', '<leader>ba', telescope.extensions.vim_bookmarks.all, { desc = "Show [b]ookmarks in [a]ll files" })
+          vim.keymap.set('n', '<leader>bc', telescope.extensions.vim_bookmarks.current_file, { desc = "Show [b]ookmarks in [c]urrent file" })
         end,
         cond = not_vscode
       },
