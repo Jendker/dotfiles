@@ -121,12 +121,31 @@ end
 
 lsp.configure('pyright', {
   before_init = function(_, config)
-    config.settings.python.pythonPath = get_python_path(config.root_dir)
+    local python_path = get_python_path(config.root_dir)
+    config.settings.python.pythonPath = python_path
+    -- vim.env.PATH = require('lspconfig/util').path.dirname(python_path) .. ":" .. vim.env.PATH
+    vim.g.python_host_prog = python_path
+    vim.g.python3_host_prog = python_path
   end
 })
 
 lsp.nvim_workspace()
 lsp.setup()
+
+-- null-ls
+
+local null_ls = require('null-ls')
+local null_options = lsp.build_options('null-ls', {})
+
+null_ls.setup({
+  on_attach = null_options.on_attach,
+  sources = {
+    null_ls.builtins.formatting.black,
+    null_ls.builtins.formatting.yapf,
+  }
+})
+
+-- miscellaneous
 
 -- vim.diagnostic.config({
 --   virtual_text = true,

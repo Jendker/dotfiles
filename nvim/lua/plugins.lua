@@ -215,7 +215,8 @@ local plugins = {
 
           -- Added by me
           {'ray-x/lsp_signature.nvim'},
-          {'nvim-autopairs'}
+          {'nvim-autopairs'},
+          {'jose-elias-alvarez/null-ls.nvim'}
         },
         cond = not_vscode
       },
@@ -291,6 +292,7 @@ local plugins = {
                     { event = "lsp", kind = "message" },
                   },
                 },
+                filter_opts = { count = 500 },
               },
               -- :Noice last
               last = {
@@ -313,6 +315,7 @@ local plugins = {
           { "<leader>ol", function() require("noice").cmd("last") end, desc = "N[o]ice [l]ast message" },
           { "<leader>oh", function() require("noice").cmd("history") end, desc = "N[o]ice [h]istory" },
           { "<leader>oa", function() require("noice").cmd("all") end, desc = "N[o]ice [a]ll" },
+          { "<leader>om", "<cmd>:messages<cr>", desc = ":messages" },
         },
         cond = not_vscode
       },
@@ -325,6 +328,7 @@ local plugins = {
         end,
         cond = not_vscode
       },
+      {"petertriho/nvim-scrollbar", cond = not_vscode, config = function() require("scrollbar").setup({hide_if_all_visible = true}) end},
 }
 
 require("lazy").setup(plugins)

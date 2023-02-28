@@ -16,6 +16,8 @@ require('nvim-treesitter.configs').setup({
         ["ac"] = "@class.outer",
         ["ic"] = "@class.inner",
         ["aw"] = { query = "@scope", query_group = "locals", desc = "Select language scope" },
+        ["ai"] = { query = "@conditional.outer" },
+        ["ii"] = { query = "@conditional.inner" },
       },
       include_surrounding_whitespace = true,
     },
@@ -28,7 +30,7 @@ require('nvim-treesitter.configs').setup({
         [']o'] = "@loop.*",
         [']w'] = { query = "@scope", query_group = "locals", desc = "Next scope start" },
         [']z'] = { query = "@fold", query_group = "folds", desc = "Next fold start" },
-        [']f'] = "@conditional.outer",
+        [']i'] = "@conditional.outer",
       },
       goto_next_end = {
         [']M'] = '@function.outer',
@@ -36,7 +38,7 @@ require('nvim-treesitter.configs').setup({
         [']O'] = "@loop.*",
         [']W'] = { query = "@scope", query_group = "locals", desc = "Next scope end" },
         [']Z'] = { query = "@fold", query_group = "folds", desc = "Next fold end" },
-        [']F'] = "@conditional.outer",
+        [']I'] = "@conditional.outer",
       },
       goto_previous_start = {
         ['[m'] = '@function.outer',
@@ -44,7 +46,7 @@ require('nvim-treesitter.configs').setup({
         ['[o'] = "@loop.*",
         ['[w'] = { query = "@scope", query_group = "locals", desc = "Previous scope start" },
         ['[z'] = { query = "@fold", query_group = "folds", desc = "Previous fold start" },
-        ['[f'] = "@conditional.outer",
+        ['[i'] = "@conditional.outer",
       },
       goto_previous_end = {
         ['[M'] = '@function.outer',
@@ -52,7 +54,7 @@ require('nvim-treesitter.configs').setup({
         ['[O'] = "@loop.*",
         ['[W'] = { query = "@scope", query_group = "locals", desc = "Previous scope end" },
         ['[Z'] = { query = "@fold", query_group = "folds", desc = "Previous fold end" },
-        ['[F'] = "@conditional.outer",
+        ['[I'] = "@conditional.outer",
       },
     },
     swap = {
