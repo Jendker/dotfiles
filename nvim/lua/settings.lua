@@ -28,13 +28,6 @@ vim.opt.scrolloff = 4
 --   vim.opt.grepformat = vim.opt.grepformat ^ { "%f:%l:%c:%m" }
 -- end
 
--- Highlight on yank
-vim.cmd([[
-  augroup YankHighlight
-    autocmd!
-    autocmd TextYankPost * silent! lua vim.highlight.on_yank()
-  augroup end
-]])
 -- auto clear
 vim.cmd [[au CursorHold,CursorHoldI * set nohls | set tw=100]]
 -- don't continue comment on newline
@@ -47,3 +40,30 @@ vim.opt.foldexpr = "nvim_treesitter#foldexpr()"
 vim.opt.foldlevelstart = 99 -- don't fold by default
 
 vim.opt.spelllang = 'en_us'
+
+local function augroup(name)
+  return vim.api.nvim_create_augroup("jorbik_" .. name, { clear = true })
+end
+-- Highlight on yank
+vim.api.nvim_create_autocmd("TextYankPost", {
+  group = augroup("highlight_yank"),
+  callback = function()
+    vim.highlight.on_yank()
+  end,
+})
+-- resize splits if window got resized
+vim.api.nvim_create_autocmd({ "VimResized" }, {
+  group = augroup("resize_splits"),
+  callback = function()
+    vim.cmd("tabdo wincmd =")
+  end,
+})
+-- wrap and check for spell in text filetypes
+vim.api.nvim_create_autocmd("FileType", {
+  group = augroup("wrap_spell"),
+  pattern = { "gitcommit", "markdown" },
+  callback = function()
+    vim.opt_local.wrap = true
+    vim.opt_local.spell = true
+  end,
+})

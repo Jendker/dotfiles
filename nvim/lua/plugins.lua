@@ -233,9 +233,7 @@ local plugins = {
           vim.o.timeout = true
           vim.o.timeoutlen = 500
           require("which-key").setup {
-            -- your configuration comes here
-            -- or leave it empty to use the default settings
-            -- refer to the configuration section below
+            plugins = { spelling = true },
           }
         end,
         cond = not_vscode
@@ -287,8 +285,7 @@ local plugins = {
                     { event = "notify" },
                     { error = true },
                     { warning = true },
-                    { event = "msg_show", kind = "" },
-                    { event = "msg_show", kind = "echo" },
+                    { event = "msg_show", kind = {"", "echo" } },
                     { event = "lsp", kind = "message" },
                   },
                 },
@@ -301,8 +298,7 @@ local plugins = {
                     { event = "notify" },
                     { error = true },
                     { warning = true },
-                    { event = "msg_show", kind = "" },
-                    { event = "msg_show", kind = "echo" },
+                    { event = "msg_show", kind = {"", "echo" } },
                     { event = "lsp", kind = "message" },
                   },
                 },
