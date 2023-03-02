@@ -30,16 +30,27 @@ lsp.setup_nvim_cmp({
     end
   },
 })
-
-lsp.ensure_installed({
-  -- list of servers in
+local mason_ensure_installed = {
+  -- accepts only LSP servers. List of servers in
   -- https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md
   'bashls',
   'clangd',
   'pyright',
   'lua_ls',
   'yamlls',
-})
+}
+lsp.ensure_installed(mason_ensure_installed)
+
+-- this will install any mason package, even formatters and linters
+local mason_install_if_system_command_not_available = {'jq'}
+
+local null_ls = require('null-ls')
+local mason_packages_to_source_if_available = {
+  black = null_ls.builtins.formatting.black,
+  yapf = null_ls.builtins.formatting.yapf,
+  jq = null_ls.builtins.formatting.jq,
+}
+
 local lsp_signature_config = {
   toggle_key = '<C-h>'
 }
@@ -134,15 +145,38 @@ lsp.setup()
 
 -- null-ls
 
-local null_ls = require('null-ls')
-local null_options = lsp.build_options('null-ls', {})
+-- this has to be called after lsp.setup()
+-- see https://github.com/VonHeikemen/lsp-zero.nvim/issues/60#issuecomment-1363800412
+local null_ls_options = lsp.build_options('null-ls', {})
+
+local function has_value (tab, val)
+  for _, value in ipairs(tab) do
+    if value == val then return true end
+  end
+  return false
+end
+
+local mason_installed_packages = require('mason-registry').get_installed_package_names()
+
+for _, mason_package in ipairs(mason_install_if_system_command_not_available) do
+  if not has_value(mason_installed_packages, mason_package) then
+    if vim.fn.executable(mason_package) ~= 1 then
+      require('mason.api.command').MasonInstall({mason_package})  -- but how to do it in background?
+    end
+  end
+end
+
+local null_ls_builtin_sources = {}
+
+for mason_package, builtin in pairs(mason_packages_to_source_if_available) do
+  if has_value(mason_installed_packages, mason_package) then
+    table.insert(null_ls_builtin_sources, builtin)
+  end
+end
 
 null_ls.setup({
-  on_attach = null_options.on_attach,
-  sources = {
-    null_ls.builtins.formatting.black,
-    null_ls.builtins.formatting.yapf,
-  }
+  on_attach = null_ls_options.on_attach,
+  sources = null_ls_builtin_sources
 })
 
 -- miscellaneous

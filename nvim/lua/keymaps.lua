@@ -98,6 +98,7 @@ if vscode then
   -- and https://github.com/vscode-neovim/vscode-neovim/issues/58#issuecomment-1053940452
   map("n", "<leader>c", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI]], { desc = 'Find and [C]hange word under cursor'})
   map({'n', 'x'}, 'go', ":call VSCodeNotify('editor.action.goToTypeDefinition')<CR>")
+  map({'n', 'x'}, 'gl', ":call VSCodeNotify('editor.action.showHover')<CR>")
 else
   -- telescope
   map('n', '<leader>sf', require('telescope.builtin').find_files, { desc = '[S]earch [f]iles' })
