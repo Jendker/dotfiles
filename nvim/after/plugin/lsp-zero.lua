@@ -49,6 +49,8 @@ local mason_packages_to_source_if_available = {
   black = null_ls.builtins.formatting.black,
   yapf = null_ls.builtins.formatting.yapf,
   jq = null_ls.builtins.formatting.jq,
+  cspell = {null_ls.builtins.diagnostics.cspell, null_ls.builtins.code_actions.cspell},
+  misspell = null_ls.builtins.diagnostics.misspell,
 }
 
 local lsp_signature_config = {
@@ -177,7 +179,16 @@ local null_ls_builtin_sources = {}
 
 for mason_package, builtin in pairs(mason_packages_to_source_if_available) do
   if has_value(mason_installed_packages, mason_package) then
-    table.insert(null_ls_builtin_sources, builtin)
+    local done = false
+    for _, b in ipairs(builtin) do
+      -- this runs only for arrays
+      table.insert(null_ls_builtin_sources, b)
+      done = true
+    end
+    if not done then
+      -- if the previous didn't run - is not an array - run this
+      table.insert(null_ls_builtin_sources, builtin)
+    end
   end
 end
 
