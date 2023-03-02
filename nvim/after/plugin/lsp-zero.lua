@@ -158,10 +158,17 @@ end
 
 local mason_installed_packages = require('mason-registry').get_installed_package_names()
 
+local Package = require "mason-core.package"
+local registry = require "mason-registry"
+local install_package = function(pkg_specifier)
+  local package_name, version = Package.Parse(pkg_specifier)
+  local pkg = registry.get_package(package_name)
+  return pkg:install{version = version}
+end
 for _, mason_package in ipairs(mason_install_if_system_command_not_available) do
   if not has_value(mason_installed_packages, mason_package) then
     if vim.fn.executable(mason_package) ~= 1 then
-      require('mason.api.command').MasonInstall({mason_package})  -- but how to do it in background?
+      install_package(mason_package)
     end
   end
 end
