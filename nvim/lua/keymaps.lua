@@ -100,26 +100,6 @@ if vscode then
   map({'n', 'x'}, 'go', ":call VSCodeNotify('editor.action.goToTypeDefinition')<CR>")
   map({'n', 'x'}, 'gl', ":call VSCodeNotify('editor.action.showHover')<CR>")
 else
-  -- telescope
-  map('n', '<leader>sf', require('telescope.builtin').find_files, { desc = '[S]earch [f]iles' })
-  map('n', '<leader>sl', require('telescope.builtin').live_grep, { desc = '[S]earch with [l]ive grep' })
-  map('n', '<leader>sg', function() require('telescope.builtin').grep_string({ search = vim.fn.input("Grep > ") }) end, { desc = "[S]earch after [g]rep with string"})
-  map('n', '<leader>si', require('telescope.builtin').git_files, { desc = '[S]earch in g[i]t files'})
-  map('n', '<leader>sb', require('telescope.builtin').buffers, { desc = '[S]earch existing [b]uffers'})
-  map('n', '<leader>sh', require('telescope.builtin').help_tags, { desc = '[S]earch [h]elp' })
-  map('n', '<leader>sd', require('telescope.builtin').diagnostics, { desc = '[S]earch [d]iagnostics' })
-  map('n', '<leader>so', require('telescope.builtin').oldfiles, { desc = '[S]earch recently [o]pened files' })
-  map('n', '<leader>?', require('telescope.builtin').grep_string, { desc = '[?] search for word under cursor'})
-  map('n', '<leader>sr', require('telescope.builtin').resume, { desc = '[S]earch [r]esume'})
-  map('n', '<leader>/', function()
-    -- You can pass additional configuration to telescope to change theme, layout, etc.
-    require('telescope.builtin').current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
-      winblend = 10,
-      previewer = false,
-    })
-  end, { desc = '[/] Fuzzily search in current buffer' })
-
   map('i', '<C-c>', "<Esc>")
   map("n", "<leader>c", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]], { desc = 'Find and [C]hange word under cursor'})
-
 end
