@@ -49,8 +49,22 @@ local mason_packages_to_source_if_available = {
   black = null_ls.builtins.formatting.black,
   yapf = null_ls.builtins.formatting.yapf,
   jq = null_ls.builtins.formatting.jq,
-  cspell = {null_ls.builtins.diagnostics.cspell, null_ls.builtins.code_actions.cspell},
-  misspell = null_ls.builtins.diagnostics.misspell,
+  cspell = {
+    null_ls.builtins.diagnostics.cspell.with({
+      -- Force the severity to be HINT
+      diagnostics_postprocess = function(diagnostic)
+        diagnostic.severity = vim.diagnostic.severity.HINT
+      end,
+    }),
+    null_ls.builtins.code_actions.cspell
+  },
+  misspell = null_ls.builtins.diagnostics.misspell.with({
+    -- Force the severity to be HINT
+    diagnostics_postprocess = function(diagnostic)
+      diagnostic.severity = vim.diagnostic.severity.HINT
+    end,
+  }),
+  shellcheck = null_ls.builtins.diagnostics.shellcheck,
 }
 
 local lsp_signature_config = {
@@ -165,7 +179,9 @@ local registry = require "mason-registry"
 local install_package = function(pkg_specifier)
   local package_name, version = Package.Parse(pkg_specifier)
   local pkg = registry.get_package(package_name)
-  return pkg:install{version = version}
+  if not pkg:is_installed() then
+    pkg:install{version = version}
+  end
 end
 for _, mason_package in ipairs(mason_install_if_system_command_not_available) do
   if not has_value(mason_installed_packages, mason_package) then
@@ -199,9 +215,11 @@ null_ls.setup({
 
 -- miscellaneous
 
--- vim.diagnostic.config({
---   virtual_text = true,
--- })
+vim.diagnostic.config({
+  -- virtual_text = true,
+  -- update_in_insert = false,
+  severity_sort = true,
+})
 
 -- If you want to insert `(` after selected function
 local ok, cmp_autopairs = pcall(require, 'nvim-autopairs.completion.cmp')
