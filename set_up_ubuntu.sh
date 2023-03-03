@@ -83,7 +83,8 @@ if [[ ! $# -eq 0 ]]; then
   fi
 fi
 
-sudo apt install tmux zsh xclip -y
+sudo apt install tmux zsh xclip unzip -y
+sudo apt install ripgrep -y || true
 if [ -d ~/.oh-my-zsh ]; then
 	echo "oh-my-zsh is installed"
  else

@@ -40,7 +40,8 @@ local plugins = {
   --     require'flit'.setup()
   --   end
   -- },
-  'tpope/vim-sleuth', -- automatically detect tabwidth
+  -- Don't use for now - seems that it messes up with tabwidth when switching tmux sessions
+  -- 'tpope/vim-sleuth', -- automatically detect tabwidth
   {
     'tpope/vim-commentary', -- gcc to comment
     config = function ()
