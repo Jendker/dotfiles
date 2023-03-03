@@ -19,7 +19,6 @@ vim.opt.smartindent = true
 vim.opt.wrap = false
 vim.opt.ignorecase = true
 vim.opt.smartcase = true
-vim.opt.textwidth = 0
 vim.opt.scrolloff = 4
 
 -- Prefer ripgrep if it exists
@@ -28,10 +27,9 @@ vim.opt.scrolloff = 4
 --   vim.opt.grepformat = vim.opt.grepformat ^ { "%f:%l:%c:%m" }
 -- end
 
--- auto clear
-vim.cmd [[au CursorHold,CursorHoldI * set nohls | set tw=100]]
 -- don't continue comment on newline
 vim.cmd("autocmd BufEnter * setlocal formatoptions-=cro")
+
 vim.g.mapleader = " "
 -- use tree-sitter for folding. If needed to use normal folding, run :set foldmethod=syntax
 vim.opt.fillchars = "fold: "

@@ -1,5 +1,3 @@
--- Global functions
-require "globals"
 -- Sensible defaults
 require "settings"
 -- Install plugins

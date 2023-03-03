@@ -19,7 +19,7 @@ local plugins = {
       leap.set_default_keymaps()
       leap.opts.safe_labels = {}
     end,
-    dependencies = {{'tpope/vim-repeat'}},
+    dependencies = {'tpope/vim-repeat'},
   },
   {
     'ggandor/leap-spooky.nvim',
@@ -40,8 +40,6 @@ local plugins = {
   --     require'flit'.setup()
   --   end
   -- },
-  -- Don't use for now - seems that it messes up with tabwidth when switching tmux sessions
-  -- 'tpope/vim-sleuth', -- automatically detect tabwidth
   {
     'tpope/vim-commentary', -- gcc to comment
     config = function ()
@@ -329,6 +327,8 @@ local plugins = {
         cond = not_vscode
       },
       {"petertriho/nvim-scrollbar", cond = not_vscode, config = function() require("scrollbar").setup({hide_if_all_visible = true}) end},
+      {"haya14busa/is.vim", cond = not_vscode}, -- auto hide highlight after search
+      {"tpope/vim-sleuth", cond = not_vscode}, -- automatically detect tabwidth
 }
 
 require("lazy").setup(plugins)
