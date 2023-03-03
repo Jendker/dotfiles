@@ -260,7 +260,10 @@ local plugins = {
                 ["vim.lsp.util.stylize_markdown"] = true,
               },
               signature = {
-                enabled = false
+                enabled = false,
+              },
+              progress = {
+                enabled = false,
               }
             },
             -- you can enable a preset for easier configuration
