@@ -170,7 +170,38 @@ local plugins = {
         dependencies = { 'nvim-lua/plenary.nvim' },
         config = function()
           local telescope = require('telescope')
-          telescope.setup()
+          local actions = require('telescope.actions')
+          telescope.setup({
+            defaults = {
+              path_display={"smart"},
+            },
+            pickers = {
+              live_grep = {
+                mappings = {
+                  i = {
+                    ["<C-Down>"] = function(...)
+                      return actions.cycle_history_next(...)
+                    end,
+                    ["<C-Up>"] = function(...)
+                      return actions.cycle_history_prev(...)
+                    end,
+                    ["<C-f>"] = function(...)
+                      return actions.preview_scrolling_down(...)
+                    end,
+                    ["<C-b>"] = function(...)
+                      return actions.preview_scrolling_up(...)
+                    end,
+                    ["<c-r>"] = actions.to_fuzzy_refine,
+                  },
+                  n = {
+                    ["q"] = function(...)
+                      return actions.close(...)
+                    end,
+                  },
+                },
+              },
+            },
+          })
           -- vim_booksmarks
           telescope.load_extension('vim_bookmarks')
           vim.keymap.set('n', '<leader>ba', telescope.extensions.vim_bookmarks.all, { desc = "Show [b]ookmarks in [a]ll files" })
@@ -210,7 +241,7 @@ local plugins = {
         cond = not_vscode
       },
       {
-        'VonHeikemen/lsp-zero.nvim',
+        'VonHeikemen/lsp-zero.nvim', branch = 'v1.x',
         dependencies = {
           -- LSP Support
           {'neovim/nvim-lspconfig'},
