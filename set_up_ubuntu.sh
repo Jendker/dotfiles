@@ -96,6 +96,7 @@ export EDITOR=nvim
 alias venv="if [ -e ./venv/bin/activate ]; then source ./venv/bin/activate; else python3 -m venv venv && source ./venv/bin/activate; fi"
 unsetopt BEEP
 EOT
+sed -i 's/plugins=(git)/plugins=(git ubuntu)/g' $HOME/.zshrc
 sed -i '/mode auto/s/^# //g' $HOME/.zshrc
 fi
 
