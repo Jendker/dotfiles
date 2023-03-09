@@ -57,22 +57,16 @@ map("v", ">", ">gv")
 -- toggle settings
 map("n", "<leader>ts", function() toggle("spell") end, { desc = "Toggle Spelling" })
 map("n", "<leader>tw", function() toggle("wrap") end, { desc = "Toggle Word Wrap" })
+if vim.fn.has("nvim-0.9.0") == 1 then
+  map("n", "<leader>ti", vim.show_pos, { desc = "Inspect Pos" }) -- highlights under cursor
+end
 
 -- quit
 map("n", "<leader>qq", "<cmd>qa<cr>", { desc = "Quit all" })
 
--- highlights under cursor
-if vim.fn.has("nvim-0.9.0") == 1 then
-  map("n", "<leader>ti", vim.show_pos, { desc = "Inspect Pos" })
-end
-
--- Move Lines
-map("n", "<C-j>", "<cmd>m .+1<cr>==", { desc = "Move down" })
-map("n", "<C-k>", "<cmd>m .-2<cr>==", { desc = "Move up" })
-map("i", "<C-j>", "<esc><cmd>m .+1<cr>==gi", { desc = "Move down" })
-map("i", "<C-k>", "<esc><cmd>m .-2<cr>==gi", { desc = "Move up" })
-map("v", "<C-j>", ":m '>+1<cr>gv=gv", { silent = true, desc = "Move down" })
-map("v", "<C-k>", ":m '<-2<cr>gv=gv", { silent = true, desc = "Move up" })
+-- search for selected text
+map('v', '/', "\"fy/<C-R>f<CR>")
+map('v', '?', "\"fy?<C-R>f<CR>")
 
 if vscode then
   map('n', '<leader>?', "<Cmd>call VSCodeNotify('workbench.action.findInFiles', { 'query': expand('<cword>')})<CR>")
@@ -96,10 +90,23 @@ if vscode then
   -- map('n', 'j', function() return moveCursor('j') end, { expr = true, remap = true })
   -- end folds helpers. Comes from https://github.com/vscode-neovim/vscode-neovim/issues/58#issuecomment-989481648
   -- and https://github.com/vscode-neovim/vscode-neovim/issues/58#issuecomment-1053940452
-  map("n", "<leader>c", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI]], { desc = 'Find and [C]hange word under cursor'})
+  map('n', "<leader>r", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI]], { desc = 'Find and [C]hange word under cursor'})
+  map('n', "<leader>c", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gcI]], { desc = 'Find and [C]hange word under cursor with confirmation'})
+  map('v', "<leader>r", [["fy:%s/<C-r>f/<C-r>f/gI]], { desc = 'Find and [C]hange selected'})
+  map('v', "<leader>c", [["fy:%s/<C-r>f/<C-r>f/gcI]], { desc = 'Find and [C]hange selected with confirmation'})
   map({'n', 'x'}, 'go', ":call VSCodeNotify('editor.action.goToTypeDefinition')<CR>")
   map({'n', 'x'}, 'gl', ":call VSCodeNotify('editor.action.showHover')<CR>")
 else
   map('i', '<C-c>', "<Esc>")
-  map("n", "<leader>c", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]], { desc = 'Find and [C]hange word under cursor'})
+  map("n", "<leader>r", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]], { desc = 'Find and [C]hange word under cursor'})
+  map("n", "<leader>c", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gcI<Left><Left><Left>]], { desc = 'Find and [C]hange word under cursor with confirmation'})
+  map('v', "<leader>r", [["fy:%s/<C-r>f/<C-r>f/gI<Left><Left><Left>]], { desc = 'Find and [C]hange selected'})
+  map('v', "<leader>c", [["fy:%s/<C-r>f/<C-r>f/gcI<Left><Left><Left>]], { desc = 'Find and [C]hange selected with confirmation'})
+  -- Move Lines - this messes up VSCode pasting for some reason. Leave it here or find some plugin to do the same better
+  map("n", "<C-j>", "<cmd>m .+1<cr>==", { desc = "Move down" })
+  map("n", "<C-k>", "<cmd>m .-2<cr>==", { desc = "Move up" })
+  map("i", "<C-j>", "<esc><cmd>m .+1<cr>==gi", { desc = "Move down" })
+  map("i", "<C-k>", "<esc><cmd>m .-2<cr>==gi", { desc = "Move up" })
+  map("v", "<C-j>", ":m '>+1<cr>gv=gv", { silent = true, desc = "Move down" })
+  map("v", "<C-k>", ":m '<-2<cr>gv=gv", { silent = true, desc = "Move up" })
 end

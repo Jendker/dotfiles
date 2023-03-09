@@ -73,6 +73,7 @@ local plugins = {
     end
   },
   'mg979/vim-visual-multi',
+  "haya14busa/is.vim", -- auto hide highlight after search
   -- without VSCode
       -- auto trail whitespace
       {
@@ -375,7 +376,6 @@ local plugins = {
         cond = not_vscode
       },
       {"petertriho/nvim-scrollbar", cond = not_vscode, config = function() require("scrollbar").setup({hide_if_all_visible = true}) end},
-      {"haya14busa/is.vim", cond = not_vscode}, -- auto hide highlight after search
       {"tpope/vim-sleuth", cond = not_vscode}, -- automatically detect tabwidth
 }
 
