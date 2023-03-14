@@ -102,6 +102,9 @@ sed -i 's/plugins=(git)/plugins=(git ubuntu)/g' $HOME/.zshrc
 sed -i '/mode auto/s/^# //g' $HOME/.zshrc
 fi
 
+sudo locale-gen en_US
+sudo locale-gen en_US.UTF-8
+
 # .tmux.conf
 grep -qxF 'set-option -g default-shell /bin/zsh' $HOME/.tmux.conf || printf "set-option -g history-limit 125000\nset-option -g default-shell /bin/zsh" >> $HOME/.tmux.conf
 
