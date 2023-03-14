@@ -227,6 +227,15 @@ local plugins = {
         end,
         cond = not_vscode
       },
+      {
+        "nvim-telescope/telescope-frecency.nvim",
+        dependencies = {"kkharji/sqlite.lua", "nvim-telescope/telescope.nvim"},
+        config = function()
+          require"telescope".load_extension("frecency")
+          vim.api.nvim_set_keymap("n", "<leader>sp", "<Cmd>lua require('telescope').extensions.frecency.frecency({ workspace = 'CWD' })<CR>", {noremap = true, silent = true})
+        end,
+        cond = not_vscode
+      },
       {'farmergreg/vim-lastplace', cond = not_vscode},
       {
         'karb94/neoscroll.nvim',

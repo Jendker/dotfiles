@@ -114,8 +114,8 @@ lsp.configure('clangd', {
   cmd = {
     "clangd",
     "--background-index",
-    "--suggest-missing-includes",
     "--compile-commands-dir=build",
+    "--header-insertion=never"
   },
 })
 
