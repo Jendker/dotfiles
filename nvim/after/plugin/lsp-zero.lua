@@ -71,7 +71,7 @@ local lsp_signature_config = {
   toggle_key = '<C-h>'
 }
 --  This function gets run when an LSP connects to a particular buffer.
-lsp.on_attach(function(_, bufnr)
+lsp.on_attach(function(client, bufnr)
   require('lsp_signature').on_attach(lsp_signature_config, bufnr)
 
   local nmap = function(keys, func, desc)
@@ -105,15 +105,17 @@ lsp.on_attach(function(_, bufnr)
   vim.api.nvim_buf_create_user_command(bufnr, 'Format', function(_)
     vim.lsp.buf.format()
   end, { desc = 'Format current buffer with LSP' })
-  vim.keymap.set('v', '=', '<cmd>lua vim.lsp.buf.format()<cr><esc>')
-  vim.keymap.set('n', '==', function()
-    vim.lsp.buf.format({
-      range = {
-            ["start"] = vim.api.nvim_win_get_cursor(0),
-            ["end"] = vim.api.nvim_win_get_cursor(0),
-      }
-    })
-  end)
+  if client.server_capabilities.documentRangeFormattingProvider then
+    vim.keymap.set('v', '=', '<cmd>lua vim.lsp.buf.format()<cr><esc>')
+    vim.keymap.set('n', '==', function()
+      vim.lsp.buf.format({
+        range = {
+          ["start"] = vim.api.nvim_win_get_cursor(0),
+          ["end"] = vim.api.nvim_win_get_cursor(0),
+        }
+      })
+    end)
+  end
 end)
 
 lsp.configure('clangd', {
