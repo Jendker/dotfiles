@@ -83,7 +83,7 @@ if [[ ! $# -eq 0 ]]; then
   fi
 fi
 
-sudo apt install tmux zsh xclip unzip -y
+sudo apt install tmux zsh xclip unzip python3-venv -y
 sudo apt install ripgrep -y || true
 if [ -d ~/.oh-my-zsh ]; then
 	echo "oh-my-zsh is installed"
@@ -131,3 +131,5 @@ fi
 if [[ $(lsb_release -cs) == "bionic" ]]; then
   pyenv global 3.8.15 || pyenv install 3.8.15 && pyenv global 3.8.15
 fi
+git config --global user.name "Jedrzej Orbik"
+git config --global user.email jedrzej.orbik@roboception.de

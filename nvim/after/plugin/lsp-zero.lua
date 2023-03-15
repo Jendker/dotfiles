@@ -105,6 +105,15 @@ lsp.on_attach(function(_, bufnr)
   vim.api.nvim_buf_create_user_command(bufnr, 'Format', function(_)
     vim.lsp.buf.format()
   end, { desc = 'Format current buffer with LSP' })
+  vim.keymap.set('v', '=', '<cmd>lua vim.lsp.buf.format()<cr><esc>')
+  vim.keymap.set('n', '==', function()
+    vim.lsp.buf.format({
+      range = {
+            ["start"] = vim.api.nvim_win_get_cursor(0),
+            ["end"] = vim.api.nvim_win_get_cursor(0),
+      }
+    })
+  end)
 end)
 
 lsp.configure('clangd', {
@@ -114,7 +123,6 @@ lsp.configure('clangd', {
   cmd = {
     "clangd",
     "--background-index",
-    "--compile-commands-dir=build",
     "--header-insertion=never"
   },
 })

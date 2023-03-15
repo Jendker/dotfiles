@@ -62,7 +62,19 @@ local plugins = {
   },
   'nvim-treesitter/nvim-treesitter-textobjects',
   'nvim-treesitter/nvim-treesitter-context',
-  'AndrewRadev/splitjoin.vim',
+  {
+    'Wansmer/treesj',
+    dependencies = { 'nvim-treesitter/nvim-treesitter' },
+    config = function()
+      local treesj = require('treesj')
+      treesj.setup({
+        use_default_keymaps = false,
+        max_join_length = 100,
+      })
+      vim.keymap.set('n', 'gJ', treesj.join, {desc = "[J]oin lines"})
+      vim.keymap.set('n', 'gS', treesj.split, {desc = "[S]plit lines"})
+    end,
+  },
   {
     "gbprod/substitute.nvim",
     config = function()
