@@ -83,20 +83,23 @@ if [[ ! $# -eq 0 ]]; then
   fi
 fi
 
-sudo apt install tmux zsh xclip unzip python3-venv -y
+sudo apt install tmux zsh xclip unzip python3-venv fd-find -y
 sudo apt install ripgrep -y || true
 if [ -d ~/.oh-my-zsh ]; then
 	echo "oh-my-zsh is installed"
  else
  	echo "installing oh-my-zsh"
-  sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" || true
-  sudo tee -a $HOME/.zshrc > /dev/null <<EOT
+  sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+  chsh -s $(which zsh) || true
+  sudo tee -a $HOME/.zshrc > /dev/null <<'EOT'
 alias vim=nvim
 export EDITOR=nvim
 alias venv="if [ -e ./venv/bin/activate ]; then source ./venv/bin/activate; else python3 -m venv venv && source ./venv/bin/activate; fi"
 unsetopt BEEP
 PROMPT="%(?:%{$fg_bold[green]%}➜ :%{$fg_bold[red]%}➜ )"
 PROMPT+=' %{$fg[cyan]%}%~%{$reset_color%} $(git_prompt_info)'
+export LANG=en_US.UTF-8
+export LC_ALL=en_US.UTF-8
 EOT
 sed -i 's/plugins=(git)/plugins=(git ubuntu)/g' $HOME/.zshrc
 sed -i '/mode auto/s/^# //g' $HOME/.zshrc
