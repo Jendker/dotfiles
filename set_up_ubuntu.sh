@@ -136,3 +136,4 @@ if [[ $(lsb_release -cs) == "bionic" ]]; then
 fi
 git config --global user.name "Jedrzej Orbik"
 git config --global user.email jedrzej.orbik@roboception.de
+# git config --global user.email Jendker@users.noreply.github.com
