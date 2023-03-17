@@ -77,6 +77,7 @@ local plugins = {
   },
   {
     "gbprod/substitute.nvim",
+    version = "*",
     config = function()
       vim.keymap.set("n", "gr", "<cmd>lua require('substitute').operator()<cr>", { noremap = true })
       vim.keymap.set("n", "grr", "<cmd>lua require('substitute').line()<cr>", { noremap = true })
@@ -263,7 +264,7 @@ local plugins = {
         cond = not_vscode
       },
       {
-        'VonHeikemen/lsp-zero.nvim', branch = 'v1.x',
+        'VonHeikemen/lsp-zero.nvim', branch = 'v2.x',
         dependencies = {
           -- LSP Support
           {'neovim/nvim-lspconfig'},
