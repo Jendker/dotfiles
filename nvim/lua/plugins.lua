@@ -264,7 +264,7 @@ local plugins = {
         cond = not_vscode
       },
       {
-        'VonHeikemen/lsp-zero.nvim', branch = 'v2.x',
+        'VonHeikemen/lsp-zero.nvim', branch = 'v1.x',
         dependencies = {
           -- LSP Support
           {'neovim/nvim-lspconfig'},
