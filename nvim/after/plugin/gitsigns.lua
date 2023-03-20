@@ -32,17 +32,17 @@ gitsigns.setup {
     end, {expr=true, desc="Jump to previous hunk"})
 
     -- Actions
-    map({'n', 'v'}, '<leader>hs', ':Gitsigns stage_hunk<CR>', { desc = "[s]tage hunk" })
-    map({'n', 'v'}, '<leader>hr', ':Gitsigns reset_hunk<CR>', { desc = "[r]eset hunk" })
-    map('n', '<leader>hS', gs.stage_buffer, { desc = "[S]tage buffer" })
-    map('n', '<leader>hu', gs.undo_stage_hunk, { desc = "[u]ndo stage hunk" })
-    map('n', '<leader>hR', gs.reset_buffer, { desc = "[r]eset buffer" })
-    map('n', '<leader>hp', gs.preview_hunk, { desc = "[p]review hunk" })
-    map('n', '<leader>hb', function() gs.blame_line{full=true} end, { desc = "show full line [b]lame" })
-    map('n', '<leader>tb', gs.toggle_current_line_blame, { desc = "[t]oggle current line [b]lame" })
-    map('n', '<leader>hd', gs.diffthis, { desc = "[d]iff this" })
-    map('n', '<leader>hD', function() gs.diffthis('~') end)
-    map('n', '<leader>td', gs.toggle_deleted, { desc = "[t]oggle [d]eleted" })
+    map({'n', 'v'}, '<leader>hs', ':Gitsigns stage_hunk<CR>', { desc = "[s]tage hunk", silent = true })
+    map({'n', 'v'}, '<leader>hr', ':Gitsigns reset_hunk<CR>', { desc = "[r]eset hunk", silent = true })
+    map('n', '<leader>hS', gs.stage_buffer, { desc = "[S]tage buffer", silent = true })
+    map('n', '<leader>hu', gs.undo_stage_hunk, { desc = "[u]ndo stage hunk", silent = true })
+    map('n', '<leader>hR', gs.reset_buffer, { desc = "[r]eset buffer", silent = true })
+    map('n', '<leader>hp', gs.preview_hunk, { desc = "[p]review hunk", silent = true })
+    map('n', '<leader>hb', function() gs.blame_line{full=true} end, { desc = "show full line [b]lame", silent = true })
+    map('n', '<leader>tb', gs.toggle_current_line_blame, { desc = "[t]oggle current line [b]lame", silent = true })
+    map('n', '<leader>hd', gs.diffthis, { desc = "[d]iff this", silent = true })
+    map('n', '<leader>hD', function() gs.diffthis('~') end, { desc = "Diff to previous commit", silent = true })
+    map('n', '<leader>td', gs.toggle_deleted, { desc = "[t]oggle [d]eleted", silent = true })
 
     -- Text object
     map({'o', 'x'}, 'ih', ':<C-U>Gitsigns select_hunk<CR>', { desc = "select hunk"} )
