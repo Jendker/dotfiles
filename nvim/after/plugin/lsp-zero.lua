@@ -8,28 +8,10 @@ if not status_ok then
 end
 
 lsp.preset({
-  name = 'recommended',
-  suggest_lsp_servers = false,
-  set_lsp_keymaps = {omit = {'gr', '<C-k>'}, preserve_mappings = false},
+  name = 'minimal',
+  manage_nvim_cmp = {set_basic_mappings = true, set_extra_mappings = true},
 })
 
-local cmp = require('cmp')
-local cmp_mappings = lsp.defaults.cmp_mappings({
-  ['<C-Space>'] = cmp.mapping.complete(),
-  ['<C-e>'] = cmp.mapping.abort(),
-  ['<Tab>'] = cmp.mapping.confirm(),
-  ['<S-Tab>'] = nil,
-})
-lsp.setup_nvim_cmp({
-  mapping = cmp_mappings,
-  formatting = {
-    -- max 100 characters in item abbreviation
-    format = function(_, vim_item)
-      vim_item.abbr = string.sub(vim_item.abbr, 1, 100)
-      return vim_item
-    end
-  },
-})
 local mason_ensure_installed = {
   -- accepts only LSP servers. List of servers in
   -- https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md
@@ -72,6 +54,11 @@ local lsp_signature_config = {
 }
 --  This function gets run when an LSP connects to a particular buffer.
 lsp.on_attach(function(client, bufnr)
+  lsp.default_keymaps({
+    buffer = bufnr,
+    omit = {'gr', '<C-k>'},
+    preserve_mappings = false,
+  })
   require('lsp_signature').on_attach(lsp_signature_config, bufnr)
 
   local nmap = function(keys, func, desc)
@@ -118,7 +105,14 @@ lsp.on_attach(function(client, bufnr)
   end
 end)
 
-lsp.configure('clangd', {
+lsp.set_sign_icons({
+  error = '✘',
+  warn = '▲',
+  hint = '⚑',
+  info = '»'
+})
+
+require('lspconfig').clangd.setup({
   on_attach = function(_, bufnr)
     vim.keymap.set('n', '<A-u>', vim.cmd.ClangdSwitchSourceHeader, { buffer = bufnr, desc = "Switch between so[u]rce / header" })
   end,
@@ -126,13 +120,6 @@ lsp.configure('clangd', {
     "clangd",
     "--background-index",
     "--header-insertion=never"
-  },
-})
-
-lsp.configure('lua_ls', {
-  Lua = {
-    workspace = { checkThirdParty = false },
-    telemetry = { enable = false },
   },
 })
 
@@ -156,7 +143,7 @@ local function get_python_path(workspace)
   return vim.fn.exepath('python3') or vim.fn.exepath('python') or 'python'
 end
 
-lsp.configure('pyright', {
+require('lspconfig').pyright.setup({
   before_init = function(_, config)
     local python_path = get_python_path(config.root_dir)
     config.settings.python.pythonPath = python_path
@@ -166,7 +153,12 @@ lsp.configure('pyright', {
   end
 })
 
-lsp.nvim_workspace()
+require('lspconfig').lua_ls.setup(lsp.nvim_lua_ls({
+  Lua = {
+    workspace = { checkThirdParty = false },
+    telemetry = { enable = false },
+  },
+}))
 lsp.setup()
 
 -- null-ls
@@ -203,8 +195,8 @@ end
 
 local null_ls_builtin_sources = {}
 
-for mason_package, builtin in pairs(mason_packages_to_source_if_available) do
-  if has_value(mason_installed_packages, mason_package) then
+for package, builtin in pairs(mason_packages_to_source_if_available) do
+  if has_value(mason_installed_packages, package) or has_value(mason_install_if_system_command_not_available, package) then
     local done = false
     for _, b in ipairs(builtin) do
       -- this runs only for arrays
@@ -226,10 +218,55 @@ null_ls.setup({
 -- miscellaneous
 
 vim.diagnostic.config({
-  -- virtual_text = true,
-  -- update_in_insert = false,
+  virtual_text = false,
   severity_sort = true,
+  update_in_insert = false,
+  underline = true,
+  float = {
+    focusable = false,
+    style = 'minimal',
+    border = 'rounded',
+    source = 'always',
+    header = '',
+    prefix = '',
+  },
 })
+
+local cmp = require('cmp')
+local cmp_action = require('lsp-zero').cmp_action()
+require('luasnip.loaders.from_vscode').lazy_load() -- for snippets
+local cmp_mappings = {
+  ['<C-Space>'] = cmp.mapping.complete(),
+  ['<CR>'] = cmp.mapping.confirm(),
+  ['<Tab>'] = cmp.mapping.confirm(),
+  ['<S-Tab>'] = nil,
+  ['<C-d>'] = cmp.mapping.scroll_docs(4),
+  ['<C-u>'] = cmp.mapping.scroll_docs(-4),
+  -- jump between placeholders
+  ['<C-f>'] = cmp_action.luasnip_jump_forward(),
+  ['<C-b>'] = cmp_action.luasnip_jump_backward(),
+}
+cmp.setup({
+  mapping = cmp_mappings,
+  formatting = {
+    -- max 100 characters in item abbreviation
+    format = function(_, vim_item)
+      vim_item.abbr = string.sub(vim_item.abbr, 1, 100)
+      return vim_item
+    end
+  },
+  preselect = cmp.PreselectMode.Item,
+  completion = {
+    completeopt = 'menu,menuone,noinsert'
+  },
+  sources = {
+    {name = 'path'},
+    {name = 'nvim_lsp'},
+    {name = 'buffer', keyword_length = 3},
+    {name = 'luasnip', keyword_length = 2},
+  },
+})
+
 
 -- If you want to insert `(` after selected function
 local ok, cmp_autopairs = pcall(require, 'nvim-autopairs.completion.cmp')

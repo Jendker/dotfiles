@@ -295,11 +295,14 @@ local plugins = {
         cond = not_vscode
       },
       {
-        'VonHeikemen/lsp-zero.nvim', branch = 'v1.x',
+        'VonHeikemen/lsp-zero.nvim', branch = 'v2.x',
         dependencies = {
           -- LSP Support
           {'neovim/nvim-lspconfig'},
-          {'williamboman/mason.nvim'},
+          {
+            'williamboman/mason.nvim',
+            build = ":MasonUpdate",
+          },
           {'williamboman/mason-lspconfig.nvim'},
 
           -- Autocompletion
