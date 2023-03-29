@@ -64,6 +64,10 @@ end
 -- quit
 map("n", "<leader>qq", "<cmd>qa<cr>", { desc = "Quit all" })
 
+-- search for selected text
+map('v', '/', "\"fy/<C-R>f<CR>", {silent = true})
+map('v', '?', "\"fy?<C-R>f<CR>", {silent = true})
+
 if vscode then
   map('n', '<leader>?', "<Cmd>call VSCodeNotify('workbench.action.findInFiles', { 'query': expand('<cword>')})<CR>")
   -- Get folding working with vscode neovim plugin

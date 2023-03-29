@@ -110,10 +110,12 @@ local plugins = {
     "gbprod/substitute.nvim",
     version = "*",
     config = function()
-      vim.keymap.set("n", "gr", "<cmd>lua require('substitute').operator()<cr>", { noremap = true })
-      vim.keymap.set("n", "grr", "<cmd>lua require('substitute').line()<cr>", { noremap = true })
-      vim.keymap.set("n", "gR", "<cmd>lua require('substitute').eol()<cr>", { noremap = true })
-      vim.keymap.set("x", "gr", "<cmd>lua require('substitute').visual()<cr>", { noremap = true })
+      local substitute = require("substitute")
+      substitute.setup()
+      vim.keymap.set("n", "gr", substitute.operator, { noremap = true })
+      vim.keymap.set("n", "grr", substitute.line, { noremap = true })
+      vim.keymap.set("n", "gR", substitute.eol, { noremap = true })
+      vim.keymap.set("x", "gr", substitute.visual, { noremap = true })
     end
   },
   'mg979/vim-visual-multi',
@@ -433,6 +435,7 @@ local plugins = {
       },
       {"petertriho/nvim-scrollbar", cond = not_vscode, config = function() require("scrollbar").setup({hide_if_all_visible = true}) end},
       {"tpope/vim-sleuth", cond = not_vscode}, -- automatically detect tabwidth
+      {"iamcco/markdown-preview.nvim", build = "cd app && npm install", setup = function() vim.g.mkdp_filetypes = { "markdown" } end, ft = { "markdown" }, cond = not_vscode},
 }
 
 require("lazy").setup(plugins)
