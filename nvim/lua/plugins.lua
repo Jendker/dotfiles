@@ -434,6 +434,7 @@ local plugins = {
       {"petertriho/nvim-scrollbar", cond = not_vscode, config = function() require("scrollbar").setup({hide_if_all_visible = true}) end},
       {"tpope/vim-sleuth", cond = not_vscode}, -- automatically detect tabwidth
       {"iamcco/markdown-preview.nvim", build = "cd app && npm install", setup = function() vim.g.mkdp_filetypes = { "markdown" } end, ft = { "markdown" }, cond = not_vscode},
+      {"wintermute-cell/gitignore.nvim", dependencies = { "nvim-telescope/telescope.nvim" }, cond = not_vscode},
 }
 
 require("lazy").setup(plugins)
