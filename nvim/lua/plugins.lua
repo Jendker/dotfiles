@@ -62,6 +62,37 @@ local plugins = {
   },
   'nvim-treesitter/nvim-treesitter-textobjects',
   'nvim-treesitter/nvim-treesitter-context',
+  'andymass/vim-matchup', -- better % on matching delimeters
+  'HiPhish/nvim-ts-rainbow2',  -- colored brackets
+  {
+    "echasnovski/mini.ai", -- better textobjects
+    opts = function()
+      local ai = require("mini.ai")
+      return {
+        n_lines = 500,
+        custom_textobjects = {
+          o = ai.gen_spec.treesitter({
+            a = { "@block.outer", "@conditional.outer", "@loop.outer" },
+            i = { "@block.inner", "@conditional.inner", "@loop.inner" },
+          }, {}),
+          f = ai.gen_spec.treesitter({ a = "@function.outer", i = "@function.inner" }, {}),
+          c = ai.gen_spec.treesitter({ a = "@class.outer", i = "@class.inner" }, {}),
+        },
+      }
+    end,
+    config = function(_, opts)
+      require("mini.ai").setup(opts)
+    end,
+  },
+  {
+    "kana/vim-textobj-user",
+    dependencies = {
+      "kana/vim-textobj-entire",             -- e - entire
+      "kana/vim-textobj-line",               -- l - line
+      "kana/vim-textobj-indent",             -- i - indent block, I - same indent (won't select sub indent)
+      "Julian/vim-textobj-variable-segment", -- v - segment
+    },
+  },
   {
     'Wansmer/treesj',
     dependencies = { 'nvim-treesitter/nvim-treesitter' },
