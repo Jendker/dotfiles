@@ -130,7 +130,6 @@ local function get_python_path(workspace)
   if vim.env.VIRTUAL_ENV then
     return path.join(vim.env.VIRTUAL_ENV, 'bin', 'python')
   end
-
   -- Find and use virtualenv in workspace directory.
   for _, pattern in ipairs({'*', '.*'}) do
     local match = vim.fn.glob(path.join(workspace, pattern, 'pyvenv.cfg'))
@@ -147,7 +146,6 @@ require('lspconfig').pyright.setup({
   before_init = function(_, config)
     local python_path = get_python_path(config.root_dir)
     config.settings.python.pythonPath = python_path
-    -- vim.env.PATH = require('lspconfig/util').path.dirname(python_path) .. ":" .. vim.env.PATH
     vim.g.python_host_prog = python_path
     vim.g.python3_host_prog = python_path
   end

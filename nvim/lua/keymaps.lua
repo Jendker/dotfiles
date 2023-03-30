@@ -78,6 +78,9 @@ if vscode then
   map('n', 'zo', ":call VSCodeNotify('editor.unfold')<CR>")
   map('n', 'zO', ":call VSCodeNotify('editor.unfoldRecursively')<CR>")
   map('n', 'za', ":call VSCodeNotify('editor.toggleFold')<CR>")
+  -- Fix issues with undo https://github.com/vscode-neovim/vscode-neovim/issues/1192
+  map('n', 'u', ":call VSCodeNotify('undo')<CR>")
+  map('n', '<C-r>', ":call VSCodeNotify('redo')<CR>")
   local function moveCursor(direction)
     if (vim.fn.reg_recording() == '' and vim.fn.reg_executing() == '') then
       return ('g' .. direction)
