@@ -130,6 +130,8 @@ local function get_python_path(workspace)
   if vim.env.VIRTUAL_ENV then
     return path.join(vim.env.VIRTUAL_ENV, 'bin', 'python')
   end
+  -- trick to check the current directory if workspace is unset
+  if workspace == nil then workspace = vim.fn.getcwd() end
   -- Find and use virtualenv in workspace directory.
   for _, pattern in ipairs({'*', '.*'}) do
     local match = vim.fn.glob(path.join(workspace, pattern, 'pyvenv.cfg'))
