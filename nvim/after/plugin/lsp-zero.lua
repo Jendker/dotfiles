@@ -112,6 +112,16 @@ lsp.set_sign_icons({
   info = '»'
 })
 
+lsp.format_on_save({
+  format_opts = {
+    timeout_ms = 10000,
+  },
+  servers = {
+    ['null-ls'] = {}, -- add like = {'python', 'lua'} etc.
+    ['clangd'] = {'cpp'},
+  }
+})
+
 require('lspconfig').clangd.setup({
   on_attach = function(_, bufnr)
     vim.keymap.set('n', '<A-u>', vim.cmd.ClangdSwitchSourceHeader, { buffer = bufnr, desc = "Switch between so[u]rce / header" })
