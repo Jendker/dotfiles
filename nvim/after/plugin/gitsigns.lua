@@ -7,6 +7,9 @@ if not status_ok then
   return
 end
 
+-- Reserve space for diagnostic icons
+vim.opt.signcolumn = 'yes:2'
+
 gitsigns.setup {
   signcolumn = true, -- Toggle with `:Gitsigns toggle_signs`
   on_attach = function(bufnr)

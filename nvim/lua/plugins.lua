@@ -327,8 +327,6 @@ local plugins = {
       {
         'lewis6991/gitsigns.nvim',
         tag = 'release',
-        -- Reserve space for diagnostic icons
-        config = function() vim.opt.signcolumn = 'yes' end,
         cond = not_vscode
       },
       {
