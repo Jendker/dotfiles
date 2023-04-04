@@ -14,6 +14,7 @@ vim.opt.rtp:prepend(lazypath)
 local plugins = {
   {
     'ggandor/leap.nvim',
+    event = 'VeryLazy',
     config = function ()
       local leap = require('leap')
       leap.set_default_keymaps()
@@ -23,12 +24,14 @@ local plugins = {
   },
   {
     'ggandor/leap-spooky.nvim',
+    event = 'VeryLazy',
     config = function()
       require'leap-spooky'.setup()
     end
   },
   {
     'rhysd/clever-f.vim',
+    event = 'VeryLazy',
     config = function ()
       vim.g.clever_f_smart_case = 1
     end
@@ -42,6 +45,7 @@ local plugins = {
   -- },
   {
     'tpope/vim-commentary', -- gcc to comment
+    event = 'VeryLazy',
     config = function ()
       -- Comment c, cpp, cs, java with //
       vim.api.nvim_command([[autocmd FileType c,cpp,cs,java setlocal commentstring=//\ %s]])
@@ -49,6 +53,7 @@ local plugins = {
   },
   {
     "kylechui/nvim-surround",
+    event = 'VeryLazy',
     version = "*", -- Use for stability; omit to use `main` branch for the latest features
     config = function()
       require("nvim-surround").setup({
@@ -93,6 +98,7 @@ local plugins = {
   },
   {
     'Wansmer/treesj',
+    event = 'VeryLazy',
     dependencies = { 'nvim-treesitter/nvim-treesitter' },
     config = function()
       local treesj = require('treesj')
@@ -106,6 +112,7 @@ local plugins = {
   },
   {
     "gbprod/substitute.nvim",
+    event = 'VeryLazy',
     version = "*",
     config = function()
       local substitute = require("substitute")
@@ -116,12 +123,13 @@ local plugins = {
       vim.keymap.set("x", "gr", substitute.visual, { noremap = true })
     end
   },
-  'mg979/vim-visual-multi',
-  "haya14busa/is.vim", -- auto hide highlight after search
+  {'mg979/vim-visual-multi', event = 'VeryLazy'},
+  {"haya14busa/is.vim", event = 'VeryLazy'}, -- auto hide highlight after search
   -- without VSCode
       -- auto trail whitespace
       {
           'lewis6991/spaceless.nvim',
+          event = 'VeryLazy',
           config = function()
               require'spaceless'.setup()
           end,
@@ -129,6 +137,7 @@ local plugins = {
       },
       {
         'tpope/vim-fugitive',
+        event = 'VeryLazy',
         dependencies = {'tpope/vim-rhubarb', 'shumphrey/fugitive-gitlab.vim'},
         config = function()
           -- to open Roboception remote url:
@@ -186,6 +195,7 @@ local plugins = {
       },
       {
         'lukas-reineke/indent-blankline.nvim',
+        event = 'VeryLazy',
         config = function()
           require("indent_blankline").setup {
             char = '┊',
@@ -208,10 +218,12 @@ local plugins = {
       },
       {
         "tom-anders/telescope-vim-bookmarks.nvim",
+        event = 'VeryLazy',
         cond = not_vscode
       },
       {
         'nvim-telescope/telescope.nvim', version = '0.1.1',
+        event = 'VeryLazy',
         dependencies = { 'nvim-lua/plenary.nvim' },
         config = function()
           local telescope = require('telescope')
@@ -273,6 +285,7 @@ local plugins = {
       },
       {
         "nvim-telescope/telescope-frecency.nvim",
+        event = 'VeryLazy',
         dependencies = {"kkharji/sqlite.lua", "nvim-telescope/telescope.nvim"},
         config = function()
           require"telescope".load_extension("frecency")
@@ -283,6 +296,7 @@ local plugins = {
       {'farmergreg/vim-lastplace', cond = not_vscode},
       {
         'karb94/neoscroll.nvim',
+        event = 'VeryLazy',
         config = function()
           require('neoscroll').setup()
         end,
@@ -290,6 +304,7 @@ local plugins = {
       },
       {
         'windwp/nvim-autopairs',
+        event = 'VeryLazy',
         lazy = false,
         config = function() require('nvim-autopairs').setup {} end,
         cond = not_vscode
@@ -326,11 +341,13 @@ local plugins = {
       },
       {
         'lewis6991/gitsigns.nvim',
+        event = 'VeryLazy',
         tag = 'release',
         cond = not_vscode
       },
       {
         "folke/which-key.nvim",
+        event = 'VeryLazy',
         config = function()
           vim.o.timeout = true
           vim.o.timeoutlen = 500
@@ -342,6 +359,7 @@ local plugins = {
       },
       {
         "mbbill/undotree",
+        event = "VeryLazy",
         config = function()
           vim.keymap.set("n", "<leader>u", "<cmd>UndotreeToggle<CR><C-w>h<CR>")
           vim.opt.undofile = true
@@ -422,6 +440,7 @@ local plugins = {
       },
       {
         "907th/vim-auto-save",
+        event = 'VeryLazy',
         config = function()
           vim.g.auto_save = 0
           vim.g.auto_save_silent = 1
@@ -429,10 +448,10 @@ local plugins = {
         end,
         cond = not_vscode
       },
-      {"petertriho/nvim-scrollbar", cond = not_vscode, config = function() require("scrollbar").setup({hide_if_all_visible = true}) end},
+      {"petertriho/nvim-scrollbar", event = 'VeryLazy', cond = not_vscode, config = function() require("scrollbar").setup({hide_if_all_visible = true}) end},
       {"tpope/vim-sleuth", cond = not_vscode}, -- automatically detect tabwidth
       {"iamcco/markdown-preview.nvim", build = "cd app && npm install", setup = function() vim.g.mkdp_filetypes = { "markdown" } end, ft = { "markdown" }, cond = not_vscode},
-      {"wintermute-cell/gitignore.nvim", dependencies = { "nvim-telescope/telescope.nvim" }, cond = not_vscode},
+      {"wintermute-cell/gitignore.nvim", cmd = 'Gitignore', dependencies = { "nvim-telescope/telescope.nvim" }, cond = not_vscode},
 }
 
 require("lazy").setup(plugins)
