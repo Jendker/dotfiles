@@ -68,6 +68,7 @@ vim.api.nvim_create_autocmd("FileType", {
 -- file associations
 vim.cmd([[
   augroup FileAssociations
+    autocmd!
     autocmd BufRead,BufNewFile *.launch set filetype=xml
   augroup end
 ]])
