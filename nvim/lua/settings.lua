@@ -72,3 +72,11 @@ vim.cmd([[
     autocmd BufRead,BufNewFile *.launch set filetype=xml
   augroup end
 ]])
+-- lsp config
+vim.api.nvim_create_autocmd('BufReadPre', {
+  group = augroup("misc_aucmds"),
+  callback = function()
+    require 'config_plugins.lsp-zero'
+  end,
+  once = true,
+})

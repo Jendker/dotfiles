@@ -63,14 +63,23 @@ local plugins = {
   },
   {
     'nvim-treesitter/nvim-treesitter',
+    config = function()
+      require 'config_plugins.treesitter'
+    end,
     build = ':TSUpdate',
   },
-  'nvim-treesitter/nvim-treesitter-textobjects',
-  'nvim-treesitter/nvim-treesitter-context',
-  'andymass/vim-matchup', -- better % on matching delimeters
-  'HiPhish/nvim-ts-rainbow2',  -- colored brackets
+  {'nvim-treesitter/nvim-treesitter-textobjects', event = 'VeryLazy'},
+  {
+    'nvim-treesitter/nvim-treesitter-context',
+    config = function()
+      require 'treesitter-context'.setup{enable = not vscode}
+    end
+  },
+  {'andymass/vim-matchup', event = 'VeryLazy'},  -- better % on matching delimeters
+  {'HiPhish/nvim-ts-rainbow2', event = 'VeryLazy'},  -- colored brackets
   {
     "echasnovski/mini.ai", -- better textobjects
+    event = 'VeryLazy',
     opts = function()
       local ai = require("mini.ai")
       return {
@@ -89,6 +98,7 @@ local plugins = {
   },
   {
     "kana/vim-textobj-user",
+    event = 'VeryLazy',
     dependencies = {
       "kana/vim-textobj-entire",             -- e - entire
       "kana/vim-textobj-line",               -- l - line
@@ -98,8 +108,8 @@ local plugins = {
   },
   {
     'Wansmer/treesj',
-    event = 'VeryLazy',
     dependencies = { 'nvim-treesitter/nvim-treesitter' },
+    keys = { 'gJ', 'gS' },
     config = function()
       local treesj = require('treesj')
       treesj.setup({
@@ -285,11 +295,12 @@ local plugins = {
       },
       {
         "nvim-telescope/telescope-frecency.nvim",
-        event = 'VeryLazy',
         dependencies = {"kkharji/sqlite.lua", "nvim-telescope/telescope.nvim"},
+        keys = {
+          {"<leader>sp", "<Cmd>lua require('telescope').extensions.frecency.frecency({ workspace = 'CWD' })<CR>", "n", {noremap = true, silent = true}},
+        },
         config = function()
           require"telescope".load_extension("frecency")
-          vim.api.nvim_set_keymap("n", "<leader>sp", "<Cmd>lua require('telescope').extensions.frecency.frecency({ workspace = 'CWD' })<CR>", {noremap = true, silent = true})
         end,
         cond = not_vscode
       },
@@ -341,7 +352,9 @@ local plugins = {
       },
       {
         'lewis6991/gitsigns.nvim',
-        event = 'VeryLazy',
+        config = function()
+          require 'config_plugins.gitsigns'
+        end,
         tag = 'release',
         cond = not_vscode
       },
