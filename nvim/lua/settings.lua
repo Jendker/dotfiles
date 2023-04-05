@@ -39,6 +39,9 @@ vim.opt.foldlevelstart = 99 -- don't fold by default
 
 vim.opt.spelllang = 'en_us'
 
+-- disable matchup motions which don't work in vscode diff between between revisions
+vim.g.matchup_motion_enabled = not vscode
+
 local function augroup(name)
   return vim.api.nvim_create_augroup("jorbik_" .. name, { clear = true })
 end
