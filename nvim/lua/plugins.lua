@@ -53,7 +53,6 @@ local plugins = {
   },
   {
     "kylechui/nvim-surround",
-    event = 'VeryLazy',
     version = "*", -- Use for stability; omit to use `main` branch for the latest features
     config = function()
       require("nvim-surround").setup({
@@ -75,8 +74,8 @@ local plugins = {
       require 'treesitter-context'.setup{enable = not vscode}
     end
   },
-  {'andymass/vim-matchup', event = 'VeryLazy'},  -- better % on matching delimeters
-  {'HiPhish/nvim-ts-rainbow2', event = 'VeryLazy'},  -- colored brackets
+  'andymass/vim-matchup',  -- better % on matching delimeters
+  'HiPhish/nvim-ts-rainbow2',  -- colored brackets
   {
     "echasnovski/mini.ai", -- better textobjects
     event = 'VeryLazy',
@@ -122,7 +121,6 @@ local plugins = {
   },
   {
     "gbprod/substitute.nvim",
-    event = 'VeryLazy',
     version = "*",
     config = function()
       local substitute = require("substitute")
@@ -133,7 +131,7 @@ local plugins = {
       vim.keymap.set("x", "gr", substitute.visual, { noremap = true })
     end
   },
-  {'mg979/vim-visual-multi', event = 'VeryLazy'},
+  'mg979/vim-visual-multi',
   {"haya14busa/is.vim", event = 'VeryLazy'}, -- auto hide highlight after search
   -- without VSCode
       -- auto trail whitespace
@@ -205,7 +203,6 @@ local plugins = {
       },
       {
         'lukas-reineke/indent-blankline.nvim',
-        event = 'VeryLazy',
         config = function()
           require("indent_blankline").setup {
             char = '┊',
@@ -233,7 +230,7 @@ local plugins = {
       },
       {
         'nvim-telescope/telescope.nvim', version = '0.1.1',
-        event = 'VeryLazy',
+        cmd = 'Telescope',
         dependencies = { 'nvim-lua/plenary.nvim' },
         config = function()
           local telescope = require('telescope')
@@ -307,7 +304,6 @@ local plugins = {
       {'farmergreg/vim-lastplace', cond = not_vscode},
       {
         'karb94/neoscroll.nvim',
-        event = 'VeryLazy',
         config = function()
           require('neoscroll').setup()
         end,
@@ -369,7 +365,6 @@ local plugins = {
       },
       {
         "folke/which-key.nvim",
-        event = 'VeryLazy',
         config = function()
           vim.o.timeout = true
           vim.o.timeoutlen = 500
@@ -462,7 +457,6 @@ local plugins = {
       },
       {
         "907th/vim-auto-save",
-        event = 'VeryLazy',
         config = function()
           vim.g.auto_save = 0
           vim.g.auto_save_silent = 1
@@ -470,7 +464,7 @@ local plugins = {
         end,
         cond = not_vscode
       },
-      {"petertriho/nvim-scrollbar", event = 'VeryLazy', cond = not_vscode, config = function() require("scrollbar").setup({hide_if_all_visible = true}) end},
+      {"petertriho/nvim-scrollbar", cond = not_vscode, config = function() require("scrollbar").setup({hide_if_all_visible = true}) end},
       {"tpope/vim-sleuth", cond = not_vscode}, -- automatically detect tabwidth
       {"iamcco/markdown-preview.nvim", build = "cd app && npm install", setup = function() vim.g.mkdp_filetypes = { "markdown" } end, ft = { "markdown" }, cond = not_vscode},
       {"wintermute-cell/gitignore.nvim", cmd = 'Gitignore', dependencies = { "nvim-telescope/telescope.nvim" }, cond = not_vscode},
