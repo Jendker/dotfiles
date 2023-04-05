@@ -318,42 +318,33 @@ local plugins = {
       },
       {
         'VonHeikemen/lsp-zero.nvim', branch = 'v2.x',
-        lazy = true,
-        cond = not_vscode
-      },
-      -- Autocompletion
-      {
-        'hrsh7th/nvim-cmp',
-        event = 'InsertEnter',
         dependencies = {
-          {'hrsh7th/cmp-buffer'},
-          {'hrsh7th/cmp-path'},
-          {'saadparwaiz1/cmp_luasnip'},
-          {'hrsh7th/cmp-nvim-lsp'},
-          {'hrsh7th/cmp-nvim-lua'},
-          -- Snippets
-          {'L3MON4D3/LuaSnip'},
-          {'rafamadriz/friendly-snippets'},
-        },
-        cond = not_vscode,
-      },
-      -- LSP
-      {
-        'neovim/nvim-lspconfig',
-        cmd = 'LspInfo',
-        event = {'BufReadPre', 'BufNewFile'},
-        dependencies = {
+          -- LSP Support
+          {'neovim/nvim-lspconfig'},
           {
             'williamboman/mason.nvim',
             build = function() pcall(vim.cmd, 'MasonUpdate') end,
           },
           {'williamboman/mason-lspconfig.nvim'},
+
+          -- Autocompletion
+          {'hrsh7th/nvim-cmp'},
+          {'hrsh7th/cmp-buffer'},
+          {'hrsh7th/cmp-path'},
+          {'saadparwaiz1/cmp_luasnip'},
+          {'hrsh7th/cmp-nvim-lsp'},
+          {'hrsh7th/cmp-nvim-lua'},
+
+          -- Snippets
+          {'L3MON4D3/LuaSnip'},
+          {'rafamadriz/friendly-snippets'},
+
           -- Added by me
           {'ray-x/lsp_signature.nvim'},
           {'nvim-autopairs'},
           {'jose-elias-alvarez/null-ls.nvim'}
         },
-        cond = not_vscode,
+        cond = not_vscode
       },
       {
         'lewis6991/gitsigns.nvim',
