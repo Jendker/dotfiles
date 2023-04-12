@@ -7,11 +7,12 @@ function is_installed() {
 }
 
 function install_nvim_source() {
-  sudo apt-get install ninja-build gettext libtool libtool-bin autoconf automake cmake g++ pkg-config unzip curl doxygen -y
-  cd /tmp && git clone https://github.com/neovim/neovim.git --branch release-0.8
+  sudo apt-get install ninja-build gettext cmake unzip curl -y
+  cd /tmp && rm -rf neovim && git clone https://github.com/neovim/neovim.git --branch stable --single-branch
   cd neovim
-  make CMAKE_BUILD_TYPE=Release
+  make CMAKE_BUILD_TYPE=RelWithDebInfo
   sudo make install
+  cd .. && rm -rf neovim
 }
 
 function update_nvim() {
@@ -21,6 +22,7 @@ function update_nvim() {
   nvim --headless "+Lazy! sync" +qa
   # repeat again until successful
   while [ $? -ne 0 ]; do !!; done
+  rm -rf dotfiles
 }
 
 function install_node() {
@@ -55,8 +57,7 @@ function install_cargo() {
 }
 
 function install_nvim_binary() {
-  wget https://github.com/neovim/neovim/releases/download/v0.8.3/nvim-linux64.deb --directory-prefix=/tmp
-  sudo apt install /tmp/nvim-linux64.deb -y || install_nvim_source
+  install_nvim_source
   install_node
 }
 
