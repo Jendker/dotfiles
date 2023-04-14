@@ -166,7 +166,7 @@ local plugins = {
       },
       {
         'nvim-lualine/lualine.nvim',
-        dependencies = { 'kyazdani42/nvim-web-devicons', lazy = true},
+        dependencies = { 'nvim-tree/nvim-web-devicons', lazy = true},
         config = function()
           -- specify lualine_x depending on existance of Noice plugin
           local lualine_x = {}
@@ -344,6 +344,44 @@ local plugins = {
           {'nvim-autopairs'},
           {'jose-elias-alvarez/null-ls.nvim'}
         },
+        cond = not_vscode
+      },
+      {
+        "SmiteshP/nvim-navic",
+        dependencies = "neovim/nvim-lspconfig",
+        config = function ()
+          require("nvim-navic").setup {
+            icons = {
+              File = ' ',
+              Module = ' ',
+              Namespace = ' ',
+              Package = ' ',
+              Class = ' ',
+              Method = ' ',
+              Property = ' ',
+              Field = ' ',
+              Constructor = ' ',
+              Enum = ' ',
+              Interface = ' ',
+              Function = ' ',
+              Variable = ' ',
+              Constant = ' ',
+              String = ' ',
+              Number = ' ',
+              Boolean = ' ',
+              Array = ' ',
+              Object = ' ',
+              Key = ' ',
+              Null = ' ',
+              EnumMember = ' ',
+              Struct = ' ',
+              Event = ' ',
+              Operator = ' ',
+              TypeParameter = ' '
+            },
+            highlight = true,
+          }
+        end,
         cond = not_vscode
       },
       {

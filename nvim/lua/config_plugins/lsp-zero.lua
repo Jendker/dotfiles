@@ -25,6 +25,7 @@ lsp.ensure_installed(mason_ensure_installed)
 
 -- this will install any mason package, even formatters and linters
 local mason_install_if_system_command_not_available = {'jq'}
+local mason_install = {'black'}
 
 local null_ls = require('null-ls')
 local mason_packages_to_source_if_available = {
@@ -102,6 +103,11 @@ lsp.on_attach(function(client, bufnr)
         }
       })
     end)
+  end
+  if client.server_capabilities.documentSymbolProvider then
+    require('nvim-navic').attach(client, bufnr)
+    vim.o.winbar = " %{%v:lua.require'nvim-navic'.get_location()%}"
+    vim.defer_fn(function() vim.cmd('TSContextDisable') end, 1000)
   end
 end)
 
@@ -200,6 +206,11 @@ for _, mason_package in ipairs(mason_install_if_system_command_not_available) do
     if vim.fn.executable(mason_package) ~= 1 then
       install_package(mason_package)
     end
+  end
+end
+for _, mason_package in ipairs(mason_install) do
+  if not has_value(mason_installed_packages, mason_package) then
+    install_package(mason_package)
   end
 end
 
