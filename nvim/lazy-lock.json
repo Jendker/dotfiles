@@ -46,6 +46,7 @@
   "telescope-vim-bookmarks.nvim": { "branch": "main", "commit": "92498cbf7c127dea37c3d27117b60dd7ab9baef4" },
   "telescope.nvim": { "branch": "master", "commit": "c1a2af0af69e80e14e6b226d3957a064cd080805" },
   "treesj": { "branch": "main", "commit": "12fc4074a7dee23faabeb1f5dfd3af41d2aa04f1" },
+  "trouble.nvim": { "branch": "main", "commit": "2ae7237c2917d661f458443c9a88680f8ca2d7b2" },
   "undotree": { "branch": "master", "commit": "485f01efde4e22cb1ce547b9e8c9238f36566f21" },
   "vim-auto-save": { "branch": "master", "commit": "2e3e54ea4c0fc946c21b0a4ee4c1c295ba736ee8" },
   "vim-bookmarks": { "branch": "master", "commit": "9cc5fa7ecc23b052bd524d07c85356c64b92aeef" },

@@ -28,7 +28,7 @@ local function toggle(option, silent, values)
 end
 
 vim.g.mapleader = " "
-map("n", "<leader>x", "<cmd>!chmod +x %<CR>", { silent = true })
+map("n", "<leader>X", "<cmd>!chmod +x %<CR>", { silent = true })
 map("n", "<leader>bf", vim.lsp.buf.format, { desc = "Run [b]uffer [f]ormatting" })
 map({"n", "v"}, "<leader>d", [["_d]])
 map({"n", "v"}, "<leader>D", [["_D]])

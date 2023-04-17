@@ -235,9 +235,14 @@ local plugins = {
         config = function()
           local telescope = require('telescope')
           local actions = require('telescope.actions')
+          local trouble = require("trouble.providers.telescope")
           telescope.setup({
             defaults = {
               path_display={"smart"},
+              mappings = {
+                i = { ["<c-t>"] = trouble.open_with_trouble },
+                n = { ["<c-t>"] = trouble.open_with_trouble },
+              },
             },
             pickers = {
               live_grep = {
@@ -294,7 +299,7 @@ local plugins = {
         "nvim-telescope/telescope-frecency.nvim",
         dependencies = {"kkharji/sqlite.lua", "nvim-telescope/telescope.nvim"},
         keys = {
-          {"<leader>sp", "<Cmd>lua require('telescope').extensions.frecency.frecency({ workspace = 'CWD' })<CR>", "n", {noremap = true, silent = true}},
+          {"<leader>sp", "<Cmd>lua require('telescope').extensions.frecency.frecency({ workspace = 'CWD' })<CR>", "n", noremap = true, silent = true, desc = "Telescope frecency"},
         },
         config = function()
           require"telescope".load_extension("frecency")
@@ -386,6 +391,7 @@ local plugins = {
       },
       {
         'lewis6991/gitsigns.nvim',
+        event = { "BufReadPre", "BufNewFile" },
         config = function()
           require 'config_plugins.gitsigns'
         end,
@@ -497,6 +503,41 @@ local plugins = {
       {"tpope/vim-sleuth", cond = not_vscode}, -- automatically detect tabwidth
       {"iamcco/markdown-preview.nvim", build = "cd app && npm install", setup = function() vim.g.mkdp_filetypes = { "markdown" } end, ft = { "markdown" }, cond = not_vscode},
       {"wintermute-cell/gitignore.nvim", cmd = 'Gitignore', dependencies = { "nvim-telescope/telescope.nvim" }, cond = not_vscode},
+      {
+        -- config from https://www.lazyvim.org/plugins/editor#troublenvim
+        "folke/trouble.nvim",
+        cmd = { "TroubleToggle", "Trouble" },
+        opts = { use_diagnostic_signs = true },
+        keys = {
+          { "<leader>xx", "<cmd>TroubleToggle document_diagnostics<cr>", desc = "Document Diagnostics (Trouble)" },
+          { "<leader>xw", "<cmd>TroubleToggle workspace_diagnostics<cr>", desc = "Workspace Diagnostics (Trouble)" },
+          { "<leader>xl", "<cmd>TroubleToggle loclist<cr>", desc = "Location List (Trouble)" },
+          { "<leader>xq", "<cmd>TroubleToggle quickfix<cr>", desc = "Quickfix List (Trouble)" },
+          {
+            "[q",
+            function()
+              if require("trouble").is_open() then
+                require("trouble").previous({ skip_groups = true, jump = true })
+              else
+                pcall(vim.cmd, 'cprev')
+              end
+            end,
+            desc = "Previous trouble/quickfix item",
+          },
+          {
+            "]q",
+            function()
+              if require("trouble").is_open() then
+                require("trouble").next({ skip_groups = true, jump = true })
+              else
+                pcall(vim.cmd, 'cnext')
+              end
+            end,
+            desc = "Next trouble/quickfix item",
+          },
+        },
+        cond = not_vscode
+      },
 }
 
 require("lazy").setup(plugins)
