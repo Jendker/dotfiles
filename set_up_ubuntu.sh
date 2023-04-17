@@ -19,7 +19,7 @@ function update_nvim() {
   cd /tmp/ && rm -rf dotfiles && git clone https://github.com/Jendker/dotfiles.git
   cp -r dotfiles/nvim $HOME/.config
   run_times=1
-  nvim --headless "+Lazy! sync" +qa
+  nvim --headless "+Lazy! install" +qa
   # repeat again until successful
   while [ $? -ne 0 ]; do !!; done
   rm -rf dotfiles
