@@ -67,7 +67,7 @@ local plugins = {
     end,
     build = ':TSUpdate',
   },
-  {'nvim-treesitter/nvim-treesitter-textobjects', event = 'VeryLazy'},
+  'nvim-treesitter/nvim-treesitter-textobjects',
   {
     'nvim-treesitter/nvim-treesitter-context',
     config = function()
