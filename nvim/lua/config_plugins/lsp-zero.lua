@@ -25,7 +25,7 @@ lsp.ensure_installed(mason_ensure_installed)
 
 -- this will install any mason package, even formatters and linters
 local mason_install_if_system_command_not_available = {'jq'}
-local mason_install = {'black'}
+local mason_install = {'black', 'ruff-lsp'}
 
 local null_ls = require('null-ls')
 local mason_packages_to_source_if_available = {
@@ -168,6 +168,13 @@ require('lspconfig').pyright.setup({
     vim.g.python3_host_prog = python_path
   end
 })
+
+require('lspconfig').ruff_lsp.setup {
+  on_attach = function(client, _)
+    -- Disable hover in favor of Pyright
+    client.server_capabilities.hoverProvider = false
+  end
+}
 
 require('lspconfig').lua_ls.setup(lsp.nvim_lua_ls({
   Lua = {
