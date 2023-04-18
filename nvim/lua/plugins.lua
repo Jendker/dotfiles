@@ -346,7 +346,6 @@ local plugins = {
 
           -- Added by me
           {'ray-x/lsp_signature.nvim'},
-          {'nvim-autopairs'},
           {'jose-elias-alvarez/null-ls.nvim'}
         },
         cond = not_vscode
@@ -430,6 +429,9 @@ local plugins = {
               override = {
                 ["vim.lsp.util.convert_input_to_markdown_lines"] = true,
                 ["vim.lsp.util.stylize_markdown"] = true,
+              },
+              hover = {
+                enabled = false
               },
               signature = {
                 enabled = false,

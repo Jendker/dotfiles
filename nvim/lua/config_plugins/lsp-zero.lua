@@ -173,7 +173,13 @@ require('lspconfig').ruff_lsp.setup {
   on_attach = function(client, _)
     -- Disable hover in favor of Pyright
     client.server_capabilities.hoverProvider = false
-  end
+  end,
+  init_options = {
+    settings = {
+      -- Any extra CLI arguments for `ruff` go here.
+      args = {"--ignore", "E501"},
+    }
+  }
 }
 
 require('lspconfig').lua_ls.setup(lsp.nvim_lua_ls({
