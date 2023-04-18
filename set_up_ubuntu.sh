@@ -17,7 +17,7 @@ function install_nvim_source() {
 
 function update_nvim() {
   cd /tmp/ && rm -rf dotfiles && git clone https://github.com/Jendker/dotfiles.git
-  cp -r dotfiles/nvim $HOME/.config
+  cp -r dotfiles/nvim $HOME/.config/
   run_times=1
   nvim --headless "+Lazy! install" +qa
   # repeat again until successful
@@ -84,7 +84,12 @@ if [[ ! $# -eq 0 ]]; then
   fi
 fi
 
+sudo apt update
 sudo apt install tmux zsh xclip unzip python3-venv fd-find -y
+# symlink fdfind as fd
+mkdir -p $HOME/.local/bin
+ln -s $(which fdfind) $HOME/.local/bin/fd
+
 sudo apt install ripgrep -y || true
 if [ -d ~/.oh-my-zsh ]; then
 	echo "oh-my-zsh is installed"
@@ -101,6 +106,7 @@ PROMPT="%(?:%{$fg_bold[green]%}➜ :%{$fg_bold[red]%}➜ )"
 PROMPT+=' %{$fg[cyan]%}%~%{$reset_color%} $(git_prompt_info)'
 export LANG=en_US.UTF-8
 export LC_ALL=en_US.UTF-8
+export PATH=$PATH:$HOME/.local/bin
 EOT
 sed -i 's/plugins=(git)/plugins=(git ubuntu)/g' $HOME/.zshrc
 sed -i '/mode auto/s/^# //g' $HOME/.zshrc
