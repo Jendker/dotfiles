@@ -85,12 +85,13 @@ if [[ ! $# -eq 0 ]]; then
 fi
 
 sudo apt update
-sudo apt install tmux zsh xclip unzip python3-venv fd-find -y
+sudo apt install tmux zsh xclip unzip python3-venv fd-find ccache -y
 # symlink fdfind as fd
 mkdir -p $HOME/.local/bin
 ln -s $(which fdfind) $HOME/.local/bin/fd
 
 sudo apt install ripgrep -y || true
+sudo apt install clang-format-10 -y || true
 if [ -d ~/.oh-my-zsh ]; then
 	echo "oh-my-zsh is installed"
  else
@@ -107,6 +108,7 @@ PROMPT+=' %{$fg[cyan]%}%~%{$reset_color%} $(git_prompt_info)'
 export LANG=en_US.UTF-8
 export LC_ALL=en_US.UTF-8
 export PATH=$PATH:$HOME/.local/bin
+export PATH="/usr/lib/ccache:$PATH"
 EOT
 sed -i 's/plugins=(git)/plugins=(git ubuntu)/g' $HOME/.zshrc
 sed -i '/mode auto/s/^# //g' $HOME/.zshrc
