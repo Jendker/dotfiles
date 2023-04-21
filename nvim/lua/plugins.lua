@@ -125,10 +125,10 @@ local plugins = {
     config = function()
       local substitute = require("substitute")
       substitute.setup()
-      vim.keymap.set("n", "gr", substitute.operator, { noremap = true })
-      vim.keymap.set("n", "grr", substitute.line, { noremap = true })
-      vim.keymap.set("n", "gR", substitute.eol, { noremap = true })
-      vim.keymap.set("x", "gr", substitute.visual, { noremap = true })
+      vim.keymap.set("n", "gr", substitute.operator, { noremap = true, desc = "[r]eplace <motion>" })
+      vim.keymap.set("n", "grr", substitute.line, { noremap = true, desc = "[r]eplace whole line"})
+      vim.keymap.set("n", "gR", substitute.eol, { noremap = true,  desc = "[R]eplace until end of line"})
+      vim.keymap.set("x", "gr", substitute.visual, { noremap = true, desc = "[r]eplace selected"})
     end
   },
   'mg979/vim-visual-multi',
@@ -231,6 +231,21 @@ local plugins = {
       {
         'nvim-telescope/telescope.nvim', version = '0.1.1',
         cmd = 'Telescope',
+        keys = {
+          {'<leader>ba', "<cmd>lua telescope.extensions.vim_bookmarks.all()<cr>", 'n', desc = "Show [b]ookmarks in [a]ll files"},
+          {'<leader>bc', "<cmd>lua telescope.extensions.vim_bookmarks.current_file()<cr>", 'n', desc = "Show [b]ookmarks in [c]urrent file"},
+          {'<leader>sf', "<cmd>lua require('telescope.builtin').find_files()<cr>", 'n', desc = '[S]earch [f]iles'},
+          {'<leader>sl', "<cmd>lua require('telescope.builtin').live_grep()<cr>", 'n', desc = '[S]earch with [l]ive grep'},
+          {'<leader>sg', "<cmd>lua function() require('telescope.builtin').grep_string({ search = vim.fn.input('Grep > ') }) end()<cr>", 'n', desc = "[S]earch after [g]rep with string"},
+          {'<leader>si', "<cmd>lua require('telescope.builtin').git_files()<cr>", 'n', desc = '[S]earch in g[i]t files'},
+          {'<leader>sb', "<cmd>lua require('telescope.builtin').buffers()<cr>", 'n', desc = '[S]earch existing [b]uffers'},
+          {'<leader>sh', "<cmd>lua require('telescope.builtin').help_tags()<cr>", 'n', desc = '[S]earch [h]elp'},
+          {'<leader>sd', "<cmd>lua require('telescope.builtin').diagnostics()<cr>", 'n', desc = '[S]earch [d]iagnostics'},
+          {'<leader>so', "<cmd>lua require('telescope.builtin').oldfiles()<cr>", 'n', desc = '[S]earch recently [o]pened files'},
+          {'<leader>sr', "<cmd>lua require('telescope.builtin').resume()<cr>", 'n', { desc = '[S]earch [r]esume'}},
+          {'<leader>/', desc = '[?] search for word under cursor'},
+          {'<leader>?', desc = '[/] Fuzzily search in current buffer'},
+        },
         dependencies = { 'nvim-lua/plenary.nvim' },
         config = function()
           local telescope = require('telescope')
@@ -273,18 +288,7 @@ local plugins = {
           })
           -- vim_booksmarks
           telescope.load_extension('vim_bookmarks')
-          vim.keymap.set('n', '<leader>ba', telescope.extensions.vim_bookmarks.all, { desc = "Show [b]ookmarks in [a]ll files" })
-          vim.keymap.set('n', '<leader>bc', telescope.extensions.vim_bookmarks.current_file, { desc = "Show [b]ookmarks in [c]urrent file" })
-          vim.keymap.set('n', '<leader>sf', require('telescope.builtin').find_files, { desc = '[S]earch [f]iles' })
-          vim.keymap.set('n', '<leader>sl', require('telescope.builtin').live_grep, { desc = '[S]earch with [l]ive grep' })
-          vim.keymap.set('n', '<leader>sg', function() require('telescope.builtin').grep_string({ search = vim.fn.input("Grep > ") }) end, { desc = "[S]earch after [g]rep with string"})
-          vim.keymap.set('n', '<leader>si', require('telescope.builtin').git_files, { desc = '[S]earch in g[i]t files'})
-          vim.keymap.set('n', '<leader>sb', require('telescope.builtin').buffers, { desc = '[S]earch existing [b]uffers'})
-          vim.keymap.set('n', '<leader>sh', require('telescope.builtin').help_tags, { desc = '[S]earch [h]elp' })
-          vim.keymap.set('n', '<leader>sd', require('telescope.builtin').diagnostics, { desc = '[S]earch [d]iagnostics' })
-          vim.keymap.set('n', '<leader>so', require('telescope.builtin').oldfiles, { desc = '[S]earch recently [o]pened files' })
           vim.keymap.set('n', '<leader>?', require('telescope.builtin').grep_string, { desc = '[?] search for word under cursor'})
-          vim.keymap.set('n', '<leader>sr', require('telescope.builtin').resume, { desc = '[S]earch [r]esume'})
           vim.keymap.set('n', '<leader>/', function()
             -- You can pass additional configuration to telescope to change theme, layout, etc.
             require('telescope.builtin').current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
@@ -538,6 +542,37 @@ local plugins = {
             desc = "Next trouble/quickfix item",
           },
         },
+        cond = not_vscode
+      },
+      {'lambdalisue/suda.vim', cmd = {'SudaRead', 'SudaWrite'}, cond = not_vscode},
+      {
+        "dnlhc/glance.nvim",
+        cmd = 'Glance',
+        config = function()
+          local glance = require('glance')
+          local actions = glance.actions
+          glance.setup({
+            border = {
+              enable = true, -- Show window borders. Only horizontal borders allowed
+            },
+            hooks = {
+              -- don't show glance if there is only one result
+              before_open = function(results, open, jump, _)
+                if #results == 1 then
+                  jump(results[1]) -- argument is optional
+                else
+                  open(results) -- argument is optional
+                end
+              end,
+            },
+            mappings = {
+              list = {
+                ['l'] = actions.open_fold,
+                ['h'] = actions.close_fold,
+              },
+            },
+          })
+        end,
         cond = not_vscode
       },
 }
