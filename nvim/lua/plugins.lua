@@ -575,6 +575,17 @@ local plugins = {
         end,
         cond = not_vscode
       },
+      {
+        'Exafunction/codeium.vim',
+        event = { "BufReadPre", "BufNewFile" },
+        config = function()
+          vim.keymap.set('i', '<a-]>', function() return vim.fn['codeium#CycleCompletions'](1) end, { expr = true, desc = "Codeium next suggestion" })
+          vim.keymap.set('i', '<a-[>', function() return vim.fn['codeium#CycleCompletions'](-1) end, { expr = true, desc = "Codeium previous suggestion"})
+          vim.keymap.set('i', '<a-x>', function() return vim.fn['codeium#Clear']() end, { expr = true, desc = "Codeium clear suggestion" })
+          vim.keymap.set('i', '<a-Bslash>', function() return vim.fn['codeium#Complete']() end, { expr = true, desc = "Codeium trigger complete"})
+        end,
+        cond = not_vscode
+      },
 }
 
 require("lazy").setup(plugins)
