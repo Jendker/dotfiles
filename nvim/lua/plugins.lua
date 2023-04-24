@@ -157,10 +157,17 @@ local plugins = {
         'navarasu/onedark.nvim',
         lazy = false, -- make sure we load this during startup, that's main colorscheme
         config = function()
-          require('onedark').setup{
-            transparent = true
+          local onedark = require('onedark')
+          onedark.setup{
+            transparent = true,
+            toggle_style_list = { 'light', 'dark' }, -- List of styles to toggle between
           }
-          require('onedark').load()
+          onedark.load()
+          vim.keymap.set('n', '<leader>tt', function()
+            onedark.setup({transparent = not vim.g.onedark_config.transparent})
+            onedark.load()
+            onedark.toggle()
+          end, {desc = "Toggle dark and light mode"})
         end,
         cond = not_vscode
       },
@@ -196,7 +203,7 @@ local plugins = {
               },
               lualine_x = lualine_x,
             },
-            options = {theme = 'wombat', section_separators = '', component_separators = ''},
+            options = {theme = 'onedark', section_separators = '', component_separators = ''},
           })
         end,
         cond = not_vscode
