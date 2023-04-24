@@ -77,25 +77,6 @@ local plugins = {
   'andymass/vim-matchup',  -- better % on matching delimeters
   'HiPhish/nvim-ts-rainbow2',  -- colored brackets
   {
-    "echasnovski/mini.ai", -- better textobjects
-    event = 'VeryLazy',
-    opts = function()
-      local ai = require("mini.ai")
-      return {
-        n_lines = 500,
-        custom_textobjects = {
-          o = ai.gen_spec.treesitter({
-            a = { "@block.outer", "@conditional.outer", "@loop.outer" },
-            i = { "@block.inner", "@conditional.inner", "@loop.inner" },
-          }, {}),
-        },
-      }
-    end,
-    config = function(_, opts)
-      require("mini.ai").setup(opts)
-    end,
-  },
-  {
     "kana/vim-textobj-user",
     event = 'VeryLazy',
     dependencies = {
