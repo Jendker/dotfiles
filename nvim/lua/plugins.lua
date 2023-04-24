@@ -448,7 +448,7 @@ local plugins = {
             presets = {
               bottom_search = true, -- use a classic bottom cmdline for search
               command_palette = true, -- position the cmdline and popupmenu together
-              long_message_to_split = true, -- long messages will be sent to a split
+              long_message_to_split = false, -- if long messages should be sent to a split
             },
             messages = {
               enabled = true,
@@ -507,7 +507,22 @@ local plugins = {
       },
       {"petertriho/nvim-scrollbar", cond = not_vscode, config = function() require("scrollbar").setup({hide_if_all_visible = true}) end},
       {"tpope/vim-sleuth", cond = not_vscode}, -- automatically detect tabwidth
-      {"iamcco/markdown-preview.nvim", build = "cd app && npm install", setup = function() vim.g.mkdp_filetypes = { "markdown" } end, ft = { "markdown" }, cond = not_vscode},
+      {"iamcco/markdown-preview.nvim",
+        build = function() vim.fn["mkdp#util#install"]() end,
+        init = function()
+          vim.g.mkdp_preview_options={ ["disable_sync_scroll"] = 0 }
+          vim.g.mkdp_page_title = 'Preview: ${name}'
+        end,
+        config = function()
+          vim.keymap.set('n', '<leader>bp', "<cmd>MarkdownPreview<cr>", { desc = "Markdown [b]uffer [p]review" })
+        end,
+        ft = { "markdown" },
+        cond = not_vscode
+      },
+      {
+        "iamcco/markdown-preview.nvim",
+        build = function() vim.fn["mkdp#util#install"]() end,
+      },
       {"wintermute-cell/gitignore.nvim", cmd = 'Gitignore', dependencies = { "nvim-telescope/telescope.nvim" }, cond = not_vscode},
       {
         -- config from https://www.lazyvim.org/plugins/editor#troublenvim

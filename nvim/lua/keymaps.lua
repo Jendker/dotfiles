@@ -43,10 +43,6 @@ map("n", "q?", "<nop>")
 -- don't break scrolling. If you need join, use gJ instead
 map({"n", "x"}, "J", "j")
 
--- new line with enter
-map('n', '<CR>', 'o<Esc>')
-map('n', '<S-CR>', 'O<Esc>')
-
 -- select last pasted text
 map('n', 'gV', '`[v`]')
 
