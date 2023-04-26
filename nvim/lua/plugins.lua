@@ -74,7 +74,7 @@ local plugins = {
       require 'treesitter-context'.setup{enable = not vscode}
     end
   },
-  'andymass/vim-matchup',  -- better % on matching delimeters
+  {'andymass/vim-matchup', cond = not_vscode},  -- better % on matching delimeters
   'HiPhish/nvim-ts-rainbow2',  -- colored brackets
   {
     "kana/vim-textobj-user",
@@ -580,12 +580,15 @@ local plugins = {
       },
       {
         'Exafunction/codeium.vim',
-        event = { "BufReadPre", "BufNewFile" },
+        -- don't use events for now - I need to read codeium_enabled variable from machine_settings.lua
+        -- event = { "BufReadPre", "BufNewFile" },
         config = function()
           vim.keymap.set('i', '<a-]>', function() return vim.fn['codeium#CycleCompletions'](1) end, { expr = true, desc = "Codeium next suggestion" })
           vim.keymap.set('i', '<a-[>', function() return vim.fn['codeium#CycleCompletions'](-1) end, { expr = true, desc = "Codeium previous suggestion"})
           vim.keymap.set('i', '<a-x>', function() return vim.fn['codeium#Clear']() end, { expr = true, desc = "Codeium clear suggestion" })
           vim.keymap.set('i', '<a-Bslash>', function() return vim.fn['codeium#Complete']() end, { expr = true, desc = "Codeium trigger complete"})
+          -- disable by default - enable manually in machine_settings.lua
+          vim.g.codeium_enabled = false
         end,
         cond = not_vscode
       },

@@ -32,6 +32,8 @@ map("n", "<leader>X", "<cmd>!chmod +x %<CR>", { silent = true })
 map("n", "<leader>bf", vim.lsp.buf.format, { desc = "Run [b]uffer [f]ormatting" })
 map({"n", "v"}, "<leader>d", [["_d]])
 map({"n", "v"}, "<leader>D", [["_D]])
+map({"n", "v"}, "<leader>c", [["_c]])
+map({"n", "v"}, "<leader>C", [["_C]])
 map("n", "<leader>pv", vim.cmd.Ex)
 
 -- don't enter command history
@@ -93,9 +95,9 @@ if vscode then
   -- end folds helpers. Comes from https://github.com/vscode-neovim/vscode-neovim/issues/58#issuecomment-989481648
   -- and https://github.com/vscode-neovim/vscode-neovim/issues/58#issuecomment-1053940452
   map('n', "<leader>r", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI]], { desc = 'Find and [C]hange word under cursor'})
-  map('n', "<leader>c", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gcI]], { desc = 'Find and [C]hange word under cursor with confirmation'})
+  map('n', "<leader>rc", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gcI]], { desc = 'Find and [C]hange word under cursor with confirmation'})
   map('v', "<leader>r", [["fy:%s/<C-r>f/<C-r>f/gI]], { desc = 'Find and [C]hange selected'})
-  map('v', "<leader>c", [["fy:%s/<C-r>f/<C-r>f/gcI]], { desc = 'Find and [C]hange selected with confirmation'})
+  map('v', "<leader>rc", [["fy:%s/<C-r>f/<C-r>f/gcI]], { desc = 'Find and [C]hange selected with confirmation'})
   map({'n', 'x'}, 'go', ":call VSCodeNotify('editor.action.goToTypeDefinition')<CR>")
   map({'n', 'x'}, 'gl', ":call VSCodeNotify('editor.action.showHover')<CR>")
 else
