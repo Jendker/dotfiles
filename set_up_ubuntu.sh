@@ -86,6 +86,8 @@ fi
 
 sudo apt update
 sudo apt install tmux zsh xclip unzip python3-venv fd-find ccache -y
+# for thefuck
+sudo apt install python3-dev python3-pip python3-setuptools -y
 # symlink fdfind as fd
 mkdir -p $HOME/.local/bin
 ln -s $(which fdfind) $HOME/.local/bin/fd
@@ -98,6 +100,8 @@ if [ -d ~/.oh-my-zsh ]; then
  	echo "installing oh-my-zsh"
   sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
   chsh -s $(which zsh) || true
+  git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
+  pip3 install thefuck --user
   sudo tee -a $HOME/.zshrc > /dev/null <<'EOT'
 alias vim=nvim
 export EDITOR=nvim
@@ -109,8 +113,13 @@ export LANG=en_US.UTF-8
 export LC_ALL=en_US.UTF-8
 export PATH=$PATH:$HOME/.local/bin
 export PATH="/usr/lib/ccache:$PATH"
+eval $(thefuck --alias doit)
+# don't underline the paths with zsh-syntax-highlighting
+(( ${+ZSH_HIGHLIGHT_STYLES} )) || typeset -A ZSH_HIGHLIGHT_STYLES
+ZSH_HIGHLIGHT_STYLES[path]=none
+ZSH_HIGHLIGHT_STYLES[path_prefix]=none
 EOT
-sed -i 's/plugins=(git)/plugins=(git ubuntu)/g' $HOME/.zshrc
+sed -i 's/plugins=(git)/plugins=(git ubuntu zsh-syntax-highlighting)/g' $HOME/.zshrc
 sed -i '/mode auto/s/^# //g' $HOME/.zshrc
 fi
 
