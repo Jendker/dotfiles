@@ -17,7 +17,8 @@ function install_nvim_source() {
 
 function update_nvim() {
   cd /tmp/ && rm -rf dotfiles && git clone https://github.com/Jendker/dotfiles.git
-  cp -r dotfiles/nvim $HOME/.config/
+  mkdir -p $HOME/.config
+  cp -r dotfiles/nvim $HOME/.config
   run_times=1
   nvim --headless "+Lazy! install" +qa
   # repeat again until successful
@@ -29,7 +30,8 @@ function install_node() {
   installed=false
   if ! [ -x "$(command -v nvm)" ]; then
     echo "Installing nvm."
-    wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
+    nvm_install_command="wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash"
+    zsh -c "$nvm_install_command" || eval "$nvm_install_command"
     set +x
     export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
     [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
@@ -85,12 +87,12 @@ if [[ ! $# -eq 0 ]]; then
 fi
 
 sudo apt update
-sudo apt install tmux zsh xclip unzip python3-venv fd-find ccache -y
+sudo apt install tmux zsh xclip unzip python3-venv fd-find ccache git -y
 # for thefuck
 sudo apt install python3-dev python3-pip python3-setuptools -y
 # symlink fdfind as fd
 mkdir -p $HOME/.local/bin
-ln -s $(which fdfind) $HOME/.local/bin/fd
+ln -s $(which fdfind) $HOME/.local/bin/fd || true
 
 sudo apt install ripgrep -y || true
 sudo apt install clang-format-10 -y || true
