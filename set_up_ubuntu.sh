@@ -103,6 +103,7 @@ if [ -d ~/.oh-my-zsh ]; then
   sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
   chsh -s $(which zsh) || true
   git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
+  git clone https://github.com/MenkeTechnologies/zsh-expand.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-expand
   pip3 install thefuck --user
   sudo tee -a $HOME/.zshrc > /dev/null <<'EOT'
 alias vim=nvim
@@ -116,13 +117,24 @@ export LC_ALL=en_US.UTF-8
 export PATH=$PATH:$HOME/.local/bin
 export PATH="/usr/lib/ccache:$PATH"
 eval $(thefuck --alias doit)
+EOT
+  # set plugin variables before sourcing oh-my-zsh
+  ex -s $HOME/.zshrc <<\IN
+/source \$ZSH\/oh-my-zsh.sh/i
 # don't underline the paths with zsh-syntax-highlighting
 (( ${+ZSH_HIGHLIGHT_STYLES} )) || typeset -A ZSH_HIGHLIGHT_STYLES
 ZSH_HIGHLIGHT_STYLES[path]=none
 ZSH_HIGHLIGHT_STYLES[path_prefix]=none
-EOT
-sed -i 's/plugins=(git)/plugins=(git ubuntu zsh-syntax-highlighting)/g' $HOME/.zshrc
-sed -i '/mode auto/s/^# //g' $HOME/.zshrc
+
+# zsh-expand
+export ZPWR_EXPAND_BLACKLIST=(ls vim rg)
+export ZPWR_EXPAND_TO_HISTORY=true # expand to history also on enter
+
+.
+wq
+IN
+  sed -i 's/plugins=(git)/plugins=(git ubuntu zsh-syntax-highlighting zsh-expand)/g' $HOME/.zshrc
+  sed -i '/mode auto/s/^# //g' $HOME/.zshrc
 fi
 
 sudo locale-gen en_US
