@@ -12,6 +12,9 @@ vim.opt.signcolumn = 'yes:2'
 
 gitsigns.setup {
   signcolumn = true, -- Toggle with `:Gitsigns toggle_signs`
+  current_line_blame_opts = {
+    delay = 100,
+  },
   on_attach = function(bufnr)
     local gs = package.loaded.gitsigns
 
