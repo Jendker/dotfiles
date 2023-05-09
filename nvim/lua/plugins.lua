@@ -224,7 +224,7 @@ local plugins = {
           {'<leader>bc', "<cmd>lua telescope.extensions.vim_bookmarks.current_file()<cr>", 'n', desc = "Show [b]ookmarks in [c]urrent file"},
           {'<leader>sf', "<cmd>lua require('telescope.builtin').find_files()<cr>", 'n', desc = '[S]earch [f]iles'},
           {'<leader>sl', "<cmd>lua require('telescope.builtin').live_grep()<cr>", 'n', desc = '[S]earch with [l]ive grep'},
-          {'<leader>sg', "<cmd>lua function() require('telescope.builtin').grep_string({ search = vim.fn.input('Grep > ') }) end()<cr>", 'n', desc = "[S]earch after [g]rep with string"},
+          {'<leader>sg', "<cmd>lua require('telescope.builtin').grep_string({ search = vim.fn.input('Grep > ') })<cr>", 'n', desc = "[S]earch after [g]rep with string"},
           {'<leader>si', "<cmd>lua require('telescope.builtin').git_files()<cr>", 'n', desc = '[S]earch in g[i]t files'},
           {'<leader>sb', "<cmd>lua require('telescope.builtin').buffers()<cr>", 'n', desc = '[S]earch existing [b]uffers'},
           {'<leader>sh', "<cmd>lua require('telescope.builtin').help_tags()<cr>", 'n', desc = '[S]earch [h]elp'},
@@ -245,6 +245,12 @@ local plugins = {
               mappings = {
                 i = { ["<c-t>"] = trouble.open_with_trouble },
                 n = { ["<c-t>"] = trouble.open_with_trouble },
+              },
+              layout_config = {
+                horizontal = {
+                  width = 0.95,
+                  preview_width = 0.5,
+                }
               },
             },
             pickers = {
@@ -580,15 +586,16 @@ local plugins = {
       },
       {
         'Exafunction/codeium.vim',
-        -- don't use events for now - I need to read codeium_enabled variable from machine_settings.lua
-        -- event = { "BufReadPre", "BufNewFile" },
+        event = { "BufReadPre", "BufNewFile" },
+        init = function()
+          -- disable by default - enable manually in machine_settings.lua
+          vim.g.codeium_enabled = false
+        end,
         config = function()
           vim.keymap.set('i', '<a-]>', function() return vim.fn['codeium#CycleCompletions'](1) end, { expr = true, desc = "Codeium next suggestion" })
           vim.keymap.set('i', '<a-[>', function() return vim.fn['codeium#CycleCompletions'](-1) end, { expr = true, desc = "Codeium previous suggestion"})
           vim.keymap.set('i', '<a-x>', function() return vim.fn['codeium#Clear']() end, { expr = true, desc = "Codeium clear suggestion" })
           vim.keymap.set('i', '<a-Bslash>', function() return vim.fn['codeium#Complete']() end, { expr = true, desc = "Codeium trigger complete"})
-          -- disable by default - enable manually in machine_settings.lua
-          vim.g.codeium_enabled = false
         end,
         cond = not_vscode
       },
