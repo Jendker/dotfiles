@@ -14,7 +14,6 @@ vim.opt.rtp:prepend(lazypath)
 local plugins = {
   {
     'ggandor/leap.nvim',
-    event = 'VeryLazy',
     config = function ()
       local leap = require('leap')
       leap.set_default_keymaps()
@@ -220,17 +219,22 @@ local plugins = {
         'nvim-telescope/telescope.nvim', version = '0.1.1',
         cmd = 'Telescope',
         keys = {
+          -- bookmarks
           {'<leader>ba', "<cmd>lua telescope.extensions.vim_bookmarks.all()<cr>", 'n', desc = "Show [b]ookmarks in [a]ll files"},
           {'<leader>bc', "<cmd>lua telescope.extensions.vim_bookmarks.current_file()<cr>", 'n', desc = "Show [b]ookmarks in [c]urrent file"},
-          {'<leader>sf', "<cmd>lua require('telescope.builtin').find_files()<cr>", 'n', desc = '[S]earch [f]iles'},
+          -- files
+          {'<leader>ff', "<cmd>lua require('telescope.builtin').find_files()<cr>", 'n', desc = '[f] Search [f]iles'},
+          {'<leader>fb', "<cmd>lua require('telescope.builtin').buffers()<cr>", 'n', desc = '[f] Search existing [b]uffers'},
+          {'<leader>fg', "<cmd>lua require('telescope.builtin').git_files()<cr>", 'n', desc = '[f] search [g]it files'},
+          {'<leader>fr', "<cmd>lua require('telescope.builtin').oldfiles()<cr>", 'n', desc = '[f] Search [r]ecently opened files'},
+          -- search
           {'<leader>sl', "<cmd>lua require('telescope.builtin').live_grep()<cr>", 'n', desc = '[S]earch with [l]ive grep'},
           {'<leader>sg', "<cmd>lua require('telescope.builtin').grep_string({ search = vim.fn.input('Grep > ') })<cr>", 'n', desc = "[S]earch after [g]rep with string"},
-          {'<leader>si', "<cmd>lua require('telescope.builtin').git_files()<cr>", 'n', desc = '[S]earch in g[i]t files'},
-          {'<leader>sb', "<cmd>lua require('telescope.builtin').buffers()<cr>", 'n', desc = '[S]earch existing [b]uffers'},
           {'<leader>sh', "<cmd>lua require('telescope.builtin').help_tags()<cr>", 'n', desc = '[S]earch [h]elp'},
           {'<leader>sd', "<cmd>lua require('telescope.builtin').diagnostics()<cr>", 'n', desc = '[S]earch [d]iagnostics'},
-          {'<leader>so', "<cmd>lua require('telescope.builtin').oldfiles()<cr>", 'n', desc = '[S]earch recently [o]pened files'},
-          {'<leader>sr', "<cmd>lua require('telescope.builtin').resume()<cr>", 'n', { desc = '[S]earch [r]esume'}},
+          {'<leader>so', "<cmd>lua require('telescope.builtin').live_grep({grep_open_files=true})<cr>", 'n', desc = '[S]earch in [o]pen buffers'},
+          {'<leader>sc', "<cmd>lua require('telescope.builtin').resume()<cr>", 'n', desc = '[S]earch [c]ontinue'},
+          -- miscellaneous
           {'<leader>/', desc = '[?] search for word under cursor'},
           {'<leader>?', desc = '[/] Fuzzily search in current buffer'},
         },
@@ -239,9 +243,9 @@ local plugins = {
           local telescope = require('telescope')
           local actions = require('telescope.actions')
           local trouble = require("trouble.providers.telescope")
+          local custom_pickers = require('config_plugins.telescope_custom_pickers')
           telescope.setup({
             defaults = {
-              path_display={"smart"},
               mappings = {
                 i = { ["<c-t>"] = trouble.open_with_trouble },
                 n = { ["<c-t>"] = trouble.open_with_trouble },
@@ -270,6 +274,10 @@ local plugins = {
                       return actions.preview_scrolling_up(...)
                     end,
                     ["<c-r>"] = actions.to_fuzzy_refine,
+                    ["<c-e>"] = custom_pickers.actions.set_extension,
+                    ["<c-l>"] = custom_pickers.actions.set_folders,
+                    ["<c-o>"] = custom_pickers.actions.set_glob,
+                    ["<c-q>"] = custom_pickers.actions.reset_filters,
                   },
                   n = {
                     ["q"] = function(...)
@@ -302,6 +310,13 @@ local plugins = {
         config = function()
           require"telescope".load_extension("frecency")
         end,
+        cond = not_vscode
+      },
+      {
+        "nvim-telescope/telescope-live-grep-args.nvim",
+        keys = {
+          {"<leader>sa", "<Cmd>lua require('telescope').extensions.live_grep_args.live_grep_args()<CR>", "n", noremap = true, silent = true, desc = "[S]earch with ripgrep [a]rgs"},
+        },
         cond = not_vscode
       },
       {'farmergreg/vim-lastplace', cond = not_vscode},
