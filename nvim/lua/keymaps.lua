@@ -30,6 +30,7 @@ end
 vim.g.mapleader = " "
 map("n", "<leader>X", "<cmd>!chmod +x %<CR>", { silent = true })
 map("n", "<leader>bf", vim.lsp.buf.format, { desc = "Run [b]uffer [f]ormatting" })
+map("n", "<leader>bq", "<cmd>bp <BAR> bd #<CR>", { desc = "Close buffer"})
 map({"n", "v"}, "<leader>d", [["_d]])
 map({"n", "v"}, "<leader>D", [["_D]])
 map({"n", "v"}, "<leader>c", [["_c]])

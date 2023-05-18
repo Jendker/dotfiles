@@ -269,10 +269,45 @@ vim.diagnostic.config({
 local cmp = require('cmp')
 local cmp_action = require('lsp-zero').cmp_action()
 require('luasnip.loaders.from_vscode').lazy_load() -- for snippets
+local luasnip = require("luasnip")
+local has_words_before = function()
+  unpack = unpack or table.unpack
+  local line, col = unpack(vim.api.nvim_win_get_cursor(0))
+  return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
+end
+
 local cmp_mappings = {
   ['<C-Space>'] = cmp.mapping.complete(),
   ['<CR>'] = cmp.mapping.confirm(),
-  ['<Tab>'] = cmp.mapping.confirm(),
+  ['<Tab>'] = {
+    i = function(fallback)
+      -- We dont autocomplete if we are in an active Snippet unless the completion
+      -- item is selected explicitly.
+      if cmp.visible() then
+        cmp.confirm({ select = true, behavior = cmp.ConfirmBehavior.Replace })
+      elseif luasnip.expand_or_jumpable() then
+        luasnip.expand_or_jump()
+      elseif has_words_before() then
+        cmp.complete()
+      else
+        fallback()
+      end
+    end,
+    s = function(fallback)
+      if luasnip.expand_or_jumpable() then
+        luasnip.expand_or_jump()
+      else
+        fallback()
+      end
+    end,
+    c = function(_)
+      if cmp.visible() then
+        cmp.confirm({ select = true, behavior = cmp.ConfirmBehavior.Replace })
+      else
+        cmp.complete()
+      end
+    end,
+  },
   ['<S-Tab>'] = nil,
   ['<C-d>'] = cmp.mapping.scroll_docs(4),
   ['<C-u>'] = cmp.mapping.scroll_docs(-4),
@@ -288,10 +323,6 @@ cmp.setup({
       vim_item.abbr = string.sub(vim_item.abbr, 1, 100)
       return vim_item
     end
-  },
-  preselect = cmp.PreselectMode.Item,
-  completion = {
-    completeopt = 'menu,menuone,noinsert'
   },
   sources = {
     {name = 'path'},

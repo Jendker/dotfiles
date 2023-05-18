@@ -93,7 +93,7 @@ local plugins = {
       local treesj = require('treesj')
       treesj.setup({
         use_default_keymaps = false,
-        max_join_length = 100,
+        max_join_length = 120,
       })
       vim.keymap.set('n', 'gJ', treesj.join, {desc = "[J]oin lines"})
       vim.keymap.set('n', 'gS', treesj.split, {desc = "[S]plit lines"})
@@ -233,7 +233,7 @@ local plugins = {
           {'<leader>sh', "<cmd>lua require('telescope.builtin').help_tags()<cr>", 'n', desc = '[S]earch [h]elp'},
           {'<leader>sd', "<cmd>lua require('telescope.builtin').diagnostics()<cr>", 'n', desc = '[S]earch [d]iagnostics'},
           {'<leader>so', "<cmd>lua require('telescope.builtin').live_grep({grep_open_files=true})<cr>", 'n', desc = '[S]earch in [o]pen buffers'},
-          {'<leader>sc', "<cmd>lua require('telescope.builtin').resume()<cr>", 'n', desc = '[S]earch [c]ontinue'},
+          {'<leader>sr', "<cmd>lua require('telescope.builtin').resume()<cr>", 'n', desc = '[S]earch [r]esume'},
           -- miscellaneous
           {'<leader>/', desc = '[?] search for word under cursor'},
           {'<leader>?', desc = '[/] Fuzzily search in current buffer'},
@@ -277,13 +277,19 @@ local plugins = {
                     ["<c-e>"] = custom_pickers.actions.set_extension,
                     ["<c-l>"] = custom_pickers.actions.set_folders,
                     ["<c-o>"] = custom_pickers.actions.set_glob,
-                    ["<c-q>"] = custom_pickers.actions.reset_filters,
+                    ["<a-r>"] = custom_pickers.actions.reset_filters,
                   },
                   n = {
                     ["q"] = function(...)
                       return actions.close(...)
                     end,
                   },
+                },
+              },
+              buffers = {
+                mappings = {
+                  i = { ["<c-q>"] = actions.delete_buffer },
+                  n = { ["<c-q>"] = actions.delete_buffer },
                 },
               },
             },
@@ -603,7 +609,7 @@ local plugins = {
             },
             mappings = {
               list = {
-                ['l'] = actions.open_fold,
+                ['l'] = actions.jump,
                 ['h'] = actions.close_fold,
               },
             },
