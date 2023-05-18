@@ -506,11 +506,23 @@ local plugins = {
         cond = not_vscode
       },
       {
-        "907th/vim-auto-save",
+        "zoriya/auto-save.nvim",
+        keys = {
+          { "<leader>ta", ":ASToggle<CR>", desc = "[T]oggle [a]utosave", silent = true },
+        },
         config = function()
-          vim.g.auto_save = 0
-          vim.g.auto_save_silent = 1
-          vim.keymap.set("n", "<leader>n", vim.cmd.AutoSaveToggle, { desc = "[n] Toggle autosave", silent = true})
+          vim.g.first_autosave_disable = 1
+          require("auto-save").setup {
+            enabled = false,  -- this doesn't seem to work
+            print_enabled = false,
+            callbacks = {
+              enabling = function() print "auto-save on" end,
+              disabling = function() if vim.g.first_autosave_disable == 1 then vim.g.first_autosave_disable = 0 else print "auto-save off" end end,
+              before_saving = function() vim.b.lsp_zero_enable_autoformat = 0 end,
+              after_saving = function() vim.b.lsp_zero_enable_autoformat = 1 end,
+            }
+          }
+          vim.cmd('ASToggle') -- called manually because 'enabled = false' does not work
         end,
         cond = not_vscode
       },
