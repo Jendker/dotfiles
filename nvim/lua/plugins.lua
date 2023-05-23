@@ -73,7 +73,12 @@ local plugins = {
       require 'treesitter-context'.setup{enable = not vscode}
     end
   },
-  {'andymass/vim-matchup', cond = not_vscode},  -- better % on matching delimeters
+  {
+    'andymass/vim-matchup',
+    init = function()
+      vim.g.matchup_motion_enabled = not vscode
+    end
+  }, -- better % on matching delimeters
   'HiPhish/nvim-ts-rainbow2',  -- colored brackets
   {
     "kana/vim-textobj-user",
@@ -235,75 +240,13 @@ local plugins = {
           {'<leader>so', "<cmd>lua require('telescope.builtin').live_grep({grep_open_files=true})<cr>", 'n', desc = '[S]earch in [o]pen buffers'},
           {'<leader>sr', "<cmd>lua require('telescope.builtin').resume()<cr>", 'n', desc = '[S]earch [r]esume'},
           -- miscellaneous
-          {'<leader>/', desc = '[?] search for word under cursor'},
-          {'<leader>?', desc = '[/] Fuzzily search in current buffer'},
+          {'<leader>/', desc = '[/] Fuzzily search in current buffer'},
+          {'<leader>?', mode = 'n', desc = '[?] search for word under cursor'},
+          {'<leader>?', mode = 'v', desc = '[?] search for selection'},
         },
         dependencies = { 'nvim-lua/plenary.nvim' },
         config = function()
-          local telescope = require('telescope')
-          local actions = require('telescope.actions')
-          local trouble = require("trouble.providers.telescope")
-          local custom_pickers = require('config_plugins.telescope_custom_pickers')
-          telescope.setup({
-            defaults = {
-              mappings = {
-                i = { ["<c-t>"] = trouble.open_with_trouble },
-                n = { ["<c-t>"] = trouble.open_with_trouble },
-              },
-              layout_config = {
-                horizontal = {
-                  width = 0.95,
-                  preview_width = 0.5,
-                }
-              },
-            },
-            pickers = {
-              live_grep = {
-                mappings = {
-                  i = {
-                    ["<C-Down>"] = function(...)
-                      return actions.cycle_history_next(...)
-                    end,
-                    ["<C-Up>"] = function(...)
-                      return actions.cycle_history_prev(...)
-                    end,
-                    ["<C-f>"] = function(...)
-                      return actions.preview_scrolling_down(...)
-                    end,
-                    ["<C-b>"] = function(...)
-                      return actions.preview_scrolling_up(...)
-                    end,
-                    ["<c-r>"] = actions.to_fuzzy_refine,
-                    ["<c-e>"] = custom_pickers.actions.set_extension,
-                    ["<c-l>"] = custom_pickers.actions.set_folders,
-                    ["<c-o>"] = custom_pickers.actions.set_glob,
-                    ["<a-r>"] = custom_pickers.actions.reset_filters,
-                  },
-                  n = {
-                    ["q"] = function(...)
-                      return actions.close(...)
-                    end,
-                  },
-                },
-              },
-              buffers = {
-                mappings = {
-                  i = { ["<c-q>"] = actions.delete_buffer },
-                  n = { ["<c-q>"] = actions.delete_buffer },
-                },
-              },
-            },
-          })
-          -- vim_booksmarks
-          telescope.load_extension('vim_bookmarks')
-          vim.keymap.set('n', '<leader>?', require('telescope.builtin').grep_string, { desc = '[?] search for word under cursor'})
-          vim.keymap.set('n', '<leader>/', function()
-            -- You can pass additional configuration to telescope to change theme, layout, etc.
-            require('telescope.builtin').current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
-              winblend = 10,
-              previewer = false,
-            })
-          end, { desc = '[/] Fuzzily search in current buffer' })
+          require 'config_plugins.telescope'
         end,
         cond = not_vscode
       },
@@ -315,6 +258,13 @@ local plugins = {
         },
         config = function()
           require"telescope".load_extension("frecency")
+        end,
+        cond = not_vscode
+      },
+      {
+        "natecraddock/telescope-zf-native.nvim",
+        config = function()
+          require("telescope").load_extension("zf-native")
         end,
         cond = not_vscode
       },

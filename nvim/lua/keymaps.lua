@@ -72,6 +72,7 @@ map('v', '?', "\"fy?<C-R>f<CR>", {silent = true})
 
 if vscode then
   map('n', '<leader>?', "<Cmd>call VSCodeNotify('workbench.action.findInFiles', { 'query': expand('<cword>')})<CR>")
+  map('v', '<leader>?', "\"fy<Cmd>call VSCodeNotify('workbench.action.findInFiles', { 'query': eval('@f')})<CR>")
   -- Get folding working with vscode neovim plugin
   map('n', 'zM', ":call VSCodeNotify('editor.foldAll')<CR>")
   map('n', 'zR', ":call VSCodeNotify('editor.unfoldAll')<CR>")
@@ -99,6 +100,7 @@ if vscode then
   map('n', "<leader>rc", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gcI]], { desc = 'Find and [C]hange word under cursor with confirmation'})
   map('v', "<leader>r", [["fy:%s/<C-r>f/<C-r>f/gI]], { desc = 'Find and [C]hange selected'})
   map('v', "<leader>rc", [["fy:%s/<C-r>f/<C-r>f/gcI]], { desc = 'Find and [C]hange selected with confirmation'})
+  map({'n', 'x'}, "<leader>ca", ":call VSCodeNotify('editor.action.quickFix')<CR>")
   map({'n', 'x'}, 'go', ":call VSCodeNotify('editor.action.goToTypeDefinition')<CR>")
   map({'n', 'x'}, 'gl', ":call VSCodeNotify('editor.action.showHover')<CR>")
 else
