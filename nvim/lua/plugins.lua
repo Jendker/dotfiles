@@ -139,6 +139,16 @@ local plugins = {
         cond = not_vscode
       },
       {
+        'stevearc/oil.nvim',
+        dependencies = { "nvim-tree/nvim-web-devicons" },
+        config = function()
+          require("oil").setup()
+          vim.keymap.set("n", "-", require("oil").open, { desc = "Open parent directory" })
+          vim.keymap.set("n", "<leader>pv", require("oil").open, { desc = "Open directory view" })
+        end,
+        cond = not_vscode
+      },
+      {
         'navarasu/onedark.nvim',
         lazy = false, -- make sure we load this during startup, that's main colorscheme
         config = function()

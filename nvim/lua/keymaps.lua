@@ -35,7 +35,6 @@ map({"n", "v"}, "<leader>d", [["_d]])
 map({"n", "v"}, "<leader>D", [["_D]])
 map({"n", "v"}, "<leader>c", [["_c]])
 map({"n", "v"}, "<leader>C", [["_C]])
-map("n", "<leader>pv", vim.cmd.Ex)
 
 -- don't enter command history
 map("n", "Q", "<nop>")
