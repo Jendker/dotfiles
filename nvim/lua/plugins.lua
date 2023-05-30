@@ -393,6 +393,24 @@ local plugins = {
         cond = not_vscode
       },
       {
+        "sindrets/diffview.nvim",
+        dependencies = {
+          "nvim-lua/plenary.nvim",
+          "lewis6991/gitsigns.nvim",
+          "nvim-tree/nvim-web-devicons",
+        },
+        config = true,
+        keys = {
+          { "<leader>gd",  "<cmd>DiffviewOpen<cr>",                  desc = "[G]it [d]iff for repo", nowait = true },
+          { "<leader>gh", "<cmd>DiffviewFileHistory<cr>",            desc = "[G]it file [h]istory" },
+          { "<leader>gf", "<cmd>DiffviewFileHistory --follow %<cr>", desc = "[G]it file history with [f]ollow" },
+          { "<leader>gm", "<cmd>DiffviewOpen master<cr>",            desc = "[G]it diff with [m]aster" },
+          { "<leader>gl", "<cmd>.DiffviewFileHistory --follow<CR>",  desc = "[G]it file history for the current [l]ine"},
+          { "<leader>gl", "<Esc><cmd>'<,'>DiffviewFileHistory --follow<CR>", mode = 'v',  desc = "[G]it file history for the visual se[l]ection"},
+        },
+        cond = not_vscode
+      },
+      {
         "folke/which-key.nvim",
         config = function()
           vim.o.timeout = true
