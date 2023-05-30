@@ -49,7 +49,7 @@ map({"n", "x"}, "J", "j")
 -- select last pasted text
 map('n', 'gV', '`[v`]')
 
-map("n", "<leader>bb", "<cmd>e #<cr>", { desc = "Switch to Other Buffer" })
+map("n", "<leader>bn", "<cmd>e #<cr>", { desc = "Switch to Other Buffer" })
 map("n", "<leader>`", "<cmd>e #<cr>", { desc = "Switch to Other Buffer" })
 
 -- better indenting

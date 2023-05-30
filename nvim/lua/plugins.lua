@@ -225,8 +225,8 @@ local plugins = {
         cmd = 'Telescope',
         keys = {
           -- bookmarks
-          {'<leader>ba', "<cmd>lua telescope.extensions.vim_bookmarks.all()<cr>", 'n', desc = "Show [b]ookmarks in [a]ll files"},
-          {'<leader>bc', "<cmd>lua telescope.extensions.vim_bookmarks.current_file()<cr>", 'n', desc = "Show [b]ookmarks in [c]urrent file"},
+          {'<leader>ba', "<cmd>lua require('telescope').extensions.vim_bookmarks.all()<cr>", 'n', desc = "Show [b]ookmarks in [a]ll files"},
+          {'<leader>bb', "<cmd>lua require('telescope').extensions.vim_bookmarks.current_file()<cr>", 'n', desc = "Show [b]ookmarks in [b]uffer"},
           -- files
           {'<leader>ff', "<cmd>lua require('telescope.builtin').find_files()<cr>", 'n', desc = '[f] Search [f]iles'},
           {'<leader>fb', "<cmd>lua require('telescope.builtin').buffers()<cr>", 'n', desc = '[f] Search existing [b]uffers'},
@@ -237,14 +237,17 @@ local plugins = {
           {'<leader>sg', "<cmd>lua require('telescope.builtin').grep_string({ search = vim.fn.input('Grep > ') })<cr>", 'n', desc = "[S]earch after [g]rep with string"},
           {'<leader>sh', "<cmd>lua require('telescope.builtin').help_tags()<cr>", 'n', desc = '[S]earch [h]elp'},
           {'<leader>sd', "<cmd>lua require('telescope.builtin').diagnostics()<cr>", 'n', desc = '[S]earch [d]iagnostics'},
-          {'<leader>so', "<cmd>lua require('telescope.builtin').live_grep({grep_open_files=true})<cr>", 'n', desc = '[S]earch in [o]pen buffers'},
+          {'<leader>so', "<cmd>lua require('telescope.builtin').live_grep({grep_open_files=true})<cr>", 'n', desc = '[S]earch with live grep in [o]pen buffers'},
           {'<leader>sr', "<cmd>lua require('telescope.builtin').resume()<cr>", 'n', desc = '[S]earch [r]esume'},
+          {'<leader>ssb', "<cmd>lua require('telescope.builtin').lsp_document_symbols()<cr>", '[s][s]ymbols [b]uffer'},
+          {'<leader>ssw', "<cmd>lua require('telescope.builtin').lsp_dynamic_workspace_symbols()<cr>", '[s][s]ymbols [w]orkspace'},
+
           -- miscellaneous
           {'<leader>/', desc = '[/] Fuzzily search in current buffer'},
           {'<leader>?', mode = 'n', desc = '[?] search for word under cursor'},
           {'<leader>?', mode = 'v', desc = '[?] search for selection'},
         },
-        dependencies = { 'nvim-lua/plenary.nvim' },
+        dependencies = { 'nvim-lua/plenary.nvim', 'nvim-telescope/telescope-frecency.nvim', 'natecraddock/telescope-zf-native.nvim' },
         config = function()
           require 'config_plugins.telescope'
         end,
@@ -252,17 +255,18 @@ local plugins = {
       },
       {
         "nvim-telescope/telescope-frecency.nvim",
-        dependencies = {"kkharji/sqlite.lua", "nvim-telescope/telescope.nvim"},
+        dependencies = {"kkharji/sqlite.lua"},
         keys = {
-          {"<leader>sp", "<Cmd>lua require('telescope').extensions.frecency.frecency({ workspace = 'CWD' })<CR>", "n", noremap = true, silent = true, desc = "Telescope frecency"},
+          {"<leader>fp", "<Cmd>lua require('telescope').extensions.frecency.frecency({ workspace = 'CWD' })<CR>", "n", noremap = true, silent = true, desc = "Telescope frecency"},
         },
         config = function()
-          require"telescope".load_extension("frecency")
+          require("telescope").load_extension("frecency")
         end,
         cond = not_vscode
       },
       {
         "natecraddock/telescope-zf-native.nvim",
+        cmd = 'Telescope',
         config = function()
           require("telescope").load_extension("zf-native")
         end,
@@ -355,6 +359,18 @@ local plugins = {
             highlight = true,
           }
         end,
+        cond = not_vscode
+      },
+      {
+        "SmiteshP/nvim-navbuddy",
+        dependencies = {
+          "SmiteshP/nvim-navic",
+          "MunifTanjim/nui.nvim"
+        },
+        opts = function()
+          return { mappings = { ["<C-c>"] = require("nvim-navbuddy.actions").close()}}
+        end,
+        keys = {{"<leader>bs", "<cmd>Navbuddy<CR>", desc = "Navbuddy [b]uffer [s]ymbols"}},
         cond = not_vscode
       },
       {
@@ -482,7 +498,11 @@ local plugins = {
         end,
         cond = not_vscode
       },
-      {"petertriho/nvim-scrollbar", cond = not_vscode, config = function() require("scrollbar").setup({hide_if_all_visible = true}) end},
+      {
+        "petertriho/nvim-scrollbar",
+        config = function() require("scrollbar").setup({hide_if_all_visible = true, show_in_active_only = true}) end,
+        cond = not_vscode
+      },
       {"tpope/vim-sleuth", cond = not_vscode}, -- automatically detect tabwidth
       {"iamcco/markdown-preview.nvim",
         build = function() vim.fn["mkdp#util#install"]() end,
@@ -561,6 +581,7 @@ local plugins = {
               list = {
                 ['l'] = actions.jump,
                 ['h'] = actions.close_fold,
+                ['<C-c>'] = actions.close,
               },
             },
           })

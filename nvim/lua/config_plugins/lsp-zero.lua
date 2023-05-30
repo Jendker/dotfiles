@@ -75,8 +75,6 @@ lsp.on_attach(function(client, bufnr)
   nmap('gH', "<cmd>Glance references<cr>", 'Goto references')
   nmap('go', "<cmd>Glance type_definitions<cr>", 'Goto type lsp_definitions')
   nmap('gh', vim.lsp.buf.hover, '[G][H]over documentation')
-  nmap('<leader>bs', "<cmd>lua require('telescope.builtin').lsp_document_symbols()<cr>", '[B]uffer [s]ymbols')
-  nmap('<leader>ws', "<cmd>lua require('telescope.builtin').lsp_dynamic_workspace_symbols()<cr>", '[W]orkspace [s]ymbols')
 
   nmap('<leader>rn', vim.lsp.buf.rename, '[R]e[n]ame')
   nmap('<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction')
@@ -106,8 +104,14 @@ lsp.on_attach(function(client, bufnr)
   end
   if client.server_capabilities.documentSymbolProvider then
     require('nvim-navic').attach(client, bufnr)
+    require('nvim-navbuddy').attach(client, bufnr)
     vim.o.winbar = " %{%v:lua.require'nvim-navic'.get_location()%}"
     vim.defer_fn(function() vim.cmd('TSContextDisable') end, 1000)
+  end
+  if vim.fn.has("nvim-0.9.0") == 1 then
+    if client.server_capabilities.documentHighlightProvider then
+      vim.cmd('TSBufDisable highlight')
+    end
   end
 end)
 

@@ -11,37 +11,50 @@ local os_sep = Path.path.sep
 local pickers = require 'telescope.pickers'
 local scan = require 'plenary.scandir'
 
-local M = {}
+local M = {
+  default_additional_args = {'--fixed-strings'}
+}
+
+function shallow_copy(t)
+  local t2 = {}
+  for k,v in pairs(t) do
+    t2[k] = v
+  end
+  return t2
+end
 
 -- Keeps track of the active extension, folders, glob for `live_grep`
-local live_grep_filters = {
+local live_grep_data = {
   ---@type nil|string
   extension = nil,
   ---@type nil|string[]
   directories = nil,
   ---@type nil|string
   glob = nil,
+  ---@type string[]
+  args = shallow_copy(M.default_additional_args),
 }
 
 local function reset_live_grep_filters()
-  live_grep_filters.extension = nil
-  live_grep_filters.directories = nil
-  live_grep_filters.glob = nil
+  live_grep_data.extension = nil
+  live_grep_data.directories = nil
+  live_grep_data.glob = nil
+  live_grep_data.args = shallow_copy(M.default_additional_args)
 end
 
 
 -- Run `live_grep` with the active filters (extension and folders)
 local function run_live_grep(current_input)
   local glob_array = {}
-  if live_grep_filters.extension then
-    table.insert(glob_array, { '--iglob', '*.' .. live_grep_filters.extension})
+  if live_grep_data.extension then
+    table.insert(glob_array, { '--iglob', '*.' .. live_grep_data.extension})
   end
-  if live_grep_filters.glob then
-    table.insert(glob_array, { '--iglob', live_grep_filters.glob})
+  if live_grep_data.glob then
+    table.insert(glob_array, { '--iglob', live_grep_data.glob})
   end
   require('telescope.builtin').live_grep {
-    additional_args = glob_array,
-    search_dirs = live_grep_filters.directories,
+    additional_args = vim.tbl_extend("error", glob_array, live_grep_data.args),
+    search_dirs = live_grep_data.directories,
     default_text = current_input,
   }
 end
@@ -57,7 +70,7 @@ M.actions = transform_mod {
         return
       end
 
-      live_grep_filters.extension = input
+      live_grep_data.extension = input
 
       actions._close(prompt_bufnr, current_picker.initial_mode == 'insert')
       run_live_grep(current_input)
@@ -74,7 +87,7 @@ M.actions = transform_mod {
         return
       end
 
-      live_grep_filters.glob = input
+      live_grep_data.glob = input
 
       actions._close(prompt_bufnr, current_picker.initial_mode == 'insert')
       run_live_grep(current_input)
@@ -89,6 +102,12 @@ M.actions = transform_mod {
     run_live_grep(current_input)
   end,
 
+    -- sets regex flag
+  set_regex = function()
+    local current_input = action_state.get_current_line()
+    table.insert(live_grep_data.args, '--no-fixed-strings')
+    run_live_grep(current_input)
+  end,
 
   -- Ask the user for a folder and olen a new `live_grep` filtering by it
   set_folders = function(prompt_bufnr)
@@ -125,7 +144,7 @@ M.actions = transform_mod {
               table.insert(dirs, selection.value)
             end
           end
-          live_grep_filters.directories = dirs
+          live_grep_data.directories = dirs
 
           actions.close(bufnr)
           run_live_grep(current_input)

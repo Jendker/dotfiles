@@ -5,8 +5,15 @@ local custom_pickers = require('config_plugins.telescope_custom_pickers')
 telescope.setup({
   defaults = {
     mappings = {
-      i = { ["<c-t>"] = trouble.open_with_trouble },
-      n = { ["<c-t>"] = trouble.open_with_trouble },
+      i = {
+        ["<c-t>"] = trouble.open_with_trouble,
+      },
+      n = {
+        ["<c-t>"] = trouble.open_with_trouble,
+        ["q"] = function(...)
+          return actions.close(...)
+        end,
+      },
     },
     layout_config = {
       horizontal = {
@@ -35,14 +42,11 @@ telescope.setup({
           ["<c-e>"] = custom_pickers.actions.set_extension,
           ["<c-l>"] = custom_pickers.actions.set_folders,
           ["<c-o>"] = custom_pickers.actions.set_glob,
+          ["<c-g>"] = custom_pickers.actions.set_regex,
           ["<a-r>"] = custom_pickers.actions.reset_filters,
         },
-        n = {
-          ["q"] = function(...)
-            return actions.close(...)
-          end,
-        },
       },
+      additional_args = custom_pickers.default_additional_args,
     },
     buffers = {
       mappings = {

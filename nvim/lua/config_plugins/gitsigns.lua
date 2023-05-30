@@ -54,3 +54,4 @@ gitsigns.setup {
     map({'o', 'x'}, 'ih', ':<C-U>Gitsigns select_hunk<CR>', { desc = "select hunk"} )
   end
 }
+require("scrollbar.handlers.gitsigns").setup()

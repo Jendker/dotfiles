@@ -70,7 +70,7 @@ if [[ ! $# -eq 0 ]]; then
     exit 0
   elif [[ $1 == "--update-nvim-bin" ]]; then
     echo "Updating nvim binary..."
-    install_nvim_binary
+    install_nvim_source
     exit 0
   elif [[ $1 == "--install-node" ]]; then
     echo "Installing node js over nvm..."
