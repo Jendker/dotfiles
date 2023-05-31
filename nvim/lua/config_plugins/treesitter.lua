@@ -80,6 +80,9 @@ require('nvim-treesitter.configs').setup({
   highlight = {
     enable = not vscode,
   },
+  indent = {
+    enable = false
+  },
   rainbow = {
     enable = not vscode,
     max_file_lines = nil, -- Do not enable for files with more than n lines, int

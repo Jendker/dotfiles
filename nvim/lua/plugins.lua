@@ -532,6 +532,7 @@ local plugins = {
         cond = not_vscode
       },
       {"tpope/vim-sleuth", cond = not_vscode}, -- automatically detect tabwidth
+      {"rmagatti/auto-session", config = true, cond = not_vscode},
       {"iamcco/markdown-preview.nvim",
         build = function() vim.fn["mkdp#util#install"]() end,
         init = function()
