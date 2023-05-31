@@ -174,16 +174,25 @@ local plugins = {
           local lualine_x = {}
           local is_ok, noice = pcall(require, 'noice')
           if is_ok then
-            lualine_x = {
+            table.insert(lualine_x,
               {
                 noice.api.status.mode.get,
                 cond = function()
                   -- Don't show if status is e.g. -- INSERT -- or -- VISUAL LINE --
                   return noice.api.status.mode.has() and noice.api.status.mode.get():find("^-- .+ --$") == nil
                 end,
-              },
-            }
+              })
           end
+          table.insert(lualine_x,
+            {
+              function()
+                if vim.g.autosave_on == 1 then
+                  return "󱑜"
+                else
+                  return ""
+                end
+              end
+            })
           table.insert(lualine_x, {'filetype'})
           -- lualine_x definition done
           require("lualine").setup(
@@ -513,12 +522,13 @@ local plugins = {
         },
         config = function()
           vim.g.first_autosave_disable = 1
+          vim.g.autosave_on = 0
           require("auto-save").setup {
             enabled = false,  -- this doesn't seem to work
             print_enabled = false,
             callbacks = {
-              enabling = function() print "auto-save on" end,
-              disabling = function() if vim.g.first_autosave_disable == 1 then vim.g.first_autosave_disable = 0 else print "auto-save off" end end,
+              enabling = function() print "auto-save on"; vim.g.autosave_on = 1 end,
+              disabling = function() if vim.g.first_autosave_disable == 1 then vim.g.first_autosave_disable = 0 else print "auto-save off"; vim.g.autosave_on = 0 end end,
               before_saving = function() vim.b.lsp_zero_enable_autoformat = 0 end,
               after_saving = function() vim.b.lsp_zero_enable_autoformat = 1 end,
             }
