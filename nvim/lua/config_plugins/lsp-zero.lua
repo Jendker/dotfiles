@@ -304,13 +304,6 @@ local cmp_mappings = {
         fallback()
       end
     end,
-    c = function(_)
-      if cmp.visible() then
-        cmp.confirm({ select = true, behavior = cmp.ConfirmBehavior.Replace })
-      else
-        cmp.complete()
-      end
-    end,
   },
   ['<S-Tab>'] = nil,
   ['<C-d>'] = cmp.mapping.scroll_docs(4),
@@ -336,6 +329,25 @@ cmp.setup({
   },
 })
 
+-- Use buffer source for `/`.
+cmp.setup.cmdline('/', {
+  mapping = cmp.mapping.preset.cmdline(),
+  completion = { autocomplete = false },
+  sources = {
+    { name = 'buffer' }
+  }
+})
+
+-- Use cmdline & path source for ':'.
+cmp.setup.cmdline(':', {
+  mapping = cmp.mapping.preset.cmdline(),
+  completion = { autocomplete = false },
+  sources = cmp.config.sources({
+    { name = 'path' }
+  }, {
+    { name = 'cmdline' }
+  })
+})
 
 -- If you want to insert `(` after selected function
 local ok, cmp_autopairs = pcall(require, 'nvim-autopairs.completion.cmp')
