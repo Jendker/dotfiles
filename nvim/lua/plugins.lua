@@ -45,7 +45,7 @@ local plugins = {
   {
     'tpope/vim-commentary', -- gcc to comment
     event = 'VeryLazy',
-    config = function ()
+    init = function ()
       -- Comment c, cpp, cs, java with //
       vim.api.nvim_command([[autocmd FileType c,cpp,cs,java setlocal commentstring=//\ %s]])
     end
@@ -198,6 +198,7 @@ local plugins = {
           require("lualine").setup(
           {
             sections = {
+              lualine_b = {'branch', 'diagnostics'},
               lualine_c = {
                 {
                   'filename',
@@ -244,22 +245,22 @@ local plugins = {
         cmd = 'Telescope',
         keys = {
           -- bookmarks
-          {'<leader>ba', "<cmd>lua require('telescope').extensions.vim_bookmarks.all()<cr>", 'n', desc = "Show [b]ookmarks in [a]ll files"},
-          {'<leader>bb', "<cmd>lua require('telescope').extensions.vim_bookmarks.current_file()<cr>", 'n', desc = "Show [b]ookmarks in [b]uffer"},
+          {'<leader>sba', "<cmd>lua require('telescope').extensions.vim_bookmarks.all()<cr>", 'n', desc = "Show [b]ookmarks in [a]ll files"},
+          {'<leader>sbb', "<cmd>lua require('telescope').extensions.vim_bookmarks.current_file()<cr>", 'n', desc = "Show [b]ookmarks in [b]uffer"},
           -- files
-          {'<leader>ff', "<cmd>lua require('telescope.builtin').find_files()<cr>", 'n', desc = '[f] Search [f]iles'},
-          {'<leader>fb', "<cmd>lua require('telescope.builtin').buffers()<cr>", 'n', desc = '[f] Search existing [b]uffers'},
-          {'<leader>fg', "<cmd>lua require('telescope.builtin').git_files()<cr>", 'n', desc = '[f] search [g]it files'},
-          {'<leader>fr', "<cmd>lua require('telescope.builtin').oldfiles()<cr>", 'n', desc = '[f] Search [r]ecently opened files'},
+          {'<leader>sff', "<cmd>lua require('telescope.builtin').find_files()<cr>", 'n', desc = 'Search [f]iles'},
+          {'<leader>sfg', "<cmd>lua require('telescope.builtin').git_files()<cr>", 'n', desc = 'search [g]it files'},
+          {'<leader>sfr', "<cmd>lua require('telescope.builtin').oldfiles()<cr>", 'n', desc = 'Search [r]ecently opened files'},
           -- search
-          {'<leader>sl', "<cmd>lua require('telescope.builtin').live_grep()<cr>", 'n', desc = '[S]earch with [l]ive grep'},
-          {'<leader>sg', "<cmd>lua require('telescope.builtin').grep_string({ search = vim.fn.input('Grep > ') })<cr>", 'n', desc = "[S]earch after [g]rep with string"},
-          {'<leader>sh', "<cmd>lua require('telescope.builtin').help_tags()<cr>", 'n', desc = '[S]earch [h]elp'},
-          {'<leader>sd', "<cmd>lua require('telescope.builtin').diagnostics()<cr>", 'n', desc = '[S]earch [d]iagnostics'},
-          {'<leader>so', "<cmd>lua require('telescope.builtin').live_grep({grep_open_files=true})<cr>", 'n', desc = '[S]earch with live grep in [o]pen buffers'},
-          {'<leader>sr', "<cmd>lua require('telescope.builtin').resume()<cr>", 'n', desc = '[S]earch [r]esume'},
-          {'<leader>ssb', "<cmd>lua require('telescope.builtin').lsp_document_symbols()<cr>", '[s][s]ymbols [b]uffer'},
-          {'<leader>ssw', "<cmd>lua require('telescope.builtin').lsp_dynamic_workspace_symbols()<cr>", '[s][s]ymbols [w]orkspace'},
+          {'<leader>sl', "<cmd>lua require('telescope.builtin').live_grep()<cr>", 'n', desc = 'Search with [l]ive grep'},
+          {'<leader>sg', "<cmd>lua require('telescope.builtin').grep_string({ search = vim.fn.input('Grep > ') })<cr>", 'n', desc = "Search after [g]rep with string"},
+          {'<leader>sh', "<cmd>lua require('telescope.builtin').help_tags()<cr>", 'n', desc = 'Search [h]elp'},
+          {'<leader>sd', "<cmd>lua require('telescope.builtin').diagnostics()<cr>", 'n', desc = 'Search [d]iagnostics'},
+          {'<leader>so', "<cmd>lua require('telescope.builtin').live_grep({grep_open_files=true})<cr>", 'n', desc = 'Search with live grep in [o]pen buffers'},
+          {'<leader>sr', "<cmd>lua require('telescope.builtin').resume()<cr>", 'n', desc = 'Search [r]esume'},
+          {'<leader>ss', "<cmd>lua require('telescope.builtin').lsp_document_symbols()<cr>", '[s]ymbols in document'},
+          {'<leader>sS', "<cmd>lua require('telescope.builtin').lsp_dynamic_workspace_symbols()<cr>", '[S]ymbols in workspace'},
+          {'<leader>sb', "<cmd>lua require('telescope.builtin').buffers()<cr>", 'n', desc = 'Search existing [b]uffers'},
 
           -- miscellaneous
           {'<leader>/', desc = '[/] Fuzzily search in current buffer'},
@@ -276,7 +277,7 @@ local plugins = {
         "nvim-telescope/telescope-frecency.nvim",
         dependencies = {"kkharji/sqlite.lua"},
         keys = {
-          {"<leader>fp", "<Cmd>lua require('telescope').extensions.frecency.frecency({ workspace = 'CWD' })<CR>", "n", noremap = true, silent = true, desc = "Telescope frecency"},
+          {"<leader>sfp", "<Cmd>lua require('telescope').extensions.frecency.frecency({ workspace = 'CWD' })<CR>", "n", noremap = true, silent = true, desc = "Telescope frecency"},
         },
         config = function()
           require("telescope").load_extension("frecency")
@@ -425,9 +426,15 @@ local plugins = {
         config = function()
           vim.o.timeout = true
           vim.o.timeoutlen = 500
-          require("which-key").setup {
+          local wk = require("which-key")
+          wk.setup {
             plugins = { spelling = true },
           }
+          wk.register({
+            mode = { "n", "v" },
+            ["<leader>s"] = { name = "+search" },
+            ["<leader>sf"] = { name = "+go to file" },
+          })
         end,
         cond = not_vscode
       },
@@ -475,7 +482,7 @@ local plugins = {
             },
             views = {
               mini = {
-                timeout = 3500
+                timeout = 2500
               }
             },
             commands = {
@@ -543,7 +550,28 @@ local plugins = {
         cond = not_vscode
       },
       {"tpope/vim-sleuth", cond = not_vscode}, -- automatically detect tabwidth
-      {"rmagatti/auto-session", config = true, cond = not_vscode},
+      {
+        "rmagatti/auto-session",
+        opts = {
+          pre_save_cmds =
+          { function()
+            -- close fugitive tabs
+            local tabpages = vim.api.nvim_list_tabpages()
+            for _, tabpage in ipairs(tabpages) do
+              local windows = vim.api.nvim_tabpage_list_wins(tabpage)
+              for _, window in ipairs(windows) do
+                local buffer = vim.api.nvim_win_get_buf(window)
+                local file_name = vim.api.nvim_buf_get_name(buffer)
+                if string.find(file_name, "fugitive:") then
+                  vim.api.nvim_win_close(window, true)
+                  break
+                end
+              end
+            end
+          end }
+        },
+        cond = not_vscode,
+      },
       {"iamcco/markdown-preview.nvim",
         build = function() vim.fn["mkdp#util#install"]() end,
         init = function()
@@ -559,6 +587,7 @@ local plugins = {
       {
         "iamcco/markdown-preview.nvim",
         build = function() vim.fn["mkdp#util#install"]() end,
+        cond = not_vscode
       },
       {"wintermute-cell/gitignore.nvim", cmd = 'Gitignore', dependencies = { "nvim-telescope/telescope.nvim" }, cond = not_vscode},
       {
@@ -568,7 +597,7 @@ local plugins = {
         opts = { use_diagnostic_signs = true },
         keys = {
           { "<leader>xx", "<cmd>TroubleToggle document_diagnostics<cr>", desc = "Document Diagnostics (Trouble)" },
-          { "<leader>xw", "<cmd>TroubleToggle workspace_diagnostics<cr>", desc = "Workspace Diagnostics (Trouble)" },
+          { "<leader>xX", "<cmd>TroubleToggle workspace_diagnostics<cr>", desc = "Workspace Diagnostics (Trouble)" },
           { "<leader>xl", "<cmd>TroubleToggle loclist<cr>", desc = "Location List (Trouble)" },
           { "<leader>xq", "<cmd>TroubleToggle quickfix<cr>", desc = "Quickfix List (Trouble)" },
           {
