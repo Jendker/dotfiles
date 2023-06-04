@@ -283,29 +283,29 @@ end
 local cmp_mappings = {
   ['<C-Space>'] = cmp.mapping.complete(),
   ['<CR>'] = cmp.mapping.confirm(),
-  ['<Tab>'] = {
-    i = function(fallback)
-      -- We dont autocomplete if we are in an active Snippet unless the completion
-      -- item is selected explicitly.
-      if cmp.visible() then
+  ['<Tab>'] = cmp.mapping(
+    function(fallback)
+      if cmp.visible() and cmp.get_active_entry() then
+        -- completion if a cmp item is selected
+        cmp.confirm({ select = false, behavior = cmp.ConfirmBehavior.Replace })
+      elseif vim.fn["codeium#Accept"]() ~= "" then
+        -- accept codeium completion if visible
+        vim.fn['codeium#Accept']()
+        fallback()
+      elseif cmp.visible() then
+        -- select first item if visible
         cmp.confirm({ select = true, behavior = cmp.ConfirmBehavior.Replace })
       elseif luasnip.expand_or_jumpable() then
+        -- jump to next snippet position
         luasnip.expand_or_jump()
       elseif has_words_before() then
+        -- show autocomplete
         cmp.complete()
       else
         fallback()
       end
-    end,
-    s = function(fallback)
-      if luasnip.expand_or_jumpable() then
-        luasnip.expand_or_jump()
-      else
-        fallback()
-      end
-    end,
-  },
-  ['<S-Tab>'] = nil,
+    end, {"i","s"}),
+  ['<S-Tab>'] = vim.NIL,
   ['<C-d>'] = cmp.mapping.scroll_docs(4),
   ['<C-u>'] = cmp.mapping.scroll_docs(-4),
   -- jump between placeholders
