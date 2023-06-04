@@ -186,6 +186,23 @@ local plugins = {
           table.insert(lualine_x,
             {
               function()
+                local codeium_str = vim.fn['codeium#GetStatusString']()
+                if codeium_str == "" then
+                  return ""
+                elseif string.find(codeium_str, "/") then
+                  return "Codeium: " .. codeium_str
+                -- elseif codeium_str == " * " then
+                --   return "Codeium thinking..."
+                -- elseif codeium_str == " 0 " then
+                --   return "No suggestions"
+                else
+                  return ""
+                end
+              end
+            })
+          table.insert(lualine_x,
+            {
+              function()
                 if vim.g.autosave_on == 1 then
                   return "󱑜"
                 else
