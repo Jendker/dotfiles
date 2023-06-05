@@ -7,8 +7,12 @@ function is_installed() {
 }
 
 function install_nvim_source() {
+  branch_str="--branch stable"
+  if [ -n "$1" ]; then
+    branch_str="--branch $1"
+  fi
   sudo apt-get install ninja-build gettext cmake unzip curl -y
-  cd /tmp && rm -rf neovim && git clone https://github.com/neovim/neovim.git --branch stable --single-branch
+  cd /tmp && rm -rf neovim && git clone https://github.com/neovim/neovim.git $branch_str --single-branch
   cd neovim
   make CMAKE_BUILD_TYPE=RelWithDebInfo
   sudo make install
@@ -59,7 +63,11 @@ function install_cargo() {
 }
 
 function install_nvim_binary() {
-  install_nvim_source
+  branch="stable"
+  if [ -n "$1" ]; then
+    branch="$1"
+  fi
+  install_nvim_source $branch
   install_node
 }
 
@@ -70,7 +78,11 @@ if [[ ! $# -eq 0 ]]; then
     exit 0
   elif [[ $1 == "--update-nvim-bin" ]]; then
     echo "Updating nvim binary..."
-    install_nvim_source
+    install_nvim_source stable
+    exit 0
+  elif [[ $1 == "--update-nvim-bin-dev" ]]; then
+    echo "Updating nvim binary from git dev branch..."
+    install_nvim_source master
     exit 0
   elif [[ $1 == "--install-node" ]]; then
     echo "Installing node js over nvm..."
@@ -146,7 +158,7 @@ grep -qxF 'set-option -g default-shell /bin/zsh' $HOME/.tmux.conf || printf "set
 # set up nvim
 if ! [ -x "$(command -v nvim)" ]; then
   echo 'nvim is not installed. installing'
-  install_nvim_binary
+  install_nvim_binary stable
   update_nvim
 fi
 
