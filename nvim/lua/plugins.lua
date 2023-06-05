@@ -162,6 +162,7 @@ local plugins = {
             onedark.setup({transparent = not vim.g.onedark_config.transparent})
             onedark.load()
             onedark.toggle()
+            require("config_plugins.nvim-scrollbar").setup()
           end, {desc = "Toggle dark and light mode"})
         end,
         cond = not_vscode
@@ -264,10 +265,13 @@ local plugins = {
           -- bookmarks
           {'<leader>sba', "<cmd>lua require('telescope').extensions.vim_bookmarks.all()<cr>", 'n', desc = "Show [b]ookmarks in [a]ll files"},
           {'<leader>sbb', "<cmd>lua require('telescope').extensions.vim_bookmarks.current_file()<cr>", 'n', desc = "Show [b]ookmarks in [b]uffer"},
+
           -- files
           {'<leader>sff', "<cmd>lua require('telescope.builtin').find_files()<cr>", 'n', desc = 'Search [f]iles'},
           {'<leader>sfg', "<cmd>lua require('telescope.builtin').git_files()<cr>", 'n', desc = 'search [g]it files'},
           {'<leader>sfr', "<cmd>lua require('telescope.builtin').oldfiles()<cr>", 'n', desc = 'Search [r]ecently opened files'},
+          {'<leader>sfb', "<cmd>lua require('telescope.builtin').buffers()<cr>", 'n', desc = 'Search existing [b]uffers'},
+
           -- search
           {'<leader>sl', "<cmd>lua require('telescope.builtin').live_grep()<cr>", 'n', desc = 'Search with [l]ive grep'},
           {'<leader>sg', "<cmd>lua require('telescope.builtin').grep_string({ search = vim.fn.input('Grep > ') })<cr>", 'n', desc = "Search after [g]rep with string"},
@@ -277,7 +281,6 @@ local plugins = {
           {'<leader>sr', "<cmd>lua require('telescope.builtin').resume()<cr>", 'n', desc = 'Search [r]esume'},
           {'<leader>ss', "<cmd>lua require('telescope.builtin').lsp_document_symbols()<cr>", '[s]ymbols in document'},
           {'<leader>sS', "<cmd>lua require('telescope.builtin').lsp_dynamic_workspace_symbols()<cr>", '[S]ymbols in workspace'},
-          {'<leader>sb', "<cmd>lua require('telescope.builtin').buffers()<cr>", 'n', desc = 'Search existing [b]uffers'},
 
           -- miscellaneous
           {'<leader>/', desc = '[/] Fuzzily search in current buffer'},
@@ -451,6 +454,7 @@ local plugins = {
             mode = { "n", "v" },
             ["<leader>s"] = { name = "+search" },
             ["<leader>sf"] = { name = "+go to file" },
+            ["<leader>sb"] = { name = "+bookmarks" },
           })
         end,
         cond = not_vscode
@@ -563,7 +567,7 @@ local plugins = {
       },
       {
         "petertriho/nvim-scrollbar",
-        config = function() require("scrollbar").setup({hide_if_all_visible = true, show_in_active_only = true}) end,
+        config = function() require("config_plugins.nvim-scrollbar").setup() end,
         cond = not_vscode
       },
       {"tpope/vim-sleuth", cond = not_vscode}, -- automatically detect tabwidth

@@ -81,7 +81,8 @@ require('nvim-treesitter.configs').setup({
     enable = not vscode,
   },
   indent = {
-    enable = false
+    enable = not vscode,
+    disable = { 'python' },
   },
   rainbow = {
     enable = not vscode,
