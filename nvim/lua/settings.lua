@@ -31,8 +31,11 @@ vim.opt.scrolloff = 4
 vim.cmd("autocmd BufEnter * setlocal formatoptions-=cro")
 
 vim.g.mapleader = " "
+-- nicer diff markings
+vim.opt.fillchars = vim.opt.fillchars + 'diff:╱'
+-- improve fold markings
+vim.opt.fillchars =  vim.opt.fillchars + "fold: "
 -- use tree-sitter for folding. If needed to use normal folding, run :set foldmethod=syntax
-vim.opt.fillchars = "fold: "
 vim.opt.foldmethod = "expr"
 vim.opt.foldexpr = "nvim_treesitter#foldexpr()"
 vim.opt.foldlevelstart = 99 -- don't fold by default

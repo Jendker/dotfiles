@@ -20,12 +20,13 @@ local mason_ensure_installed = {
   'pyright',
   'lua_ls',
   'yamlls',
+  'ruff_lsp'
 }
 lsp.ensure_installed(mason_ensure_installed)
 
 -- this will install any mason package, even formatters and linters
 local mason_install_if_system_command_not_available = {'jq'}
-local mason_install = {'black', 'ruff-lsp'}
+local mason_install = {'black', 'jsonlint'}
 
 local null_ls = require('null-ls')
 local mason_packages_to_source_if_available = {
@@ -48,6 +49,7 @@ local mason_packages_to_source_if_available = {
     end,
   }),
   shellcheck = null_ls.builtins.diagnostics.shellcheck,
+  jsonlint = null_ls.builtins.diagnostics.jsonlint,
 }
 
 local lsp_signature_config = {
@@ -288,7 +290,7 @@ local cmp_mappings = {
       if cmp.visible() and cmp.get_active_entry() then
         -- completion if a cmp item is selected
         cmp.confirm({ select = false, behavior = cmp.ConfirmBehavior.Replace })
-      elseif vim.fn["codeium#Accept"]() ~= "" then
+      elseif vim.b._codeium_completions then
         -- accept codeium completion if visible
         vim.fn['codeium#Accept']()
         fallback()

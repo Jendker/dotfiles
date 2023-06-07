@@ -430,11 +430,19 @@ local plugins = {
           "lewis6991/gitsigns.nvim",
           "nvim-tree/nvim-web-devicons",
         },
-        config = true,
+        opts = {
+          hooks = {
+            -- from :h diffview-config-hooks
+            diff_buf_read = function(_)
+              -- Change local options in diff buffers
+              vim.opt_local.wrap = false -- wrapping causes hunk misalignment
+            end,
+          },
+        },
         keys = {
           { "<leader>gd",  "<cmd>DiffviewOpen<cr>",                  desc = "[G]it [d]iff for repo", nowait = true },
-          { "<leader>gh", "<cmd>DiffviewFileHistory<cr>",            desc = "[G]it file [h]istory" },
-          { "<leader>gf", "<cmd>DiffviewFileHistory --follow %<cr>", desc = "[G]it file history with [f]ollow" },
+          { "<leader>gr", "<cmd>DiffviewFileHistory<cr>",            desc = "[G]it [r]epo history" },
+          { "<leader>gf", "<cmd>DiffviewFileHistory --follow %<cr>", desc = "[G]it [f]ile history" },
           { "<leader>gm", "<cmd>DiffviewOpen master<cr>",            desc = "[G]it diff with [m]aster" },
           { "<leader>gl", "<cmd>.DiffviewFileHistory --follow<CR>",  desc = "[G]it file history for the current [l]ine"},
           { "<leader>gl", "<Esc><cmd>'<,'>DiffviewFileHistory --follow<CR>", mode = 'v',  desc = "[G]it file history for the visual se[l]ection"},

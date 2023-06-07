@@ -64,8 +64,9 @@ map("v", "<", "<gv")
 map("v", ">", ">gv")
 
 -- toggle settings
-map("n", "<leader>ts", function() toggle("spell") end, { desc = "Toggle Spelling" })
-map("n", "<leader>tw", function() toggle("wrap") end, { desc = "Toggle Word Wrap" })
+map("n", "<leader>ts", function() toggle("spell") end, { desc = "[T]oggle [s]pelling" })
+map("n", "<leader>tw", function() toggle("wrap") end, { desc = "[T]oggle word [w]rap" })
+map("n", "<leader>to", "<leader>ta<leader>tb", { desc = "[T]oggle development [o]ptions", remap = true})
 if vim.fn.has("nvim-0.9.0") == 1 then
   map("n", "<leader>ti", vim.show_pos, { desc = "Inspect Pos" }) -- highlights under cursor
 end
@@ -112,10 +113,10 @@ if vscode then
   map({'n', 'x'}, 'gl', ":call VSCodeNotify('editor.action.showHover')<CR>")
 else
   map('i', '<C-c>', "<Esc>")
-  map("n", "<leader>r", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]], { desc = 'Find and [C]hange word under cursor'})
-  map("n", "<leader>c", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gcI<Left><Left><Left>]], { desc = 'Find and [C]hange word under cursor with confirmation'})
-  map('v', "<leader>r", [["fy:%s/<C-r>f/<C-r>f/gI<Left><Left><Left>]], { desc = 'Find and [C]hange selected'})
-  map('v', "<leader>c", [["fy:%s/<C-r>f/<C-r>f/gcI<Left><Left><Left>]], { desc = 'Find and [C]hange selected with confirmation'})
+  map("n", "<leader>r", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]], { desc = 'Find and Change word under cursor'})
+  map("n", "<leader>rc", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gcI<Left><Left><Left>]], { desc = 'Find and Change word under cursor with confirmation'})
+  map('v', "<leader>r", [["fy:%s/<C-r>f/<C-r>f/gI<Left><Left><Left>]], { desc = 'Find and Change selected'})
+  map('v', "<leader>rc", [["fy:%s/<C-r>f/<C-r>f/gcI<Left><Left><Left>]], { desc = 'Find and Change selected with confirmation'})
   -- Move Lines - this messes up VSCode pasting for some reason. Leave it here or find some plugin to do the same better
   map("n", "<C-j>", "<cmd>m .+1<cr>==", { desc = "Move down" })
   map("n", "<C-k>", "<cmd>m .-2<cr>==", { desc = "Move up" })
