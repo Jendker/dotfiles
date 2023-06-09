@@ -15,12 +15,19 @@ local M = {
   default_additional_args = {'--fixed-strings'}
 }
 
-function shallow_copy(t)
+local function shallow_copy(t)
   local t2 = {}
   for k,v in pairs(t) do
     t2[k] = v
   end
   return t2
+end
+
+local function extend_array(target_array, src_array)
+  for i = 1, #src_array do
+    table.insert(target_array, src_array[i])
+  end
+  return target_array
 end
 
 -- Keeps track of the active extension, folders, glob for `live_grep`
@@ -47,13 +54,13 @@ end
 local function run_live_grep(current_input)
   local glob_array = {}
   if live_grep_data.extension then
-    table.insert(glob_array, { '--iglob', '*.' .. live_grep_data.extension})
+    glob_array = extend_array(glob_array, { '--iglob', '*.' .. live_grep_data.extension})
   end
   if live_grep_data.glob then
-    table.insert(glob_array, { '--iglob', live_grep_data.glob})
+    glob_array = extend_array(glob_array, { '--iglob', live_grep_data.glob})
   end
   require('telescope.builtin').live_grep {
-    additional_args = vim.tbl_extend("error", glob_array, live_grep_data.args),
+    additional_args = extend_array(glob_array, live_grep_data.args),
     search_dirs = live_grep_data.directories,
     default_text = current_input,
   }
@@ -115,7 +122,7 @@ M.actions = transform_mod {
     local current_input = action_state.get_current_line()
 
     local data = {}
-    scan.scan_dir(vim.loop.cwd(), {
+    scan.scan_dir(vim.uv.cwd(), {
       hidden = false,
       only_dirs = true,
       respect_gitignore = true,

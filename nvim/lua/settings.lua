@@ -16,10 +16,12 @@ vim.opt.shiftwidth = 2
 vim.opt.tabstop = 2
 vim.opt.softtabstop = 2
 vim.opt.smartindent = true
+
 vim.opt.wrap = true
 vim.opt.ignorecase = true
 vim.opt.smartcase = true
 vim.opt.scrolloff = 4
+vim.opt.termguicolors = true
 
 -- Prefer ripgrep if it exists
 -- if fn.executable("rg") > 0 then

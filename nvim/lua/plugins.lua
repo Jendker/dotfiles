@@ -117,7 +117,7 @@ local plugins = {
     end
   },
   'mg979/vim-visual-multi',
-  {"haya14busa/is.vim", event = 'VeryLazy'}, -- auto hide highlight after search
+  {"romainl/vim-cool", event = 'BufReadPost'}, -- auto hide highlight after search
   -- without VSCode
       -- auto trail whitespace
       {
@@ -135,6 +135,17 @@ local plugins = {
         config = function()
           -- to open Roboception remote url:
           vim.g.fugitive_gitlab_domains = {'https://gitlab.com', 'https://gitlab.roboception.de'}
+          vim.keymap.set("n", "<leader>hm", function()
+              local main_branch_name = GetGitMainBranch
+              if main_branch_name then
+                local keys_string = "<C-W>v<C-W>l:Gedit " .. GetGitMainBranch() .. ":%<cr><C-W>h"
+                local keys = vim.api.nvim_replace_termcodes(keys_string, true, false, true)
+                vim.api.nvim_feedkeys(keys, 'm', false)
+              else
+                print("Not git repository")
+              end
+            end,
+            { desc = "Current file main version" })
         end,
         cond = not_vscode
       },
@@ -430,15 +441,25 @@ local plugins = {
           "lewis6991/gitsigns.nvim",
           "nvim-tree/nvim-web-devicons",
         },
-        opts = {
-          hooks = {
-            -- from :h diffview-config-hooks
-            diff_buf_read = function(_)
-              -- Change local options in diff buffers
-              vim.opt_local.wrap = false -- wrapping causes hunk misalignment
-            end,
-          },
-        },
+        config = function()
+          local actions = require("diffview.actions")
+          require('diffview').setup(
+            {
+              hooks = {
+                -- from :h diffview-config-hooks
+                diff_buf_read = function(_)
+                  -- Change local options in diff buffers
+                  vim.opt_local.wrap = false -- wrapping causes hunk misalignment
+                end,
+              },
+              keymaps = {
+                file_panel = {
+                  { "n", "s", actions.toggle_stage_entry, { desc = "Stage / unstage the selected entry" } },
+                  { "n", "-", false}
+                }
+              },
+            })
+        end,
         keys = {
           { "<leader>gd",  "<cmd>DiffviewOpen<cr>",                  desc = "[G]it [d]iff for repo", nowait = true },
           { "<leader>gr", "<cmd>DiffviewFileHistory<cr>",            desc = "[G]it [r]epo history" },
@@ -591,6 +612,13 @@ local plugins = {
               for _, window in ipairs(windows) do
                 local buffer = vim.api.nvim_win_get_buf(window)
                 local file_name = vim.api.nvim_buf_get_name(buffer)
+                if string.find(file_name, "diffview:") then
+                  -- close all windows in this tab
+                  for _, this_window in ipairs(windows) do
+                    vim.api.nvim_win_close(this_window, true)
+                  end
+                  break
+                end
                 if string.find(file_name, "fugitive:") then
                   vim.api.nvim_win_close(window, true)
                   break
