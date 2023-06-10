@@ -290,7 +290,7 @@ local cmp_mappings = {
       if cmp.visible() and cmp.get_active_entry() then
         -- completion if a cmp item is selected
         cmp.confirm({ select = false, behavior = cmp.ConfirmBehavior.Replace })
-      elseif vim.b._codeium_completions then
+      elseif vim.fn.exists('b:_codeium_completions') ~= 0 then
         -- accept codeium completion if visible
         vim.fn['codeium#Accept']()
         fallback()
