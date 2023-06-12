@@ -1,0 +1,18 @@
+Diagnostics:
+  UnusedIncludes: Strict
+  ClangTidy:
+    Add: readability-*
+    Remove: [modernize-use-nodiscard, readability-magic-numbers, readability-identifier-length,
+             readability-uppercase-literal-suffix, readability-implicit-bool-conversion,
+             ]
+    CheckOptions:
+      readability-function-cognitive-complexity.Threshold: 50
+
+CompileFlags:
+  # many come from https://www.jetbrains.com/help/clion/settings-languages-cpp-clangd.html
+  # -ferror-limit=0 disables LSP abort after default 20 errors
+  Add: [-Wunused-variable, -Wno-shadow, -Wshadow-field-in-constructor-modified, -Wshadow-ivar,
+    -Wno-implicit-function-declaration, -Wno-switch, -Wno-parentheses, -Wbitwise-op-parentheses,
+    -Wdangling-else, -Wlogical-not-parentheses, -Wlogical-op-parentheses,
+    -Woverloaded-shift-op-parentheses, -Wparentheses-equality, -Wshift-op-parentheses,
+    -ferror-limit=0]
