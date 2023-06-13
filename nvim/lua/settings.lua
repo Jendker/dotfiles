@@ -22,6 +22,7 @@ vim.opt.ignorecase = true
 vim.opt.smartcase = true
 vim.opt.scrolloff = 4
 vim.opt.termguicolors = true
+vim.opt.laststatus = 3 -- global statusline
 
 -- Prefer ripgrep if it exists
 -- if fn.executable("rg") > 0 then

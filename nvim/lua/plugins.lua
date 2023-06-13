@@ -136,13 +136,13 @@ local plugins = {
           -- to open Roboception remote url:
           vim.g.fugitive_gitlab_domains = {'https://gitlab.com', 'https://gitlab.roboception.de'}
           vim.keymap.set("n", "<leader>hm", function()
-              local main_branch_name = GetGitMainBranch
-              if main_branch_name then
-                local keys_string = "<C-W>v<C-W>l:Gedit " .. GetGitMainBranch() .. ":%<cr><C-W>h"
+              local main_branch_name = GetGitMainBranch()
+              if main_branch_name ~= nil then
+                local keys_string = "<C-W>v<C-W>l<cmd>Gedit " .. main_branch_name .. ":%<cr>"
                 local keys = vim.api.nvim_replace_termcodes(keys_string, true, false, true)
                 vim.api.nvim_feedkeys(keys, 'm', false)
               else
-                print("Not git repository")
+                vim.api.nvim_err_writeln("Not git repository")
               end
             end,
             { desc = "Current file main version" })
@@ -253,10 +253,12 @@ local plugins = {
       },
       {
         "MattesGroeger/vim-bookmarks",
-        config = function()
+        init = function()
           vim.g.bookmark_no_default_key_mappings = 1
           vim.g.bookmark_save_per_working_dir = 1
           vim.g.bookmark_sign = ""
+        end,
+        config = function()
           vim.keymap.set('n', '<Leader><Leader>', '<Plug>BookmarkToggle', { desc = "Bookmark toggle" })
           vim.keymap.set('n', '<Leader>bi', '<Plug>BookmarkAnnotate', { desc = "Bookmark annotate" })
           vim.keymap.set('n', '<Leader>bj', '<Plug>BookmarkNext', { desc = "Bookmark next" })
@@ -334,7 +336,21 @@ local plugins = {
       {
         'karb94/neoscroll.nvim',
         config = function()
-          require('neoscroll').setup()
+          local easing_function = "sine"
+          require('neoscroll').setup({
+            post_hook = function(info)
+              if info ~= "no_scroll" then
+                vim.cmd("normal! zz")
+              end
+            end,
+            easing_function = easing_function
+          })
+          local mappings = {}
+          mappings['zt']  = { 'zt', { '250', easing_function, "'no_scroll'" } }
+          mappings['zb']  = { 'zb', { '250', easing_function, "'no_scroll'" } }
+          mappings["<C-y>"] = { "scroll", { "-0.10", "false", "100", easing_function, "'no_scroll'" } }
+          mappings["<C-e>"] = { "scroll", { "0.10", "false", "100", easing_function, "'no_scroll'" } }
+          require('neoscroll.config').set_mappings(mappings)
         end,
         cond = not_vscode
       },
@@ -630,9 +646,11 @@ local plugins = {
         cond = not_vscode,
       },
       {"iamcco/markdown-preview.nvim",
-        build = function() vim.fn["mkdp#util#install"]() end,
+        -- build = function() vim.fn["mkdp#util#install"]() end,
+        -- doing this until https://github.com/iamcco/markdown-preview.nvim/issues/50 works how it should
+        build = "cd app && npm install",
         init = function()
-          vim.g.mkdp_preview_options={ ["disable_sync_scroll"] = 0 }
+          vim.g.mkdp_preview_options = { ["disable_sync_scroll"] = 0 }
           vim.g.mkdp_page_title = 'Preview: ${name}'
         end,
         config = function()
@@ -712,6 +730,12 @@ local plugins = {
             },
           })
         end,
+        cond = not_vscode
+      },
+      {
+        "kevinhwang91/nvim-bqf",
+        event = "VeryLazy",
+        opts = {},
         cond = not_vscode
       },
       {

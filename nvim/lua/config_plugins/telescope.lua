@@ -58,21 +58,21 @@ telescope.setup({
 })
 -- vim_booksmarks
 telescope.load_extension('vim_bookmarks')
+-- more keymaps
+local function getVisualSelection()
+  vim.cmd('noau normal! "vy"')
+  local text = vim.fn.getreg('v')
+  vim.fn.setreg('v', {})
+  text = string.gsub(text, "\n", "")
+  if #text > 0 then
+    return text
+  else
+    return ''
+  end
+end
 vim.keymap.set('n', '<leader>?', require('telescope.builtin').grep_string, { desc = '[?] search for word under cursor'})
 vim.keymap.set('v', '<leader>?', function()
-    local function getVisualSelection()
-      vim.cmd('noau normal! "vy"')
-      local text = vim.fn.getreg('v')
-      vim.fn.setreg('v', {})
-      text = string.gsub(text, "\n", "")
-      if #text > 0 then
-        return text
-      else
-        return ''
-      end
-    end
-    local text = getVisualSelection()
-    require('telescope.builtin').grep_string({ search = text })
+    require('telescope.builtin').grep_string({ search = getVisualSelection() })
   end,
   { desc = '[?] search for selection' })
 vim.keymap.set('n', '<leader>/', function()
@@ -81,4 +81,11 @@ vim.keymap.set('n', '<leader>/', function()
     winblend = 10,
     previewer = false,
   })
-end, { desc = '[/] Fuzzily search in current buffer' })
+end, { desc = '[/] Search in current buffer' })
+vim.keymap.set('v', '<leader>/', function()
+  require('telescope.builtin').current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
+    winblend = 10,
+    previewer = false,
+    default_text = getVisualSelection(),
+  })
+end, { desc = '[/] Search for selection in current buffer' })

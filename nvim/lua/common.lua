@@ -17,9 +17,9 @@ function GetGitMainBranch()
     done
     echo master
   ]]
-  local is_git_repo = vim.fn.system('git rev-parse --is-inside-work-tree')
-  if is_git_repo == "true\n" then
-    return vim.fn.system(get_main_branch_shell_command)
+  local is_git_repo = string.gsub(vim.fn.system('git rev-parse --is-inside-work-tree'), "\n$", "")
+  if is_git_repo == "true" then
+    return string.gsub(vim.fn.system(get_main_branch_shell_command), "\n$", "")
   else
     return nil
   end
