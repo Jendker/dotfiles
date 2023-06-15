@@ -35,6 +35,8 @@ map({"n", "v"}, "<leader>d", [["_d]])
 map({"n", "v"}, "<leader>D", [["_D]])
 map({"n", "v"}, "<leader>c", [["_c]])
 map({"n", "v"}, "<leader>C", [["_C]])
+map("n", "<leader>tc", "<cmd>tabclose<cr>", { desc = "[T]ab [c]lose" })
+map("n", "<leader>tn", "<cmd>tabnew<CR>", { desc = "[T]ab [n]ew"})
 
 -- center after buffer movements
 vim.keymap.set("n", "n", "nzzzv")

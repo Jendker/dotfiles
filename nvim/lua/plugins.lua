@@ -59,6 +59,7 @@ local plugins = {
       })
     end
   },
+  -- treesitter stuff
   {
     'nvim-treesitter/nvim-treesitter',
     config = function()
@@ -67,12 +68,6 @@ local plugins = {
     build = ':TSUpdate',
   },
   'nvim-treesitter/nvim-treesitter-textobjects',
-  {
-    'nvim-treesitter/nvim-treesitter-context',
-    config = function()
-      require 'treesitter-context'.setup{enable = not vscode}
-    end
-  },
   {
     'andymass/vim-matchup',
     init = function()
@@ -162,6 +157,7 @@ local plugins = {
       {
         'navarasu/onedark.nvim',
         lazy = false, -- make sure we load this during startup, that's main colorscheme
+        priority = 100,
         config = function()
           local onedark = require('onedark')
           onedark.setup{
@@ -392,41 +388,74 @@ local plugins = {
         cond = not_vscode
       },
       {
-        "SmiteshP/nvim-navic",
-        dependencies = "neovim/nvim-lspconfig",
-        config = function ()
-          require("nvim-navic").setup {
-            icons = {
-              File = ' ',
-              Module = ' ',
-              Namespace = ' ',
-              Package = ' ',
-              Class = ' ',
-              Method = ' ',
-              Property = ' ',
-              Field = ' ',
-              Constructor = ' ',
-              Enum = ' ',
-              Interface = ' ',
-              Function = ' ',
-              Variable = ' ',
-              Constant = ' ',
-              String = ' ',
-              Number = ' ',
-              Boolean = ' ',
-              Array = ' ',
-              Object = ' ',
-              Key = ' ',
-              Null = ' ',
-              EnumMember = ' ',
-              Struct = ' ',
-              Event = ' ',
-              Operator = ' ',
-              TypeParameter = ' '
+        'Bekaboo/dropbar.nvim',
+        opts = {
+          bar = {
+            sources = function(_, _)
+              local sources = require('dropbar.sources')
+              return {
+                sources.path,
+                {
+                  get_symbols = function(buf, win, cursor)
+                    if vim.bo[buf].ft == 'markdown' then
+                      return sources.markdown.get_symbols(buf, win, cursor)
+                    end
+                    for _, source in ipairs({
+                      sources.lsp,
+                      sources.treesitter,
+                    }) do
+                      local symbols = source.get_symbols(buf, win, cursor)
+                      if not vim.tbl_isempty(symbols) then
+                        return symbols
+                      end
+                    end
+                    return {}
+                  end,
+                },
+              }
+            end,
+          },
+          icons = {
+            ui = {
+              bar = {
+                separator = ' > ',
+              },
+              menu = {
+                indicator = ' > ',
+              },
             },
-            highlight = true,
+            kinds = {
+              symbols = {
+                File = ' ',
+                Module = ' ',
+                Namespace = ' ',
+                Package = ' ',
+                Class = ' ',
+                Method = ' ',
+                Property = ' ',
+                Field = ' ',
+                Constructor = ' ',
+                Enum = ' ',
+                Interface = ' ',
+                Function = ' ',
+                Variable = ' ',
+                Constant = ' ',
+                String = ' ',
+                Number = ' ',
+                Boolean = ' ',
+                Array = ' ',
+                Object = ' ',
+                Key = ' ',
+                Null = ' ',
+                EnumMember = ' ',
+                Struct = ' ',
+                Event = ' ',
+                Operator = ' ',
+                TypeParameter = ' '
+              }
+            }
           }
-        end,
+        },
         cond = not_vscode
       },
       {
@@ -500,6 +529,7 @@ local plugins = {
             ["<leader>s"] = { name = "+search" },
             ["<leader>sf"] = { name = "+go to file" },
             ["<leader>sb"] = { name = "+bookmarks" },
+            ["<leader>t"] = { name = "+toogle/tab"}
           })
         end,
         cond = not_vscode
@@ -515,6 +545,7 @@ local plugins = {
       },
       {
         "folke/noice.nvim",
+        event = "VeryLazy",
         dependencies = {
           "MunifTanjim/nui.nvim",
         },

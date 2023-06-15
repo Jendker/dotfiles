@@ -105,10 +105,7 @@ lsp.on_attach(function(client, bufnr)
     end)
   end
   if client.server_capabilities.documentSymbolProvider then
-    require('nvim-navic').attach(client, bufnr)
     require('nvim-navbuddy').attach(client, bufnr)
-    vim.o.winbar = " %{%v:lua.require'nvim-navic'.get_location()%}"
-    vim.defer_fn(function() vim.cmd('TSContextDisable') end, 1000)
   end
   if vim.fn.has("nvim-0.9.0") == 1 then
     if client.server_capabilities.documentHighlightProvider then
