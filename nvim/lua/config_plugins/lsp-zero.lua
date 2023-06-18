@@ -104,9 +104,6 @@ lsp.on_attach(function(client, bufnr)
       })
     end)
   end
-  if client.server_capabilities.documentSymbolProvider then
-    require('nvim-navbuddy').attach(client, bufnr)
-  end
   if vim.fn.has("nvim-0.9.0") == 1 then
     if client.server_capabilities.documentHighlightProvider then
       vim.cmd('TSBufDisable highlight')
@@ -294,9 +291,6 @@ local cmp_mappings = {
       elseif cmp.visible() then
         -- select first item if visible
         cmp.confirm({ select = true, behavior = cmp.ConfirmBehavior.Replace })
-      elseif luasnip.expand_or_jumpable() then
-        -- jump to next snippet position
-        luasnip.expand_or_jump()
       elseif has_words_before() then
         -- show autocomplete
         cmp.complete()

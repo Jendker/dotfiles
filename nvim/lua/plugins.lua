@@ -33,15 +33,17 @@ local plugins = {
     event = 'VeryLazy',
     config = function ()
       vim.g.clever_f_smart_case = 1
-    end
+    end,
+    -- Switch to flit when possible, see comment below
+    cond = vscode
   },
-  -- Waiting for this to be fixed: https://github.com/neovim/neovim/pull/19035
-  -- {
-  --   'ggandor/flit.nvim',
-  --   config = function()
-  --     require'flit'.setup()
-  --   end
-  -- },
+  -- Waiting for this to be fixed to activate for vscode: https://github.com/neovim/neovim/pull/19035
+  {
+    'ggandor/flit.nvim',
+    event = 'VeryLazy',
+    config = true,
+    cond = not_vscode
+  },
   {
     'tpope/vim-commentary', -- gcc to comment
     event = 'VeryLazy',
@@ -85,6 +87,8 @@ local plugins = {
       "Julian/vim-textobj-variable-segment", -- v - segment
     },
   },
+  "wellle/targets.vim",
+  -- end treesitter stuff
   {
     'Wansmer/treesj',
     dependencies = { 'nvim-treesitter/nvim-treesitter' },
@@ -333,10 +337,13 @@ local plugins = {
         'karb94/neoscroll.nvim',
         config = function()
           local easing_function = "sine"
-          require('neoscroll').setup({
+          local neoscroll = require('neoscroll')
+          neoscroll.setup({
             post_hook = function(info)
+              -- this doesn't seem to do anything, for some reason
+              -- that's fine for now
               if info ~= "no_scroll" then
-                vim.cmd("normal! zz")
+                neoscroll.zz('250', easing_function, "'no_scroll'")
               end
             end,
             easing_function = easing_function
@@ -394,7 +401,6 @@ local plugins = {
             sources = function(_, _)
               local sources = require('dropbar.sources')
               return {
-                sources.path,
                 {
                   get_symbols = function(buf, win, cursor)
                     if vim.bo[buf].ft == 'markdown' then
@@ -459,18 +465,6 @@ local plugins = {
         cond = not_vscode
       },
       {
-        "SmiteshP/nvim-navbuddy",
-        dependencies = {
-          "SmiteshP/nvim-navic",
-          "MunifTanjim/nui.nvim"
-        },
-        opts = function()
-          return { mappings = { ["<C-c>"] = require("nvim-navbuddy.actions").close()}}
-        end,
-        keys = {{"<leader>bs", "<cmd>Navbuddy<CR>", desc = "Navbuddy [b]uffer [s]ymbols"}},
-        cond = not_vscode
-      },
-      {
         'lewis6991/gitsigns.nvim',
         event = { "BufReadPre", "BufNewFile" },
         config = function()
@@ -507,6 +501,7 @@ local plugins = {
         end,
         keys = {
           { "<leader>gd",  "<cmd>DiffviewOpen<cr>",                  desc = "[G]it [d]iff for repo", nowait = true },
+          { "<leader>gD",  "<cmd>DiffviewOpen HEAD~<cr>",            desc = "[G]it [D]iff previous commit", nowait = true },
           { "<leader>gr", "<cmd>DiffviewFileHistory<cr>",            desc = "[G]it [r]epo history" },
           { "<leader>gf", "<cmd>DiffviewFileHistory --follow %<cr>", desc = "[G]it [f]ile history" },
           { "<leader>gm", "<cmd>DiffviewOpen master<cr>",            desc = "[G]it diff with [m]aster" },
@@ -646,7 +641,7 @@ local plugins = {
         config = function() require("config_plugins.nvim-scrollbar").setup() end,
         cond = not_vscode
       },
-      {"tpope/vim-sleuth", cond = not_vscode}, -- automatically detect tabwidth
+      {"tpope/vim-sleuth", init = function() vim.g.sleuth_cpp_heuristics = 0 end, cond = not_vscode}, -- automatically detect tabwidth
       {
         "rmagatti/auto-session",
         opts = {
@@ -712,7 +707,10 @@ local plugins = {
               if require("trouble").is_open() then
                 require("trouble").previous({ skip_groups = true, jump = true })
               else
-                pcall(vim.cmd, 'cprev')
+                local ok, err = pcall(vim.cmd.cprev)
+                if not ok then
+                  vim.notify(err, vim.log.levels.ERROR)
+                end
               end
             end,
             desc = "Previous trouble/quickfix item",
@@ -723,7 +721,10 @@ local plugins = {
               if require("trouble").is_open() then
                 require("trouble").next({ skip_groups = true, jump = true })
               else
-                pcall(vim.cmd, 'cnext')
+                local ok, err = pcall(vim.cmd.cnext)
+                if not ok then
+                  vim.notify(err, vim.log.levels.ERROR)
+                end
               end
             end,
             desc = "Next trouble/quickfix item",
@@ -783,6 +784,81 @@ local plugins = {
           vim.keymap.set('i', '<a-Bslash>', function() return vim.fn['codeium#Complete']() end, { expr = true, desc = "Codeium trigger complete"})
         end,
         cond = not_vscode
+      },
+      {
+        'tzachar/highlight-undo.nvim',
+        config = true,
+        cond = not_vscode
+      },
+      {
+        'stevearc/aerial.nvim',
+        keys = { {'<leader>ba', '<cmd>AerialToggle<CR>', 'n', desc = "[b]uffer [a]erial toggle"} },
+        opts = {
+          layout = {
+            max_width = { 80, 0.2 },
+          },
+          autojump = true,
+          close_on_select = true,
+          highlight_on_jump = 150,
+          on_attach = function(bufnr)
+            -- Jump forwards/backwards with '{' and '}'
+            vim.keymap.set('n', '{', '<cmd>AerialPrev<CR>', {buffer = bufnr})
+            vim.keymap.set('n', '}', '<cmd>AerialNext<CR>', {buffer = bufnr})
+          end
+        },
+        -- Optional dependencies
+        dependencies = {
+           "nvim-treesitter/nvim-treesitter",
+           "nvim-tree/nvim-web-devicons"
+        },
+        cond = not_vscode
+      },
+      {
+        'simrat39/symbols-outline.nvim',
+        keys = { {'<leader>bo', '<cmd>SymbolsOutline<CR>', 'n', desc = "[b]uffer symbols [o]outline"} },
+        opts = { auto_close = true, },
+        cond = not_vscode,
+      },
+      {
+        "RRethy/vim-illuminate",
+        event = { "BufReadPost", "BufNewFile" },
+        opts = {
+          delay = 200,
+          under_cursor = false,
+          large_file_cutoff = 2000,
+          large_file_overrides = {
+            providers = { "lsp" },
+          },
+        },
+        config = function(_, opts)
+          require("illuminate").configure(opts)
+
+          local function map(key, dir, buffer)
+            vim.keymap.set("n", key, function()
+              require("illuminate")["goto_" .. dir .. "_reference"](false)
+            end, { desc = dir:sub(1, 1):upper() .. dir:sub(2) .. " Reference", buffer = buffer })
+          end
+
+          map("]]", "next")
+          map("[[", "prev")
+
+          -- also set it after loading ftplugins, since a lot overwrite [[ and ]]
+          vim.api.nvim_create_autocmd("FileType", {
+            callback = function()
+              local buffer = vim.api.nvim_get_current_buf()
+              map("]]", "next", buffer)
+              map("[[", "prev", buffer)
+            end,
+          })
+          vim.api.nvim_command [[ hi IlluminatedWordText gui=none ]]
+          vim.api.nvim_command [[ hi IlluminatedWordRead gui=none ]]
+          vim.api.nvim_command [[ hi IlluminatedWordWrite gui=none ]]
+        end,
+        keys = {
+          { "]]", desc = "Next Reference" },
+          { "[[", desc = "Prev Reference" },
+        },
+        cond = not_vscode,
       },
 }
 
