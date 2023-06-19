@@ -37,8 +37,18 @@ function install_node() {
     nvm_install_command="wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash"
     zsh -c "$nvm_install_command" || eval "$nvm_install_command"
     set +x
+    # load nvm
     export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
     [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
+    # add nvm to .zshrc with string does not exists after the installation
+    if ! grep -Fxq 'export NVM_DIR="$HOME/.nvm"' $HOME/.zshrc; then
+      sudo tee -a $HOME/.zshrc > /dev/null <<'EOT'
+# Load nvm
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+EOT
+    fi
     set -x
     installed=true
   fi
@@ -99,7 +109,7 @@ if [[ ! $# -eq 0 ]]; then
 fi
 
 sudo apt update
-sudo apt install tmux zsh xclip unzip python3-venv fd-find ccache git -y
+sudo apt install tmux curl wget locales lsb-release zsh xclip unzip python3-venv fd-find ccache git -y
 # for thefuck
 sudo apt install python3-dev python3-pip python3-setuptools -y
 # symlink fdfind as fd
@@ -158,7 +168,7 @@ grep -qxF 'set-option -g default-shell /bin/zsh' $HOME/.tmux.conf || printf "set
 # set up nvim
 if ! [ -x "$(command -v nvim)" ]; then
   echo 'nvim is not installed. installing'
-  install_nvim_binary stable
+  install_nvim_binary master
   update_nvim
 fi
 

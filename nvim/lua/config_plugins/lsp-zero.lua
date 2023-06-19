@@ -71,8 +71,8 @@ lsp.on_attach(function(client, bufnr)
     vim.keymap.set('n', keys, func, { buffer = bufnr, desc = desc })
   end
 
-  nmap('gd', "<cmd>Glance definitions<cr>", '[G]oto [D]efinition')
-  nmap('gf', vim.lsp.buf.declaration, '[G]oto Decalaration')
+  nmap('gd', "<cmd>Glance definitions<cr>", '[G]oto [d]efinition')
+  nmap('gD', vim.lsp.buf.declaration, '[G]oto [D]ecalaration')
   nmap('gi', "<cmd>Glance implementations<cr>", '[G]oto [I]mplementation')
   nmap('gH', "<cmd>Glance references<cr>", 'Goto references')
   nmap('go', "<cmd>Glance type_definitions<cr>", 'Goto type lsp_definitions')

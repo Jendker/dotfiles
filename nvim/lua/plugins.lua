@@ -174,6 +174,9 @@ local plugins = {
             onedark.load()
             onedark.toggle()
             require("config_plugins.nvim-scrollbar").setup()
+            vim.api.nvim_command [[ hi IlluminatedWordText gui=none ]]
+            vim.api.nvim_command [[ hi IlluminatedWordRead gui=none ]]
+            vim.api.nvim_command [[ hi IlluminatedWordWrite gui=none ]]
           end, {desc = "Toggle dark and light mode"})
         end,
         cond = not_vscode
@@ -272,7 +275,7 @@ local plugins = {
         cond = not_vscode
       },
       {
-        'nvim-telescope/telescope.nvim', version = '0.1.1',
+        'nvim-telescope/telescope.nvim', version = '0.1.x',
         cmd = 'Telescope',
         keys = {
           -- bookmarks
