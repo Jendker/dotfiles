@@ -105,7 +105,7 @@ lsp.on_attach(function(client, bufnr)
     end)
   end
   if vim.fn.has("nvim-0.9.0") == 1 then
-    if client.server_capabilities.documentHighlightProvider then
+    if (client.server_capabilities.semanticTokensProvider and client.server_capabilities.semanticTokensProvider ~= 0) then
       vim.cmd('TSBufDisable highlight')
     end
   end
@@ -177,7 +177,12 @@ require('lspconfig').ruff_lsp.setup {
   init_options = {
     settings = {
       -- Any extra CLI arguments for `ruff` go here.
-      args = {"--ignore", "E501"},
+      args = {
+        "--ignore",
+        "E501", -- line-too-long
+        "E402", -- module-import-not-at-top-of-file
+        "E731", -- lambda-assignment
+      },
     }
   }
 }

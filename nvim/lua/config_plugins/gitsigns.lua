@@ -51,7 +51,8 @@ gitsigns.setup {
     map('n', '<leader>td', gs.toggle_deleted, { desc = "[t]oggle [d]eleted", silent = true })
 
     -- Text object
-    map({'o', 'x'}, 'ih', ':<C-U>Gitsigns select_hunk<CR>', { desc = "select hunk"} )
+    map({'o', 'x'}, 'ih', ':<C-U>Gitsigns select_hunk<CR>', { desc = "select hunk", silent = true} )
+    map({'o', 'x'}, 'ah', ':<C-U>Gitsigns select_hunk<CR>', { desc = "select hunk", silent = true} )
   end
 }
 require("scrollbar.handlers.gitsigns").setup()

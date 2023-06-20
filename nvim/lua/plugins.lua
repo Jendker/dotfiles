@@ -76,7 +76,8 @@ local plugins = {
       vim.g.matchup_motion_enabled = not vscode
     end
   }, -- better % on matching delimeters
-  'HiPhish/nvim-ts-rainbow2',  -- colored brackets
+  -- Re-enable after this is fixed https://github.com/HiPhish/nvim-ts-rainbow2/issues/49
+  -- 'HiPhish/nvim-ts-rainbow2',  -- colored brackets
   {
     "kana/vim-textobj-user",
     event = 'VeryLazy',
@@ -497,6 +498,7 @@ local plugins = {
               keymaps = {
                 file_panel = {
                   { "n", "s", actions.toggle_stage_entry, { desc = "Stage / unstage the selected entry" } },
+                  { "n", "u", actions.toggle_stage_entry, { desc = "Stage / unstage the selected entry" } },
                   { "n", "-", false}
                 }
               },
