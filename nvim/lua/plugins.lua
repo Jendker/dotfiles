@@ -174,7 +174,6 @@ local plugins = {
             onedark.setup({transparent = not vim.g.onedark_config.transparent})
             onedark.load()
             onedark.toggle()
-            require("config_plugins.nvim-scrollbar").setup()
             vim.api.nvim_command [[ hi IlluminatedWordText gui=none ]]
             vim.api.nvim_command [[ hi IlluminatedWordRead gui=none ]]
             vim.api.nvim_command [[ hi IlluminatedWordWrite gui=none ]]
@@ -642,8 +641,15 @@ local plugins = {
         cond = not_vscode
       },
       {
-        "petertriho/nvim-scrollbar",
-        config = function() require("config_plugins.nvim-scrollbar").setup() end,
+        'dstein64/nvim-scrollview',
+        event = { "BufReadPre", "BufNewFile" },
+        opts = {
+          excluded_filetypes = {},
+          current_only = true,
+          winblend = 0,
+          signs_on_startup = {'diagnostics', 'search', 'conflicts'},
+          diagnostics_severities = { vim.diagnostic.severity.ERROR },
+        },
         cond = not_vscode
       },
       {"tpope/vim-sleuth", init = function() vim.g.sleuth_cpp_heuristics = 0 end, cond = not_vscode}, -- automatically detect tabwidth
