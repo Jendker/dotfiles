@@ -172,11 +172,11 @@ local plugins = {
           onedark.load()
           vim.keymap.set('n', '<leader>tt', function()
             onedark.setup({transparent = not vim.g.onedark_config.transparent})
-            onedark.load()
             onedark.toggle()
             vim.api.nvim_command [[ hi IlluminatedWordText gui=none ]]
             vim.api.nvim_command [[ hi IlluminatedWordRead gui=none ]]
             vim.api.nvim_command [[ hi IlluminatedWordWrite gui=none ]]
+            require('highlight-undo').setup()
           end, {desc = "Toggle dark and light mode"})
         end,
         cond = not_vscode

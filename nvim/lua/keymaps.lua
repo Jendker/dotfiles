@@ -122,4 +122,17 @@ else
   map("i", "<C-k>", "<esc><cmd>m .-2<cr>==gi", { desc = "Move up" })
   map("v", "<C-j>", ":m '>+1<cr>gv=gv", { silent = true, desc = "Move down" })
   map("v", "<C-k>", ":m '<-2<cr>gv=gv", { silent = true, desc = "Move up" })
+  map('v', '<leader>o', function()
+    local command
+    local system_name = vim.uv.os_uname().sysname
+    if system_name == "Darwin" then
+      command = "open"
+    elseif system_name == "Linux" then
+      command = "xdg-open"
+    else
+      vim.api.nvim_err_writeln("System not known: " .. system_name)
+      return
+    end
+    vim.fn.jobstart(command .. " " .. GetVisualSelection())
+    end, { desc = "Open with default application" })
 end

@@ -1,3 +1,4 @@
+require('common')
 local telescope = require('telescope')
 local actions = require('telescope.actions')
 local trouble = require("trouble.providers.telescope")
@@ -54,25 +55,26 @@ telescope.setup({
         n = { ["<c-q>"] = actions.delete_buffer },
       },
     },
+    find_files = {
+      mappings = {
+        i = { ["<c-o>"] =  function()
+            local selection = require('telescope.actions.state').get_selected_entry()
+            vim.fn.jobstart("xdg-open " .. selection.path)
+          end },
+        n = { ["<c-o>"] =  function()
+            local selection = require('telescope.actions.state').get_selected_entry()
+            vim.fn.jobstart("xdg-open " .. selection.path)
+          end },
+      },
+    },
   },
 })
 -- vim_booksmarks
 telescope.load_extension('vim_bookmarks')
 -- more keymaps
-local function getVisualSelection()
-  vim.cmd('noau normal! "vy"')
-  local text = vim.fn.getreg('v')
-  vim.fn.setreg('v', {})
-  text = string.gsub(text, "\n", "")
-  if #text > 0 then
-    return text
-  else
-    return ''
-  end
-end
 vim.keymap.set('n', '<leader>?', require('telescope.builtin').grep_string, { desc = '[?] search for word under cursor'})
 vim.keymap.set('v', '<leader>?', function()
-    require('telescope.builtin').grep_string({ search = getVisualSelection() })
+    require('telescope.builtin').grep_string({ search = GetVisualSelection() })
   end,
   { desc = '[?] search for selection' })
 vim.keymap.set('n', '<leader>/', function()
@@ -86,6 +88,6 @@ vim.keymap.set('v', '<leader>/', function()
   require('telescope.builtin').current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
     winblend = 10,
     previewer = false,
-    default_text = getVisualSelection(),
+    default_text = GetVisualSelection(),
   })
 end, { desc = '[/] Search for selection in current buffer' })
