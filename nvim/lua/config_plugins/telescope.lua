@@ -1,4 +1,4 @@
-require('common')
+local common = require('common')
 local telescope = require('telescope')
 local actions = require('telescope.actions')
 local trouble = require("trouble.providers.telescope")
@@ -74,7 +74,7 @@ telescope.load_extension('vim_bookmarks')
 -- more keymaps
 vim.keymap.set('n', '<leader>?', require('telescope.builtin').grep_string, { desc = '[?] search for word under cursor'})
 vim.keymap.set('v', '<leader>?', function()
-    require('telescope.builtin').grep_string({ search = GetVisualSelection() })
+    require('telescope.builtin').grep_string({ search = common.getVisualSelection() })
   end,
   { desc = '[?] search for selection' })
 vim.keymap.set('n', '<leader>/', function()
@@ -88,6 +88,6 @@ vim.keymap.set('v', '<leader>/', function()
   require('telescope.builtin').current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
     winblend = 10,
     previewer = false,
-    default_text = GetVisualSelection(),
+    default_text = common.getVisualSelection(),
   })
 end, { desc = '[/] Search for selection in current buffer' })

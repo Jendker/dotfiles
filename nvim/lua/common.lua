@@ -5,7 +5,22 @@ end
 
 vscode = vim.fn.exists('g:vscode') ~= 0
 
-function GetGitMainBranch()
+function TableToString(o)
+   if type(o) == 'table' then
+      local s = '{ '
+      for k,v in pairs(o) do
+         if type(k) ~= 'number' then k = '"'..k..'"' end
+         s = s .. '['..k..'] = ' .. TableToString(v) .. ','
+      end
+      return s .. '} '
+   else
+      return tostring(o)
+   end
+end
+
+local M = {}
+
+function M.getGitMainBranch()
   -- get git main branch name
   local get_main_branch_shell_command = [[command git rev-parse --git-dir &>/dev/null || return
     local ref
@@ -25,20 +40,7 @@ function GetGitMainBranch()
   end
 end
 
-function TableToString(o)
-   if type(o) == 'table' then
-      local s = '{ '
-      for k,v in pairs(o) do
-         if type(k) ~= 'number' then k = '"'..k..'"' end
-         s = s .. '['..k..'] = ' .. TableToString(v) .. ','
-      end
-      return s .. '} '
-   else
-      return tostring(o)
-   end
-end
-
-function GetVisualSelection()
+function M.getVisualSelection()
   vim.cmd('noau normal! "vy"')
   local text = vim.fn.getreg('v')
   vim.fn.setreg('v', {})
@@ -49,3 +51,9 @@ function GetVisualSelection()
     return ''
   end
 end
+
+function M.bufferEmpty(buffer)
+  return vim.api.nvim_buf_line_count(buffer) == 1 and vim.api.nvim_buf_get_lines(buffer, 0, 1, {true})[1] == ""
+end
+
+return M

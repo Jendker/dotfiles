@@ -1,3 +1,5 @@
+local common = require('common')
+
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not vim.loop.fs_stat(lazypath) then
   vim.fn.system({
@@ -658,7 +660,6 @@ local plugins = {
         opts = {
           pre_save_cmds =
           { function()
-            -- close fugitive tabs
             local tabpages = vim.api.nvim_list_tabpages()
             for _, tabpage in ipairs(tabpages) do
               local windows = vim.api.nvim_tabpage_list_wins(tabpage)
@@ -668,13 +669,27 @@ local plugins = {
                 if string.find(file_name, "diffview:") then
                   -- close all windows in this tab
                   for _, this_window in ipairs(windows) do
-                    vim.api.nvim_win_close(this_window, true)
+                    vim.api.nvim_win_close(this_window, false)
                   end
                   break
                 end
                 if string.find(file_name, "fugitive:") then
-                  vim.api.nvim_win_close(window, true)
-                  break
+                  -- close buffer
+                  vim.api.nvim_win_close(window, false)
+                end
+              end
+            end
+          end },
+          post_restore_cmds =
+          { function()
+            -- close if buffer is empty and is not the last window
+            local tabpages = vim.api.nvim_list_tabpages()
+            for _, tabpage in ipairs(tabpages) do
+              local windows = vim.api.nvim_tabpage_list_wins(tabpage)
+              for _, window in ipairs(windows) do
+                local buffer = vim.api.nvim_win_get_buf(window)
+                if common.bufferEmpty(buffer) and #vim.api.nvim_list_wins() ~= 1 then
+                  vim.api.nvim_win_close(window, false)
                 end
               end
             end
@@ -706,7 +721,7 @@ local plugins = {
         -- config from https://www.lazyvim.org/plugins/editor#troublenvim
         "folke/trouble.nvim",
         cmd = { "TroubleToggle", "Trouble" },
-        opts = { use_diagnostic_signs = true },
+        opts = { use_diagnostic_signs = true, action_keys = {toggle_fold = {"zA", "za", "h", "l"} } },
         keys = {
           { "<leader>xx", "<cmd>TroubleToggle document_diagnostics<cr>", desc = "Document Diagnostics (Trouble)" },
           { "<leader>xX", "<cmd>TroubleToggle workspace_diagnostics<cr>", desc = "Workspace Diagnostics (Trouble)" },
