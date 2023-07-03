@@ -53,7 +53,8 @@ local mason_packages_to_source_if_available = {
 }
 
 local lsp_signature_config = {
-  toggle_key = '<C-h>'
+  toggle_key = '<C-h>',
+  select_signature_key = '<A-n>',
 }
 --  This function gets run when an LSP connects to a particular buffer.
 lsp.on_attach(function(client, bufnr)
@@ -257,7 +258,7 @@ null_ls.setup({
 -- miscellaneous
 
 vim.diagnostic.config({
-  virtual_text = false,
+  virtual_text = true,
   severity_sort = true,
   update_in_insert = false,
   underline = true,
@@ -324,6 +325,9 @@ cmp.setup({
     {name = 'nvim_lsp'},
     {name = 'buffer', keyword_length = 3},
     {name = 'luasnip', keyword_length = 2},
+  },
+  performance = {
+    max_view_entries = 15,
   },
 })
 

@@ -281,7 +281,7 @@ local plugins = {
         cmd = 'Telescope',
         keys = {
           -- bookmarks
-          {'<leader>sba', "<cmd>lua require('telescope').extensions.vim_bookmarks.all()<cr>", 'n', desc = "Show [b]ookmarks in [a]ll files"},
+          {'<leader>sbB', "<cmd>lua require('telescope').extensions.vim_bookmarks.all()<cr>", 'n', desc = "Show [b]ookmarks in workspace"},
           {'<leader>sbb', "<cmd>lua require('telescope').extensions.vim_bookmarks.current_file()<cr>", 'n', desc = "Show [b]ookmarks in [b]uffer"},
 
           -- files
