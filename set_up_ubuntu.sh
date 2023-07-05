@@ -19,10 +19,10 @@ function install_nvim_source() {
   cd .. && rm -rf neovim
 }
 
-function update_nvim() {
+function update_dotfiles() {
   cd /tmp/ && rm -rf dotfiles && git clone https://github.com/Jendker/dotfiles.git
   mkdir -p $HOME/.config
-  cp -r dotfiles/nvim $HOME/.config
+  bash dotfiles/install.sh --copy
   run_times=1
   nvim --headless "+Lazy! install" +qa
   # repeat again until successful
@@ -82,15 +82,15 @@ function install_nvim_binary() {
 }
 
 if [[ ! $# -eq 0 ]]; then
-  if [[ $1 == "--update-nvim" ]]; then
-    echo "Updating nvim..."
-    update_nvim
+  if [[ $1 == "--update" ]]; then
+    echo "Updating dotfiles..."
+    update_dotfiles
     exit 0
-  elif [[ $1 == "--update-nvim-bin" ]]; then
+  elif [[ $1 == "--update-nvim" ]]; then
     echo "Updating nvim binary..."
     install_nvim_source stable
     exit 0
-  elif [[ $1 == "--update-nvim-bin-dev" ]]; then
+  elif [[ $1 == "--update-nvim-dev" ]]; then
     echo "Updating nvim binary from git dev branch..."
     install_nvim_source master
     exit 0
@@ -169,7 +169,7 @@ grep -qxF 'set-option -g default-shell /bin/zsh' $HOME/.tmux.conf || printf "set
 if ! [ -x "$(command -v nvim)" ]; then
   echo 'nvim is not installed. installing'
   install_nvim_binary master
-  update_nvim
+  update_dotfiles
 fi
 
 # set up pyenv

@@ -1,12 +1,28 @@
 #!/usr/bin/env bash
 
-# nvim
+set -x
+set -e
+
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
+copy=false
+if [[ $1 == "--copy" ]]; then
+  copy=true
+fi
+
+function add() {
+  rm -rf $2
+  if [[ $copy == true ]]; then
+    cp -r $1 $2
+  else
+    ln -s $1 $2
+  fi
+}
+
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-  rm -rf ~/.config/nvim
-  ln -s $(pwd)/nvim ~/.config/nvim
+  add "$SCRIPT_DIR/nvim" "$HOME/.config/nvim"
 elif [[ "$OSTYPE" == "darwin"* ]]; then
-  rm -r "/Users/jedrzej/Library/Mobile Documents/com~apple~CloudDocs/Mackup/.config/nvim/"
-  cp -r $(pwd)/nvim/ "/Users/jedrzej/Library/Mobile Documents/com~apple~CloudDocs/Mackup/.config/nvim/"
+  add "$SCRIPT_DIR/nvim/" "/Users/jedrzej/Library/Mobile Documents/com~apple~CloudDocs/Mackup/.config/nvim/"
 else
   echo "OS type unknown. Exiting."
   exit 1
@@ -14,11 +30,9 @@ fi
 
 # clangd
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-  rm -rf ~/.config/clangd
-  ln -s $(pwd)/clangd ~/.config/clangd
+  add "$SCRIPT_DIR/clangd" "$HOME/.config/clangd"
 elif [[ "$OSTYPE" == "darwin"* ]]; then
-  rm -r "/Users/jedrzej/Library/Mobile Documents/com~apple~CloudDocs/Mackup/.config/clangd/"
-  cp -r $(pwd)/clangd/ "/Users/jedrzej/Library/Mobile Documents/com~apple~CloudDocs/Mackup/.config/clangd/"
+  add "$SCRIPT_DIR/clangd/" "/Users/jedrzej/Library/Mobile Documents/com~apple~CloudDocs/Mackup/.config/clangd/"
 else
   echo "OS type unknown. Exiting."
   exit 1
