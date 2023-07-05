@@ -1,7 +1,7 @@
 local common = require('common')
 
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
-if not vim.loop.fs_stat(lazypath) then
+if not vim.uv.fs_stat(lazypath) then
   vim.fn.system({
     "git",
     "clone",
@@ -485,6 +485,7 @@ local plugins = {
           "lewis6991/gitsigns.nvim",
           "nvim-tree/nvim-web-devicons",
         },
+        cmd = {'DiffviewOpen', 'DiffviewFileHistory'},
         config = function()
           local actions = require("diffview.actions")
           require('diffview').setup(
@@ -513,6 +514,7 @@ local plugins = {
           { "<leader>gm", "<cmd>DiffviewOpen master<cr>",            desc = "[G]it diff with [m]aster" },
           { "<leader>gl", "<cmd>.DiffviewFileHistory --follow<CR>",  desc = "[G]it file history for the current [l]ine"},
           { "<leader>gl", "<Esc><cmd>'<,'>DiffviewFileHistory --follow<CR>", mode = 'v',  desc = "[G]it file history for the visual se[l]ection"},
+          { "<leader>gc", ":DiffviewOpen <C-R>+<CR>",                desc = "[G]it [c]ommit from clipboard", silent = true},
         },
         cond = not_vscode
       },
@@ -572,7 +574,7 @@ local plugins = {
             presets = {
               bottom_search = true, -- use a classic bottom cmdline for search
               command_palette = true, -- position the cmdline and popupmenu together
-              long_message_to_split = false, -- if long messages should be sent to a split
+              long_message_to_split = true, -- if long messages should be sent to a split
             },
             messages = {
               enabled = true,

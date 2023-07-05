@@ -215,10 +215,13 @@ local Package = require "mason-core.package"
 local registry = require "mason-registry"
 local install_package = function(pkg_specifier)
   local package_name, version = Package.Parse(pkg_specifier)
-  local pkg = registry.get_package(package_name)
-  if not pkg:is_installed() then
-    pkg:install{version = version}
-  end
+  -- make sure that registry is downloaded by installing in refresh callback
+  require("mason-registry").refresh(function()
+    local pkg = registry.get_package(package_name)
+    if not pkg:is_installed() then
+      pkg:install{version = version}
+    end
+  end)
 end
 for _, mason_package in ipairs(mason_install_if_system_command_not_available) do
   if not has_value(mason_installed_packages, mason_package) then
@@ -236,7 +239,7 @@ end
 local null_ls_builtin_sources = {}
 
 for package, builtin in pairs(mason_packages_to_source_if_available) do
-  if has_value(mason_installed_packages, package) or has_value(mason_install_if_system_command_not_available, package) then
+  if has_value(mason_installed_packages, package) then
     local done = false
     for _, b in ipairs(builtin) do
       -- this runs only for arrays
