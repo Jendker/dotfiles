@@ -191,3 +191,9 @@ fi
 git config --global user.name "Jedrzej Orbik"
 git config --global user.email jedrzej.orbik@roboception.de
 # git config --global user.email Jendker@users.noreply.github.com
+
+# set up fzf for zsh
+if [ ! -d "$HOME/.fzf" ]; then
+  git clone --depth 1 https://github.com/junegunn/fzf.git $HOME/.fzf
+  $HOME/.fzf/install --key-bindings --completion --update-rc --no-bash
+fi
