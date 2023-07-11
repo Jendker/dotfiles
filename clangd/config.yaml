@@ -4,7 +4,8 @@ Diagnostics:
     Add: [readability-*, misc-*]
     Remove: [modernize-use-nodiscard, readability-magic-numbers, readability-identifier-length,
              readability-uppercase-literal-suffix, readability-implicit-bool-conversion,
-             readability-redundant-access-specifiers,
+             readability-redundant-access-specifiers, misc-non-private-member-variables-in-classes,
+             misc-use-anonymous-namespace,
              ]
     CheckOptions:
       readability-function-cognitive-complexity.Threshold: 50
