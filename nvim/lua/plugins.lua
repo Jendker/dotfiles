@@ -232,7 +232,6 @@ local plugins = {
           require("lualine").setup(
           {
             sections = {
-              lualine_b = {'branch', 'diagnostics'},
               lualine_c = {
                 {
                   'filename',
@@ -638,7 +637,17 @@ local plugins = {
               disabling = function() if vim.g.first_autosave_disable == 1 then vim.g.first_autosave_disable = 0 else print "auto-save off"; vim.g.autosave_on = 0 end end,
               before_saving = function() vim.b.lsp_zero_enable_autoformat = 0 end,
               after_saving = function() vim.b.lsp_zero_enable_autoformat = 1 end,
-            }
+            },
+            condition = function(buf)
+              local fn = vim.fn
+              local utils = require("auto-save.utils.data")
+
+              -- return true means will auto-save
+              if fn.getbufvar(buf, "&modifiable") == 1 and utils.not_in(fn.getbufvar(buf, "&filetype"), {'oil'}) then
+                return true
+              end
+              return false
+            end,
           }
           vim.cmd('ASToggle') -- called manually because 'enabled = false' does not work
         end,
@@ -659,6 +668,9 @@ local plugins = {
       {"tpope/vim-sleuth", init = function() vim.g.sleuth_cpp_heuristics = 0 end, cond = not_vscode}, -- automatically detect tabwidth
       {
         "rmagatti/auto-session",
+        init = function()
+          vim.o.sessionoptions=vim.o.sessionoptions .. ",winpos,terminal,folds"
+        end,
         opts = {
           pre_save_cmds =
           { function()
@@ -698,6 +710,12 @@ local plugins = {
           end }
         },
         cond = not_vscode,
+      },
+      {
+        "chrisgrieser/nvim-early-retirement",
+        config = true,
+        event = "VeryLazy",
+        cond = not_vscode
       },
       {"iamcco/markdown-preview.nvim",
         -- build = function() vim.fn["mkdp#util#install"]() end,
