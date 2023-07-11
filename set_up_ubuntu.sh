@@ -64,6 +64,24 @@ EOT
   fi
 }
 
+function update_git() {
+  # need at least git 2.31
+  version=$(git --version | tr -d -c 0-9.)
+  major=`echo $version | cut -d. -f1`
+  minor=`echo $version | cut -d. -f2`
+  revision=`echo $version | cut -d. -f3`
+  revision=`expr $revision + 1`
+
+  if (( 2 > $major )) || (( 31 > $minor )); then
+    echo "Updating git to the latest version..."
+    sudo add-apt-repository ppa:git-core/ppa -y
+    sudo apt-get update
+    sudo apt-get install --upgrade git -y
+  else
+    echo "Git version $version is sufficient."
+  fi
+}
+
 function install_cargo() {
   if ! [ -x "$(command -v cargo)" ]; then
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
@@ -79,6 +97,7 @@ function install_nvim_binary() {
   fi
   install_nvim_source $branch
   install_node
+  update_git
 }
 
 if [[ ! $# -eq 0 ]]; then
@@ -101,6 +120,10 @@ if [[ ! $# -eq 0 ]]; then
   elif [[ $1 == "--install-cargo" ]]; then
     echo "Installing cargo and rust..."
     install_cargo
+    exit 0
+  elif [[ $1 == "--update-git" ]]; then
+    echo "Updating git if necessary..."
+    update_git
     exit 0
   else
     echo "Option \"$1\" not recognized."
