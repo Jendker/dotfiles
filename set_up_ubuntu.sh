@@ -220,3 +220,22 @@ if [ ! -d "$HOME/.fzf" ]; then
   git clone --depth 1 https://github.com/junegunn/fzf.git $HOME/.fzf
   $HOME/.fzf/install --key-bindings --completion --update-rc --no-bash
 fi
+
+# random
+
+function clean_build_lib {
+  rm -r build
+  mkdir build && cd build
+  cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=1 ..
+  make -j12 package
+}
+
+function clean_build_ros {
+  rm -r build
+  mkdir build && cd build
+  cmake -DCATKIN_BUILD_BINARY_PACKAGE="1" -DCMAKE_INSTALL_PREFIX="/opt/ros/$ROS_DISTRO" -DCMAKE_PREFIX_PATH="/opt/ros/$ROS_DISTRO" -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=1 ..
+  make -j12 package
+}
+
+alias suprl="supervisorctl reload"
+alias supre="supervisorctl restart pipeline"
