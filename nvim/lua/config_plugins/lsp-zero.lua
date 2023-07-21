@@ -9,7 +9,6 @@ end
 
 lsp.preset({
   name = 'minimal',
-  manage_nvim_cmp = {set_basic_mappings = true, set_extra_mappings = true},
 })
 
 local mason_ensure_installed = {
@@ -22,7 +21,6 @@ local mason_ensure_installed = {
   'yamlls',
   'ruff_lsp'
 }
-lsp.ensure_installed(mason_ensure_installed)
 
 -- this will install any mason package, even formatters and linters
 local mason_install_if_system_command_not_available = {'jq'}
@@ -60,7 +58,7 @@ local lsp_signature_config = {
 lsp.on_attach(function(client, bufnr)
   lsp.default_keymaps({
     buffer = bufnr,
-    omit = {'gr', '<C-k>'},
+    exclude = {'gr', '<C-k>'},
     preserve_mappings = false,
   })
   require('lsp_signature').on_attach(lsp_signature_config, bufnr)
@@ -129,6 +127,17 @@ lsp.format_on_save({
   }
 })
 
+require('mason').setup({})
+require('mason-lspconfig').setup({
+  ensure_installed = mason_ensure_installed,
+  handlers = {
+    lsp.default_setup,
+    lua_ls = function() require('lspconfig').lua_ls.setup(lsp.nvim_lua_ls()) end,
+  },
+})
+
+lsp.extend_cmp({ set_basic_mappings = true, set_extra_mappings = true })
+
 require('lspconfig').clangd.setup({
   on_attach = function(_, bufnr)
     vim.keymap.set('n', '<A-u>', vim.cmd.ClangdSwitchSourceHeader, { buffer = bufnr, desc = "Switch between so[u]rce / header" })
@@ -187,14 +196,6 @@ require('lspconfig').ruff_lsp.setup {
     }
   }
 }
-
-require('lspconfig').lua_ls.setup(lsp.nvim_lua_ls({
-  Lua = {
-    workspace = { checkThirdParty = false },
-    telemetry = { enable = false },
-  },
-}))
-lsp.setup()
 
 -- null-ls
 
@@ -278,7 +279,6 @@ vim.diagnostic.config({
 local cmp = require('cmp')
 local cmp_action = require('lsp-zero').cmp_action()
 require('luasnip.loaders.from_vscode').lazy_load() -- for snippets
-local luasnip = require("luasnip")
 local has_words_before = function()
   unpack = unpack or table.unpack
   local line, col = unpack(vim.api.nvim_win_get_cursor(0))
