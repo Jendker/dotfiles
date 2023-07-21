@@ -276,7 +276,7 @@ local plugins = {
         cond = not_vscode
       },
       {
-        'nvim-telescope/telescope.nvim', version = '0.1.x',
+        'nvim-telescope/telescope.nvim',
         cmd = 'Telescope',
         keys = {
           -- bookmarks
@@ -284,17 +284,17 @@ local plugins = {
           {'<leader>sbb', "<cmd>lua require('telescope').extensions.vim_bookmarks.current_file()<cr>", 'n', desc = "Show [b]ookmarks in [b]uffer"},
 
           -- files
-          {'<leader>sff', "<cmd>lua require('telescope.builtin').find_files()<cr>", 'n', desc = 'Search [f]iles'},
-          {'<leader>sfg', "<cmd>lua require('telescope.builtin').git_files()<cr>", 'n', desc = 'search [g]it files'},
+          {'<leader>sff', "<cmd>lua require('telescope').extensions.menufacture.find_files()<cr>", 'n', desc = 'Search [f]iles'},
+          {'<leader>sfg', "<cmd>lua require('telescope').extensions.menufacture.git_files()<cr>", 'n', desc = 'search [g]it files'},
           {'<leader>sfr', "<cmd>lua require('telescope.builtin').oldfiles()<cr>", 'n', desc = 'Search [r]ecently opened files'},
           {'<leader>sfb', "<cmd>lua require('telescope.builtin').buffers()<cr>", 'n', desc = 'Search existing [b]uffers'},
 
           -- search
-          {'<leader>sl', "<cmd>lua require('telescope.builtin').live_grep()<cr>", 'n', desc = 'Search with [l]ive grep'},
-          {'<leader>sg', "<cmd>lua require('telescope.builtin').grep_string({ search = vim.fn.input('Grep > ') })<cr>", 'n', desc = "Search after [g]rep with string"},
+          {'<leader>sl', "<cmd>lua require('telescope').extensions.menufacture.live_grep()<cr>", 'n', desc = 'Search with [l]ive grep'},
+          {'<leader>sg', "<cmd>lua require('telescope').extensions.menufacture.grep_string({ search = vim.fn.input('Grep > ') })<cr>", 'n', desc = "Search after [g]rep with string"},
           {'<leader>sh', "<cmd>lua require('telescope.builtin').help_tags()<cr>", 'n', desc = 'Search [h]elp'},
           {'<leader>sd', "<cmd>lua require('telescope.builtin').diagnostics()<cr>", 'n', desc = 'Search [d]iagnostics'},
-          {'<leader>so', "<cmd>lua require('telescope.builtin').live_grep({grep_open_files=true})<cr>", 'n', desc = 'Search with live grep in [o]pen buffers'},
+          {'<leader>so', "<cmd>lua require('telescope').extensions.menufacture.live_grep({grep_open_files=true})<cr>", 'n', desc = 'Search with live grep in [o]pen buffers'},
           {'<leader>sr', "<cmd>lua require('telescope.builtin').resume()<cr>", 'n', desc = 'Search [r]esume'},
           {'<leader>ss', "<cmd>lua require('telescope.builtin').lsp_document_symbols()<cr>", '[s]ymbols in document'},
           {'<leader>sS', "<cmd>lua require('telescope.builtin').lsp_dynamic_workspace_symbols()<cr>", '[S]ymbols in workspace'},
@@ -336,6 +336,7 @@ local plugins = {
         },
         cond = not_vscode
       },
+      {"molecule-man/telescope-menufacture", cmd = 'Telescope', config = function() require('telescope').load_extension('menufacture') end, cond = not_vscode},
       {'farmergreg/vim-lastplace', cond = not_vscode},
       {
         'karb94/neoscroll.nvim',
@@ -908,4 +909,12 @@ local plugins = {
       },
 }
 
-require("lazy").setup(plugins)
+-- use the lazy_opts until this is fixed: https://github.com/rmagatti/auto-session/issues/223
+local lazy_opts = {
+  install = {
+    -- don't install missing plugins on startup as a workaround to auto-session issues with lazy
+    missing = false,
+  },
+}
+
+require("lazy").setup(plugins, lazy_opts)

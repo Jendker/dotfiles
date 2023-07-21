@@ -2,12 +2,17 @@ local common = require('common')
 local telescope = require('telescope')
 local actions = require('telescope.actions')
 local trouble = require("trouble.providers.telescope")
-local custom_pickers = require('config_plugins.telescope_custom_pickers')
 telescope.setup({
   defaults = {
     mappings = {
       i = {
-        ["<c-t>"] = trouble.open_with_trouble,
+        ["<C-t>"] = trouble.open_with_trouble,
+        ["<C-f>"] = function(...)
+          return actions.preview_scrolling_down(...)
+        end,
+        ["<C-b>"] = function(...)
+          return actions.preview_scrolling_up(...)
+        end,
       },
       n = {
         ["<c-t>"] = trouble.open_with_trouble,
@@ -27,27 +32,9 @@ telescope.setup({
     live_grep = {
       mappings = {
         i = {
-          ["<C-Down>"] = function(...)
-            return actions.cycle_history_next(...)
-          end,
-          ["<C-Up>"] = function(...)
-            return actions.cycle_history_prev(...)
-          end,
-          ["<C-f>"] = function(...)
-            return actions.preview_scrolling_down(...)
-          end,
-          ["<C-b>"] = function(...)
-            return actions.preview_scrolling_up(...)
-          end,
           ["<c-r>"] = actions.to_fuzzy_refine,
-          ["<c-e>"] = custom_pickers.actions.set_extension,
-          ["<c-l>"] = custom_pickers.actions.set_folders,
-          ["<c-o>"] = custom_pickers.actions.set_glob,
-          ["<c-g>"] = custom_pickers.actions.set_regex,
-          ["<a-r>"] = custom_pickers.actions.reset_filters,
         },
       },
-      additional_args = custom_pickers.default_additional_args,
     },
     buffers = {
       mappings = {
@@ -68,13 +55,20 @@ telescope.setup({
       },
     },
   },
+  extensions = {
+    menufacture = {
+      mappings = {
+        main_menu = { [{ 'i', 'n' }] = '<C-e>' },
+      },
+    },
+  },
 })
 -- vim_booksmarks
 telescope.load_extension('vim_bookmarks')
 -- more keymaps
-vim.keymap.set('n', '<leader>?', require('telescope.builtin').grep_string, { desc = '[?] search for word under cursor'})
+vim.keymap.set('n', '<leader>?', require('telescope').extensions.menufacture.grep_string, { desc = '[?] search for word under cursor'})
 vim.keymap.set('v', '<leader>?', function()
-    require('telescope.builtin').grep_string({ search = common.getVisualSelection() })
+    require('telescope').extensions.menufacture.grep_string({ search = common.getVisualSelection() })
   end,
   { desc = '[?] search for selection' })
 vim.keymap.set('n', '<leader>/', function()
