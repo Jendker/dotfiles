@@ -721,6 +721,7 @@ local plugins = {
       {"iamcco/markdown-preview.nvim",
         -- build = function() vim.fn["mkdp#util#install"]() end,
         -- doing this until https://github.com/iamcco/markdown-preview.nvim/issues/50 works how it should
+        -- if it still fails, run `:call mkdp#util#install()`
         build = "cd app && npm install",
         init = function()
           vim.g.mkdp_preview_options = { ["disable_sync_scroll"] = 0 }
@@ -906,6 +907,16 @@ local plugins = {
           { "[[", desc = "Prev Reference" },
         },
         cond = not_vscode,
+      },
+      {
+        "nvim-pack/nvim-spectre",
+        cmd = "Spectre",
+        opts = { open_cmd = "noswapfile vnew" },
+        -- stylua: ignore
+        keys = {
+          { "<leader>R", function() require("spectre").open() end, desc = "[R]eplace in files (Spectre)" },
+          { "<leader>R", '<esc><cmd>lua require("spectre").open_visual()<CR>', mode = 'v', desc = "[R]eplace selection (Spectre)" },
+        }
       },
 }
 

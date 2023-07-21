@@ -1,4 +1,4 @@
-require "common"
+local common = require("common")
 
 local function map(mode, key, action, opts)
   local options = { noremap = true, silent = false }
@@ -133,6 +133,6 @@ else
       vim.api.nvim_err_writeln("System not known: " .. system_name)
       return
     end
-    vim.fn.jobstart(command .. " " .. GetVisualSelection())
+    vim.fn.jobstart(command .. " " .. common.getVisualSelection())
     end, { desc = "Open with default application" })
 end
