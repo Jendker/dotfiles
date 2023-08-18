@@ -138,7 +138,7 @@ local plugins = {
           -- to open Roboception remote url:
           vim.g.fugitive_gitlab_domains = {'https://gitlab.com', 'https://gitlab.roboception.de'}
           vim.keymap.set("n", "<leader>hm", function()
-              local main_branch_name = GetGitMainBranch()
+              local main_branch_name = common.getGitMainBranch()
               if main_branch_name ~= nil then
                 local keys_string = "<C-W>v<C-W>l<cmd>Gedit " .. main_branch_name .. ":%<cr>"
                 local keys = vim.api.nvim_replace_termcodes(keys_string, true, false, true)
@@ -917,6 +917,11 @@ local plugins = {
           { "<leader>R", function() require("spectre").open() end, desc = "[R]eplace in files (Spectre)" },
           { "<leader>R", '<esc><cmd>lua require("spectre").open_visual()<CR>', mode = 'v', desc = "[R]eplace selection (Spectre)" },
         }
+      },
+      {
+        'xiyaowong/virtcolumn.nvim',
+        cond = not_vscode,
+        config = function() vim.cmd("autocmd filetype python setlocal colorcolumn=88") end,
       },
 }
 
