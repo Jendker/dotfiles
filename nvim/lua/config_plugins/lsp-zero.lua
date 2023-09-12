@@ -2,12 +2,12 @@ if vscode then
   return
 end
 
-local status_ok, lsp = pcall(require, 'lsp-zero')
+local status_ok, lsp_zero = pcall(require, 'lsp-zero')
 if not status_ok then
   return
 end
 
-lsp.preset({
+lsp_zero.preset({
   name = 'minimal',
 })
 
@@ -55,8 +55,8 @@ local lsp_signature_config = {
   select_signature_key = '<A-n>',
 }
 --  This function gets run when an LSP connects to a particular buffer.
-lsp.on_attach(function(client, bufnr)
-  lsp.default_keymaps({
+lsp_zero.on_attach(function(client, bufnr)
+  lsp_zero.default_keymaps({
     buffer = bufnr,
     exclude = {'gr', '<C-k>'},
     preserve_mappings = false,
@@ -110,17 +110,14 @@ lsp.on_attach(function(client, bufnr)
   end
 end)
 
-lsp.set_sign_icons({
+lsp_zero.set_sign_icons({
   error = '✘',
   warn = '▲',
   hint = '⚑',
   info = '»'
 })
 
-lsp.format_on_save({
-  format_opts = {
-    timeout_ms = 10000,
-  },
+lsp_zero.format_on_save({
   servers = {
     ['null-ls'] = {}, -- add like = {'python', 'lua'} etc.
     ['clangd'] = {'cpp'},
@@ -131,12 +128,13 @@ require('mason').setup({})
 require('mason-lspconfig').setup({
   ensure_installed = mason_ensure_installed,
   handlers = {
-    lsp.default_setup,
-    lua_ls = function() require('lspconfig').lua_ls.setup(lsp.nvim_lua_ls()) end,
+    lsp_zero.default_setup,
+    lua_ls = function()
+      local lua_opts = lsp_zero.nvim_lua_ls()
+      require('lspconfig').lua_ls.setup(lua_opts)
+    end,
   },
 })
-
-lsp.extend_cmp({ set_basic_mappings = true, set_extra_mappings = true })
 
 require('lspconfig').clangd.setup({
   on_attach = function(_, bufnr)
@@ -199,10 +197,8 @@ require('lspconfig').ruff_lsp.setup {
 
 -- null-ls
 
--- this has to be called after lsp.setup()
+-- this has to be called after lsp_zero.setup()
 -- see https://github.com/VonHeikemen/lsp-zero.nvim/issues/60#issuecomment-1363800412
-local null_ls_options = lsp.build_options('null-ls', {})
-
 local function has_value (tab, val)
   for _, value in ipairs(tab) do
     if value == val then return true end
@@ -255,7 +251,6 @@ for package, builtin in pairs(mason_packages_to_source_if_available) do
 end
 
 null_ls.setup({
-  on_attach = null_ls_options.on_attach,
   sources = null_ls_builtin_sources
 })
 
