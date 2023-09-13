@@ -92,7 +92,13 @@ lsp_zero.on_attach(function(client, bufnr)
   vim.api.nvim_buf_create_user_command(bufnr, 'Format', function(_)
     vim.lsp.buf.format()
   end, { desc = 'Format current buffer with LSP' })
-  if client.server_capabilities.documentRangeFormattingProvider then
+  if (
+    client.server_capabilities.documentRangeFormattingProvider
+    and client.server_capabilities.documentRangeFormattingProvider ~= 0
+    and vim.bo.filetype ~= "python" -- black used for python does not support formatting
+    -- TODO maybe the last check is not needed if the new formatter reports server_capabilities properly?
+  )
+  then
     vim.keymap.set('v', '=', '<cmd>lua vim.lsp.buf.format()<cr><esc>')
     vim.keymap.set('n', '==', function()
       vim.lsp.buf.format({
