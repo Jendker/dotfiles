@@ -540,7 +540,6 @@ local plugins = {
       {
         'kevinhwang91/nvim-fundo',
         dependencies = 'kevinhwang91/promise-async',
-        build = function() require('fundo').install() end,
         config = function()
           vim.opt.undofile = true
           require('fundo').setup({ limit_archives_size = 50 }) -- limit to store max 50 MB
