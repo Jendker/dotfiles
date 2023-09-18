@@ -23,32 +23,8 @@ local mason_ensure_installed = {
 }
 
 -- this will install any mason package, even formatters and linters
-local mason_install_if_system_command_not_available = {'jq'}
-local mason_install = {'black', 'jsonlint'}
-
-local null_ls = require('null-ls')
-local mason_packages_to_source_if_available = {
-  black = null_ls.builtins.formatting.black,
-  yapf = null_ls.builtins.formatting.yapf,
-  jq = null_ls.builtins.formatting.jq,
-  cspell = {
-    null_ls.builtins.diagnostics.cspell.with({
-      -- Force the severity to be HINT
-      diagnostics_postprocess = function(diagnostic)
-        diagnostic.severity = vim.diagnostic.severity.HINT
-      end,
-    }),
-    null_ls.builtins.code_actions.cspell
-  },
-  misspell = null_ls.builtins.diagnostics.misspell.with({
-    -- Force the severity to be HINT
-    diagnostics_postprocess = function(diagnostic)
-      diagnostic.severity = vim.diagnostic.severity.HINT
-    end,
-  }),
-  shellcheck = null_ls.builtins.diagnostics.shellcheck,
-  jsonlint = null_ls.builtins.diagnostics.jsonlint,
-}
+local mason_install_if_system_command_not_available = {}
+local mason_install = {'black', 'jsonlint', 'prettierd'}
 
 local lsp_signature_config = {
   toggle_key = '<C-h>',
@@ -89,26 +65,6 @@ lsp_zero.on_attach(function(client, bufnr)
   end, '[W]orkspace [L]ist Folders')
 
   -- Create a command `:Format` local to the LSP buffer
-  vim.api.nvim_buf_create_user_command(bufnr, 'Format', function(_)
-    vim.lsp.buf.format()
-  end, { desc = 'Format current buffer with LSP' })
-  if (
-    client.server_capabilities.documentRangeFormattingProvider
-    and client.server_capabilities.documentRangeFormattingProvider ~= 0
-    and vim.bo.filetype ~= "python" -- black used for python does not support formatting
-    -- TODO maybe the last check is not needed if the new formatter reports server_capabilities properly?
-  )
-  then
-    vim.keymap.set('v', '=', '<cmd>lua vim.lsp.buf.format()<cr><esc>')
-    vim.keymap.set('n', '==', function()
-      vim.lsp.buf.format({
-        range = {
-          ["start"] = vim.api.nvim_win_get_cursor(0),
-          ["end"] = vim.api.nvim_win_get_cursor(0),
-        }
-      })
-    end)
-  end
   if vim.fn.has("nvim-0.9.0") == 1 then
     if (client.server_capabilities.semanticTokensProvider and client.server_capabilities.semanticTokensProvider ~= 0) then
       vim.cmd('TSBufDisable highlight')
@@ -125,7 +81,6 @@ lsp_zero.set_sign_icons({
 
 lsp_zero.format_on_save({
   servers = {
-    ['null-ls'] = {}, -- add like = {'python', 'lua'} etc.
     ['clangd'] = {'cpp'},
   }
 })
@@ -201,8 +156,6 @@ require('lspconfig').ruff_lsp.setup {
   }
 }
 
--- null-ls
-
 -- this has to be called after lsp_zero.setup()
 -- see https://github.com/VonHeikemen/lsp-zero.nvim/issues/60#issuecomment-1363800412
 local function has_value (tab, val)
@@ -238,27 +191,6 @@ for _, mason_package in ipairs(mason_install) do
     install_package(mason_package)
   end
 end
-
-local null_ls_builtin_sources = {}
-
-for package, builtin in pairs(mason_packages_to_source_if_available) do
-  if has_value(mason_installed_packages, package) then
-    local done = false
-    for _, b in ipairs(builtin) do
-      -- this runs only for arrays
-      table.insert(null_ls_builtin_sources, b)
-      done = true
-    end
-    if not done then
-      -- if the previous didn't run - is not an array - run this
-      table.insert(null_ls_builtin_sources, builtin)
-    end
-  end
-end
-
-null_ls.setup({
-  sources = null_ls_builtin_sources
-})
 
 -- miscellaneous
 

@@ -395,8 +395,51 @@ local plugins = {
 
       -- Added by me
       {'ray-x/lsp_signature.nvim'},
-      {'jose-elias-alvarez/null-ls.nvim'}
     },
+    cond = not_vscode
+  },
+  {
+    'stevearc/conform.nvim',
+    opts = {
+      formatters_by_ft = {
+        python = { "black" },
+        json = { "prettierd" },
+        html = { "prettierd" },
+        yaml = { "prettierd" },
+        javascript = { "prettierd" },
+        typescript = { "prettierd" },
+      },
+    },
+    config = function(_, opts)
+      local conform = require('conform')
+      conform.setup(opts)
+      vim.api.nvim_create_user_command("Format", function(args)
+        local range = nil
+        if args.count ~= -1 then
+          local end_line = vim.api.nvim_buf_get_lines(0, args.line2 - 1, args.line2, true)[1]
+          range = {
+            start = { args.line1, 0 },
+            ["end"] = { args.line2, end_line:len() },
+          }
+        end
+        require("conform").format({ async = true, lsp_fallback = true, range = range })
+      end, { range = true })
+      vim.keymap.set('v', '=', function ()
+        require("conform").format({async = true, lsp_fallback = true })
+        vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<ESC>", true, true, true), "n", true)
+      end)
+      vim.keymap.set("n", "==", function()
+        conform.format({
+          range = {
+            ["start"] = vim.api.nvim_win_get_cursor(0),
+            ["end"] = vim.api.nvim_win_get_cursor(0),
+          }, async = true, lsp_fallback = true
+        })
+      end)
+      vim.keymap.set("n", "<leader>bf", function()
+        conform.format({ async = true, lsp_fallback = true })
+      end, { desc = "Run [b]uffer [f]ormatting" })
+    end,
     cond = not_vscode
   },
   {
