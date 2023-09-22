@@ -24,18 +24,21 @@ function add() {
 
 # nvim
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-  add "$SCRIPT_DIR/nvim" "$HOME/.config/nvim"
+  add "$SCRIPT_DIR/nvim/lua" "$HOME/.config/nvim/lua"
 elif [[ "$OSTYPE" == "darwin"* ]]; then
   config_folder="$HOME/.config/nvim"
   icloud_folder="$HOME/Library/Mobile Documents/com~apple~CloudDocs/Mackup/.config/nvim"
+  rm -rf "$config_folder" || true
+  mkdir -p "$config_folder"
   if [[ $dev == true ]]; then
     copy=false
     add "$SCRIPT_DIR/nvim" "$config_folder"
   else
     copy=true
-    add "$SCRIPT_DIR/nvim" "$icloud_folder"
-    rm -r "$config_folder" || true
-    ln -s "$icloud_folder" "$config_folder"
+    cp "$SCRIPT_DIR/nvim/init.lua" "$icloud_folder/"
+    cp -r "$SCRIPT_DIR/nvim/lua" "$icloud_folder"
+    ln -s "$icloud_folder/init.lua" "$config_folder"
+    ln -s "$icloud_folder/lua" "$config_folder"
   fi
 else
   echo "OS type unknown. Exiting."
