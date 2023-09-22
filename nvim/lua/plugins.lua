@@ -37,15 +37,14 @@ local plugins = {
       vim.g.clever_f_smart_case = 1
     end,
     -- Switch to flit when possible, see comment below
-    cond = vscode
   },
   -- Waiting for this to be fixed to activate for vscode: https://github.com/neovim/neovim/pull/19035
-  {
-    'ggandor/flit.nvim',
-    event = 'VeryLazy',
-    config = true,
-    cond = not_vscode
-  },
+  -- {
+  --   'ggandor/flit.nvim',
+  --   event = 'VeryLazy',
+  --   config = true,
+  --   cond = not_vscode
+  -- },
   {
     'tpope/vim-commentary', -- gcc to comment
     event = 'VeryLazy',
@@ -280,8 +279,8 @@ local plugins = {
     cmd = 'Telescope',
     keys = {
       -- bookmarks
-      {'<leader>sbB', "<cmd>lua require('telescope').extensions.vim_bookmarks.all()<cr>", 'n', desc = "Show [b]ookmarks in workspace"},
-      {'<leader>sbb', "<cmd>lua require('telescope').extensions.vim_bookmarks.current_file()<cr>", 'n', desc = "Show [b]ookmarks in [b]uffer"},
+      {'<leader>sB', "<cmd>lua require('telescope').extensions.vim_bookmarks.all()<cr>", 'n', desc = "Show [b]ookmarks in workspace"},
+      {'<leader>sb', "<cmd>lua require('telescope').extensions.vim_bookmarks.current_file()<cr>", 'n', desc = "Show [b]ookmarks in [b]uffer"},
 
       -- files
       {'<leader>sff', "<cmd>lua require('telescope').extensions.menufacture.find_files()<cr>", 'n', desc = 'Search [f]iles'},
@@ -290,7 +289,7 @@ local plugins = {
       {'<leader>sfb', "<cmd>lua require('telescope.builtin').buffers()<cr>", 'n', desc = 'Search existing [b]uffers'},
 
       -- search
-      {'<leader>sl', "<cmd>lua require('telescope').extensions.menufacture.live_grep()<cr>", 'n', desc = 'Search with [l]ive grep'},
+      {'<leader>sl', desc = 'Search with [l]ive grep'},
       {'<leader>sg', "<cmd>lua require('telescope').extensions.menufacture.grep_string({ search = vim.fn.input('Grep > ') })<cr>", 'n', desc = "Search after [g]rep with string"},
       {'<leader>sh', "<cmd>lua require('telescope.builtin').help_tags()<cr>", 'n', desc = 'Search [h]elp'},
       {'<leader>sd', "<cmd>lua require('telescope.builtin').diagnostics()<cr>", 'n', desc = 'Search [d]iagnostics'},
@@ -394,7 +393,7 @@ local plugins = {
       {'rafamadriz/friendly-snippets'},
 
       -- Added by me
-      {'ray-x/lsp_signature.nvim'},
+      {'ray-x/lsp_signature.nvim', opts = { toggle_key = '<C-h>', select_signature_key = '<A-n>' } },
     },
     cond = not_vscode
   },
@@ -424,18 +423,21 @@ local plugins = {
         end
         require("conform").format({ async = true, lsp_fallback = true, range = range })
       end, { range = true })
-      vim.keymap.set('v', '=', function ()
-        require("conform").format({async = true, lsp_fallback = true })
-        vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<ESC>", true, true, true), "n", true)
-      end)
-      vim.keymap.set("n", "==", function()
-        conform.format({
-          range = {
-            ["start"] = vim.api.nvim_win_get_cursor(0),
-            ["end"] = vim.api.nvim_win_get_cursor(0),
-          }, async = true, lsp_fallback = true
-        })
-      end)
+      -- python's black does not support range formatting
+      if vim.bo.filetype ~= "python" then
+        vim.keymap.set('v', '=', function ()
+          require("conform").format({async = true, lsp_fallback = true })
+          vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<ESC>", true, true, true), "n", true)
+        end)
+        vim.keymap.set("n", "==", function()
+          conform.format({
+            range = {
+              ["start"] = vim.api.nvim_win_get_cursor(0),
+              ["end"] = vim.api.nvim_win_get_cursor(0),
+            }, async = true, lsp_fallback = true
+          })
+        end)
+      end
       vim.keymap.set("n", "<leader>bf", function()
         conform.format({ async = true, lsp_fallback = true })
       end, { desc = "Run [b]uffer [f]ormatting" })
@@ -544,7 +546,8 @@ local plugins = {
             file_panel = {
               { "n", "s", actions.toggle_stage_entry, { desc = "Stage / unstage the selected entry" } },
               { "n", "u", actions.toggle_stage_entry, { desc = "Stage / unstage the selected entry" } },
-              { "n", "-", false}
+              { "n", "-", false},
+              { "n", "gf", function() actions.goto_file_edit(); vim.cmd('tabclose #') end, { desc = "Open the file in the previous tabpage" } },
             }
           },
         })
@@ -687,8 +690,16 @@ local plugins = {
         callbacks = {
           enabling = function() print "auto-save on"; vim.g.autosave_on = 1 end,
           disabling = function() if vim.g.first_autosave_disable == 1 then vim.g.first_autosave_disable = 0 else print "auto-save off"; vim.g.autosave_on = 0 end end,
-          before_saving = function() vim.b.lsp_zero_enable_autoformat = 0 end,
-          after_saving = function() vim.b.lsp_zero_enable_autoformat = 1 end,
+          before_saving = function()
+            vim.b.lsp_zero_enable_autoformat = false
+            vim.b.disable_autoformat = true
+            vim.g.disable_autoformat = true
+          end,
+          after_saving = function()
+            vim.b.lsp_zero_enable_autoformat = true
+            vim.b.disable_autoformat = false
+            vim.g.disable_autoformat = false
+          end,
         },
         condition = function(buf)
           local fn = vim.fn
@@ -875,12 +886,14 @@ local plugins = {
     init = function()
       -- disable by default - enable manually in machine_settings.lua
       vim.g.codeium_enabled = false
+      vim.g.codeium_disable_bindings = 1
     end,
     config = function()
       vim.keymap.set('i', '<a-]>', function() return vim.fn['codeium#CycleCompletions'](1) end, { expr = true, desc = "Codeium next suggestion" })
       vim.keymap.set('i', '<a-[>', function() return vim.fn['codeium#CycleCompletions'](-1) end, { expr = true, desc = "Codeium previous suggestion"})
       vim.keymap.set('i', '<a-x>', function() return vim.fn['codeium#Clear']() end, { expr = true, desc = "Codeium clear suggestion" })
       vim.keymap.set('i', '<a-Bslash>', function() return vim.fn['codeium#Complete']() end, { expr = true, desc = "Codeium trigger complete"})
+      vim.keymap.set('i', '<a-a>', function () return vim.fn['codeium#Accept']() end, { expr = true, silent = true, desc = "Codeium accept"})
     end,
     cond = not_vscode
   },
@@ -973,6 +986,33 @@ local plugins = {
     'xiyaowong/virtcolumn.nvim',
     cond = not_vscode,
     config = function() vim.cmd("autocmd filetype python setlocal colorcolumn=88") end,
+  },
+  {
+    "folke/todo-comments.nvim",
+    cmd = { "TodoTrouble", "TodoTelescope" },
+    keys = {
+      { "]t", function() require("todo-comments").jump_next() end, desc = "Next todo comment" },
+      { "[t", function() require("todo-comments").jump_prev() end, desc = "Previous todo comment" },
+      { "<leader>xt", ':exe ":TodoTrouble cwd=" .. fnameescape(expand("%:p"))<cr>', desc = "Todo (Trouble) current file", silent = true },
+      { "<leader>xT", "<cmd>TodoTrouble<cr>", desc = "Todo (Trouble) in workspace", silent = true },
+      { "<leader>st", ':exe ":TodoTelescope cwd=" .. fnameescape(expand("%:p"))<cr>', desc = "Todo current file", silent = true },
+      { "<leader>sT", "<cmd>TodoTelescope<cr>", desc = "Todo in workspace", silent = true },
+    },
+    opts = {},
+    cond = not_vscode
+  },
+  {
+    'm4xshen/hardtime.nvim',
+    opts = {
+      disabled_keys = {
+        ["<Left>"] = { "n", "x" },
+        ["<Right>"] = { "n", "x" },
+        ["<Up>"] = {},
+        ["<Down>"] = {},
+      },
+      restricted_keys = { ["j"] = {}, ["k"] = {}, ["<C-N>"] = {}, ["<C-P>"] = {} }
+    },
+    cond = not_vscode,
   },
 }
 

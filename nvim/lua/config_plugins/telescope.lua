@@ -35,6 +35,7 @@ telescope.setup({
           ["<c-r>"] = actions.to_fuzzy_refine,
         },
       },
+      additional_args = {'--fixed-strings'},
     },
     buffers = {
       mappings = {
@@ -85,3 +86,22 @@ vim.keymap.set('v', '<leader>/', function()
     default_text = common.getVisualSelection(),
   })
 end, { desc = '[/] Search for selection in current buffer' })
+vim.keymap.set('n', '<leader>sl',
+  require('telescope').extensions.menufacture.add_menu_with_default_mapping(
+    require('telescope.builtin').live_grep,
+    vim.tbl_extend('force', require('telescope').extensions.menufacture.live_grep_menu, {
+      ['toggle use_regex'] = function(opts, callback)
+        local flag_key = 'additional_args'
+        local flag_value = "--fixed-strings"
+        require('telescope').extensions.menufacture.toggle_flag(flag_key, flag_value)(opts, callback)
+        local key = 'orbik_flag_' .. flag_key .. flag_value
+        if opts[key] == nil then
+          require('telescope').extensions.menufacture.toggle_flag(flag_key, flag_value)(opts, callback)
+          opts[key] = true
+        end
+      end,
+      ['toggle whole words'] = require('telescope').extensions.menufacture.toggle_flag('additional_args', '-w'),
+      ['toggle case sensitive'] = require('telescope').extensions.menufacture.toggle_flag('additional_args', '--case-sensitive'),
+    })
+  ), { desc = 'Search with [l]ive grep' }
+)

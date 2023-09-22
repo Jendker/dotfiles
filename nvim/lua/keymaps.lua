@@ -29,14 +29,14 @@ end
 
 vim.g.mapleader = " "
 map("n", "<leader>X", "<cmd>!chmod +x %<CR>", { silent = true })
-map("n", "<leader>bf", '<cmd> lua require("conform").format({ async = true, lsp_fallback = true })<cr>', { desc = "Run [b]uffer [f]ormatting" })
 map("n", "<leader>bq", "<cmd>bp <BAR> bd #<CR>", { desc = "Close buffer"})
 map({"n", "v"}, "<leader>d", [["_d]])
 map({"n", "v"}, "<leader>D", [["_D]])
 map({"n", "v"}, "<leader>c", [["_c]])
 map({"n", "v"}, "<leader>C", [["_C]])
-map("n", "<leader>tc", "<cmd>tabclose<cr>", { desc = "[T]ab [c]lose" })
-map("n", "<leader>tn", "<cmd>tabnew<CR>", { desc = "[T]ab [n]ew"})
+map("n", "<leader>tq", "<cmd>tabclose<cr>", { desc = "[T]ab [q] close" })
+map("n", "<leader>tc", "<cmd>tabnew<CR>", { desc = "[T]ab [n]ew"})
+map("n", "<leader>tn", "<cmd>tabnew<CR>", { desc = "[T]ab [c]reate"})
 
 -- center after buffer movements
 vim.keymap.set("n", "n", "nzzzv")
@@ -75,6 +75,22 @@ map("n", "<leader>qq", "<cmd>qa<cr>", { desc = "Quit all" })
 -- search for selected text
 map('v', '/', "\"fy/<C-R>f<CR>", {silent = true})
 map('v', '?', "\"fy?<C-R>f<CR>", {silent = true})
+
+local function open_with_default(text)
+  local command
+  local system_name = vim.loop.os_uname().sysname
+  if system_name == "Darwin" then
+    command = "open"
+  elseif system_name == "Linux" then
+    command = "xdg-open"
+  else
+    vim.api.nvim_err_writeln("System not known: " .. system_name)
+    return
+  end
+  vim.fn.jobstart(command .. " " .. text)
+end
+map('n', '<leader>o',  function() open_with_default(vim.fn.expand('<cWORD>')) end, { desc = "Open with default application" })
+map('v', '<leader>o', function() open_with_default(common.getVisualSelection()) end, { desc = "Open with default application" })
 
 if vscode then
   map('n', '<leader>?', "<Cmd>call VSCodeNotify('workbench.action.findInFiles', { 'query': expand('<cword>')})<CR>")
@@ -116,23 +132,10 @@ else
   map('v', "<leader>r", [["fy:%s/<C-r>f/<C-r>f/gI<Left><Left><Left>]], { desc = 'Find and Change selected'})
   map('v', "<leader>rc", [["fy:%s/<C-r>f/<C-r>f/gcI<Left><Left><Left>]], { desc = 'Find and Change selected with confirmation'})
   -- Move Lines - this messes up VSCode pasting for some reason. Leave it here or find some plugin to do the same better
-  map("n", "<C-j>", "<cmd>m .+1<cr>==", { desc = "Move down" })
-  map("n", "<C-k>", "<cmd>m .-2<cr>==", { desc = "Move up" })
-  map("i", "<C-j>", "<esc><cmd>m .+1<cr>==gi", { desc = "Move down" })
-  map("i", "<C-k>", "<esc><cmd>m .-2<cr>==gi", { desc = "Move up" })
-  map("v", "<C-j>", ":m '>+1<cr>gv=gv", { silent = true, desc = "Move down" })
-  map("v", "<C-k>", ":m '<-2<cr>gv=gv", { silent = true, desc = "Move up" })
-  map('v', '<leader>o', function()
-    local command
-    local system_name = vim.uv.os_uname().sysname
-    if system_name == "Darwin" then
-      command = "open"
-    elseif system_name == "Linux" then
-      command = "xdg-open"
-    else
-      vim.api.nvim_err_writeln("System not known: " .. system_name)
-      return
-    end
-    vim.fn.jobstart(command .. " " .. common.getVisualSelection())
-    end, { desc = "Open with default application" })
+  map("n", "<A-j>", "<cmd>m .+1<cr>==", { desc = "Move down" })
+  map("n", "<A-k>", "<cmd>m .-2<cr>==", { desc = "Move up" })
+  map("i", "<A-j>", "<esc><cmd>m .+1<cr>==gi", { desc = "Move down" })
+  map("i", "<A-k>", "<esc><cmd>m .-2<cr>==gi", { desc = "Move up" })
+  map("v", "<A-j>", ":m '>+1<cr>gv=gv", { silent = true, desc = "Move down" })
+  map("v", "<A-k>", ":m '<-2<cr>gv=gv", { silent = true, desc = "Move up" })
 end

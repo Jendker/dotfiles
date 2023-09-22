@@ -19,25 +19,21 @@ local mason_ensure_installed = {
   'pyright',
   'lua_ls',
   'yamlls',
-  'ruff_lsp'
+  'ruff_lsp',
+  'gopls',
 }
 
 -- this will install any mason package, even formatters and linters
 local mason_install_if_system_command_not_available = {}
 local mason_install = {'black', 'jsonlint', 'prettierd'}
 
-local lsp_signature_config = {
-  toggle_key = '<C-h>',
-  select_signature_key = '<A-n>',
-}
 --  This function gets run when an LSP connects to a particular buffer.
 lsp_zero.on_attach(function(client, bufnr)
   lsp_zero.default_keymaps({
     buffer = bufnr,
-    exclude = {'gr', '<C-k>'},
+    exclude = {'gr'},
     preserve_mappings = false,
   })
-  require('lsp_signature').on_attach(lsp_signature_config, bufnr)
 
   local nmap = function(keys, func, desc)
     if desc then
@@ -156,6 +152,12 @@ require('lspconfig').ruff_lsp.setup {
   }
 }
 
+require'lspconfig'.gopls.setup{
+  on_attach = function(_, _)
+    vim.cmd('TSBufEnable highlight')
+  end
+}
+
 -- this has to be called after lsp_zero.setup()
 -- see https://github.com/VonHeikemen/lsp-zero.nvim/issues/60#issuecomment-1363800412
 local function has_value (tab, val)
@@ -250,9 +252,18 @@ local cmp_mappings = {
 cmp.setup({
   mapping = cmp_mappings,
   formatting = {
+    fields = {'abbr', 'menu', 'kind'},
     -- max 100 characters in item abbreviation
-    format = function(_, vim_item)
+    format = function(entry, vim_item)
       vim_item.abbr = string.sub(vim_item.abbr, 1, 100)
+
+      local short_name = {
+        nvim_lsp = 'LSP',
+        nvim_lua = 'nvim'
+      }
+      local menu_name = short_name[entry.source.name] or entry.source.name
+      vim_item.menu = string.format('[%s]', menu_name)
+
       return vim_item
     end
   },
