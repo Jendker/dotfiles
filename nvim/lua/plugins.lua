@@ -303,39 +303,38 @@ local plugins = {
       {'<leader>?', mode = 'n', desc = '[?] search for word under cursor'},
       {'<leader>?', mode = 'v', desc = '[?] search for selection'},
     },
-    dependencies = { 'nvim-lua/plenary.nvim', 'nvim-telescope/telescope-frecency.nvim', 'natecraddock/telescope-zf-native.nvim' },
+    dependencies = {
+      'nvim-lua/plenary.nvim',
+      -- extensions
+      "natecraddock/telescope-zf-native.nvim",
+      "molecule-man/telescope-menufacture",
+      {
+        "nvim-telescope/telescope-frecency.nvim",
+        dependencies = { "kkharji/sqlite.lua" },
+        keys = {
+          { "<leader>sfp", "<Cmd>lua require('telescope').extensions.frecency.frecency({ workspace = 'CWD' })<CR>", "n",
+            noremap = true, silent = true, desc = "Telescope frecency" },
+        },
+        cond = not_vscode
+      },
+      {
+        "nvim-telescope/telescope-live-grep-args.nvim",
+        keys = {
+          {"<leader>sa", "<Cmd>lua require('telescope').extensions.live_grep_args.live_grep_args()<CR>", "n", noremap = true, silent = true, desc = "[S]earch with ripgrep [a]rgs"},
+        },
+        cond = not_vscode
+      },
+    },
     config = function()
       require 'config_plugins.telescope'
-    end,
-    cond = not_vscode
-  },
-  {
-    "nvim-telescope/telescope-frecency.nvim",
-    dependencies = {"kkharji/sqlite.lua"},
-    keys = {
-      {"<leader>sfp", "<Cmd>lua require('telescope').extensions.frecency.frecency({ workspace = 'CWD' })<CR>", "n", noremap = true, silent = true, desc = "Telescope frecency"},
-    },
-    config = function()
-      require("telescope").load_extension("frecency")
-    end,
-    cond = not_vscode
-  },
-  {
-    "natecraddock/telescope-zf-native.nvim",
-    cmd = 'Telescope',
-    config = function()
+      -- extensions
       require("telescope").load_extension("zf-native")
+      require("telescope").load_extension("frecency")
+      require('telescope').load_extension('menufacture')
+      require("telescope").load_extension("live_grep_args")
     end,
     cond = not_vscode
   },
-  {
-    "nvim-telescope/telescope-live-grep-args.nvim",
-    keys = {
-      {"<leader>sa", "<Cmd>lua require('telescope').extensions.live_grep_args.live_grep_args()<CR>", "n", noremap = true, silent = true, desc = "[S]earch with ripgrep [a]rgs"},
-    },
-    cond = not_vscode
-  },
-  {"molecule-man/telescope-menufacture", cmd = 'Telescope', config = function() require('telescope').load_extension('menufacture') end, cond = not_vscode},
   {'farmergreg/vim-lastplace', cond = not_vscode},
   {
     'karb94/neoscroll.nvim',
