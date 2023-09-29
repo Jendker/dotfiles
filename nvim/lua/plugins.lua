@@ -423,20 +423,28 @@ local plugins = {
         require("conform").format({ async = true, lsp_fallback = true, range = range })
       end, { range = true })
       -- python's black does not support range formatting
-      if vim.bo.filetype ~= "python" then
-        vim.keymap.set('v', '=', function ()
+      vim.keymap.set('v', '=', function ()
+        if vim.bo.filetype ~= "python" then
           require("conform").format({async = true, lsp_fallback = true })
           vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<ESC>", true, true, true), "n", true)
-        end)
-        vim.keymap.set("n", "==", function()
+          return '<Ignore>'
+        else
+          return '='
+        end
+      end, {expr = true})
+      vim.keymap.set("n", "==", function()
+        if vim.bo.filetype ~= "python" then
           conform.format({
             range = {
               ["start"] = vim.api.nvim_win_get_cursor(0),
               ["end"] = vim.api.nvim_win_get_cursor(0),
             }, async = true, lsp_fallback = true
           })
-        end)
-      end
+          return '<Ignore>'
+        else
+          return '=='
+        end
+      end, {expr = true})
       vim.keymap.set("n", "<leader>bf", function()
         conform.format({ async = true, lsp_fallback = true })
       end, { desc = "Run [b]uffer [f]ormatting" })
@@ -556,7 +564,7 @@ local plugins = {
       { "<leader>gD",  "<cmd>DiffviewOpen HEAD~<cr>",            desc = "[G]it [D]iff previous commit", nowait = true },
       { "<leader>gr", "<cmd>DiffviewFileHistory<cr>",            desc = "[G]it [r]epo history" },
       { "<leader>gf", "<cmd>DiffviewFileHistory --follow %<cr>", desc = "[G]it [f]ile history" },
-      { "<leader>gm", "<cmd>DiffviewOpen master<cr>",            desc = "[G]it diff with [m]aster" },
+      { "<leader>gm", "<cmd>DiffviewOpen origin/master<cr>",            desc = "[G]it diff with [m]aster" },
       { "<leader>gl", "<cmd>.DiffviewFileHistory --follow<CR>",  desc = "[G]it file history for the current [l]ine"},
       { "<leader>gl", "<Esc><cmd>'<,'>DiffviewFileHistory --follow<CR>", mode = 'v',  desc = "[G]it file history for the visual se[l]ection"},
       { "<leader>gc", ":DiffviewOpen <C-R>+<CR>",                desc = "[G]it [c]ommit from clipboard", silent = true},
@@ -693,11 +701,15 @@ local plugins = {
             vim.b.lsp_zero_enable_autoformat = false
             vim.b.disable_autoformat = true
             vim.g.disable_autoformat = true
+            vim.b.paste_start_mark = vim.fn.getpos("'[")
+            vim.b.paste_end_mark = vim.fn.getpos("']")
           end,
           after_saving = function()
             vim.b.lsp_zero_enable_autoformat = true
             vim.b.disable_autoformat = false
             vim.g.disable_autoformat = false
+            vim.fn.setpos("'[", vim.b.paste_start_mark)
+            vim.fn.setpos("']", vim.b.paste_end_mark)
           end,
         },
         condition = function(buf)

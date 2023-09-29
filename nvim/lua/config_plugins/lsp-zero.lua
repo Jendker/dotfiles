@@ -230,8 +230,8 @@ local cmp_mappings = {
         cmp.confirm({ select = false, behavior = cmp.ConfirmBehavior.Replace })
       elseif vim.fn.exists('b:_codeium_completions') ~= 0 then
         -- accept codeium completion if visible
-        vim.fn['codeium#Accept']()
-        fallback()
+        vim.api.nvim_input(vim.fn['codeium#Accept']() .. "<ESC>")
+        -- vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes(vim.fn['codeium#Accept']() .. "<ESC>", true, true, true), "n", true)
       elseif cmp.visible() then
         -- select first item if visible
         cmp.confirm({ select = true, behavior = cmp.ConfirmBehavior.Replace })

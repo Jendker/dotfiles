@@ -39,8 +39,10 @@ map("n", "<leader>tc", "<cmd>tabnew<CR>", { desc = "[T]ab [n]ew"})
 map("n", "<leader>tn", "<cmd>tabnew<CR>", { desc = "[T]ab [c]reate"})
 
 -- center after buffer movements
-vim.keymap.set("n", "n", "nzzzv")
-vim.keymap.set("n", "N", "Nzzzv")
+-- vim.keymap.set("n", "n", "nzzzv")
+-- vim.keymap.set("n", "N", "Nzzzv")
+-- vim.keymap.set("n", "*", "*zzzv")
+-- vim.keymap.set("n", "#", "#zzzv")
 
 -- don't enter command history
 map("n", "Q", "<nop>")
@@ -76,15 +78,21 @@ map("n", "<leader>qq", "<cmd>qa<cr>", { desc = "Quit all" })
 map('v', '/', "\"fy/<C-R>f<CR>", {silent = true})
 map('v', '?', "\"fy?<C-R>f<CR>", {silent = true})
 
-local function open_with_default(text)
-  local command
+local function get_system_command()
   local system_name = vim.loop.os_uname().sysname
   if system_name == "Darwin" then
-    command = "open"
+    return "open"
   elseif system_name == "Linux" then
-    command = "xdg-open"
-  else
-    vim.api.nvim_err_writeln("System not known: " .. system_name)
+    return "xdg-open"
+  end
+  vim.api.nvim_err_writeln("System not known: " .. system_name)
+  return nil
+end
+
+
+local function open_with_default(text)
+  local command = get_system_command()
+  if command == nil then
     return
   end
   vim.fn.jobstart(command .. " " .. text)
@@ -138,4 +146,5 @@ else
   map("i", "<A-k>", "<esc><cmd>m .-2<cr>==gi", { desc = "Move up" })
   map("v", "<A-j>", ":m '>+1<cr>gv=gv", { silent = true, desc = "Move down" })
   map("v", "<A-k>", ":m '<-2<cr>gv=gv", { silent = true, desc = "Move up" })
+  map("n", "<leader>V", function() vim.system({"code", vim.fn.getcwd()}, {detach=true, cwd=vim.fn.expand('~')}) end, { desc = "Start VSCode in root folder"})
 end
