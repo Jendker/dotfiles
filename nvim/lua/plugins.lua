@@ -247,6 +247,7 @@ local plugins = {
   },
   {
     'lukas-reineke/indent-blankline.nvim',
+    version = "^2",
     config = function()
       require("indent_blankline").setup {
         char = '┊',
@@ -368,14 +369,16 @@ local plugins = {
     cond = not_vscode
   },
   {
+    'williamboman/mason.nvim',
+    build = function() pcall(vim.cmd, 'MasonUpdate') end,
+    cond = not_vscode
+  },
+  {
     'VonHeikemen/lsp-zero.nvim', branch = 'v3.x',
     dependencies = {
       -- LSP Support
       {'neovim/nvim-lspconfig'},
-      {
-        'williamboman/mason.nvim',
-        build = function() pcall(vim.cmd, 'MasonUpdate') end,
-      },
+      {'williamboman/mason.nvim'},
       {'williamboman/mason-lspconfig.nvim'},
 
       -- Autocompletion
@@ -1025,6 +1028,7 @@ local plugins = {
     },
     cond = not_vscode,
   },
+  require('debugging'),
 }
 
 -- use the lazy_opts until this is fixed: https://github.com/rmagatti/auto-session/issues/223
