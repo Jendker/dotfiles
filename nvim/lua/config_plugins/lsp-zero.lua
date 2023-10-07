@@ -31,7 +31,7 @@ local mason_install = {'black', 'jsonlint', 'prettierd'}
 lsp_zero.on_attach(function(client, bufnr)
   lsp_zero.default_keymaps({
     buffer = bufnr,
-    exclude = {'gr'},
+    exclude = {'gr', '<F3>'},
     preserve_mappings = false,
   })
 
@@ -59,6 +59,9 @@ lsp_zero.on_attach(function(client, bufnr)
   nmap('<leader>wl', function()
     print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
   end, '[W]orkspace [L]ist Folders')
+
+  nmap('[e', '<cmd>lua vim.diagnostic.goto_prev({ severity = vim.diagnostic.severity.ERROR })<CR>')
+  nmap(']e', '<cmd>lua vim.diagnostic.goto_next({ severity = vim.diagnostic.severity.ERROR })<CR>')
 
   -- Create a command `:Format` local to the LSP buffer
   if vim.fn.has("nvim-0.9.0") == 1 then

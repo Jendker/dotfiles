@@ -15,36 +15,19 @@ vim.opt.rtp:prepend(lazypath)
 
 local plugins = {
   {
-    'ggandor/leap.nvim',
-    config = function ()
-      local leap = require('leap')
-      leap.set_default_keymaps()
-      leap.opts.safe_labels = {}
-    end,
-    dependencies = {'tpope/vim-repeat'},
+    "folke/flash.nvim",
+    event = "VeryLazy",
+    opts = {},
+    -- stylua: ignore
+    keys = {
+      { "s", mode = { "n", "o" }, function() require("flash").jump({ search = { forward = true, wrap = false, multi_window = false } }) end, desc = "Forward flash" },
+      { "S", mode = { "n", "o" }, function() require("flash").jump({ search = { forward = false, wrap = false, multi_window = false } }) end, desc = "Backwards flash" },
+      { "<c-s>", mode = { "n", "x", "o" }, function() require("flash").treesitter() end, desc = "Flash Treesitter" },
+      { "r", mode = "o", function() require("flash").remote() end, desc = "Remote Flash" },
+      { "R", mode = { "o", "x" }, function() require("flash").treesitter_search() end, desc = "Treesitter Search" },
+      { "<c-s>", mode = { "c" }, function() require("flash").toggle() end, desc = "Toggle Flash Search" },
+    },
   },
-  {
-    'ggandor/leap-spooky.nvim',
-    event = 'VeryLazy',
-    config = function()
-      require'leap-spooky'.setup()
-    end
-  },
-  {
-    'rhysd/clever-f.vim',
-    event = 'VeryLazy',
-    config = function ()
-      vim.g.clever_f_smart_case = 1
-    end,
-    -- Switch to flit when possible, see comment below
-  },
-  -- Waiting for this to be fixed to activate for vscode: https://github.com/neovim/neovim/pull/19035
-  -- {
-  --   'ggandor/flit.nvim',
-  --   event = 'VeryLazy',
-  --   config = true,
-  --   cond = not_vscode
-  -- },
   {
     'tpope/vim-commentary', -- gcc to comment
     event = 'VeryLazy',
@@ -75,6 +58,7 @@ local plugins = {
     'andymass/vim-matchup',
     init = function()
       vim.g.matchup_motion_enabled = not vscode
+      vim.g.matchup_matchparen_enabled = not vscode
     end
   }, -- better % on matching delimeters
   -- Re-enable after this is fixed https://github.com/HiPhish/nvim-ts-rainbow2/issues/49
@@ -136,7 +120,7 @@ local plugins = {
     config = function()
       -- to open Roboception remote url:
       vim.g.fugitive_gitlab_domains = {'https://gitlab.com', 'https://gitlab.roboception.de'}
-      vim.keymap.set("n", "<leader>hm", function()
+      vim.keymap.set("n", "<leader>hM", function()
           local main_branch_name = common.getGitMainBranch()
           if main_branch_name ~= nil then
             local keys_string = "<C-W>v<C-W>l<cmd>Gedit " .. main_branch_name .. ":%<cr>"
@@ -154,7 +138,7 @@ local plugins = {
     'stevearc/oil.nvim',
     dependencies = { "nvim-tree/nvim-web-devicons" },
     config = function()
-      require("oil").setup()
+      require("oil").setup({default_file_explorer = false})
       vim.keymap.set("n", "-", require("oil").open, { desc = "Open parent directory" })
       vim.keymap.set("n", "<leader>pv", require("oil").open, { desc = "Open directory view" })
     end,
@@ -448,6 +432,9 @@ local plugins = {
           return '=='
         end
       end, {expr = true})
+      vim.keymap.set("n", "<F3>", function()
+        conform.format({ async = true, lsp_fallback = true })
+      end, { desc = "Run [b]uffer [f]ormatting" })
       vim.keymap.set("n", "<leader>bf", function()
         conform.format({ async = true, lsp_fallback = true })
       end, { desc = "Run [b]uffer [f]ormatting" })
@@ -557,7 +544,30 @@ local plugins = {
               { "n", "s", actions.toggle_stage_entry, { desc = "Stage / unstage the selected entry" } },
               { "n", "u", actions.toggle_stage_entry, { desc = "Stage / unstage the selected entry" } },
               { "n", "-", false},
-              { "n", "gf", function() actions.goto_file_edit(); vim.cmd('tabclose #') end, { desc = "Open the file in the previous tabpage" } },
+              { "n", "gf", function() actions.goto_file_edit(); vim.cmd('tabclose #') end, { desc = "Open the file in the previous tabpage and close diffview" } },
+              { "n", "gF", actions.goto_file_edit, { desc = "Open the file in the previous tabpage" } },
+              { "n", "<C-w>gf", function() actions.goto_file_tab(); vim.cmd('tabclose #') end, { desc = "Open the file in a new tabpage and close diffview" } },
+              { "n", "<C-w>gF", actions.goto_file_tab, { desc = "Open the file in a new tabpage" } },
+              { "n", "<leader>b", false},
+              { "n", "<leader>h", actions.toggle_files, { desc = "Toggle the file panel" } },
+            },
+            file_history_panel = {
+              { "n", "gf", function() actions.goto_file_edit(); vim.cmd('tabclose #') end, { desc = "Open the file in the previous tabpage and close diffview" } },
+              { "n", "gF", actions.goto_file_edit, { desc = "Open the file in the previous tabpage" } },
+              { "n", "<C-w>gf", function() actions.goto_file_tab(); vim.cmd('tabclose #') end, { desc = "Open the file in a new tabpage and close diffview" } },
+              { "n", "<C-w>gF", actions.goto_file_tab, { desc = "Open the file in a new tabpage" } },
+              { "n", "<leader>b", false},
+              { "n", "<leader>h", actions.toggle_files, { desc = "Toggle the file panel" } },
+            },
+            view = {
+              -- The `view` bindings are active in the diff buffers, only when the current
+              -- tabpage is a Diffview.
+              { "n", "gf", function() actions.goto_file_edit(); vim.cmd('tabclose #') end, { desc = "Open the file in the previous tabpage and close diffview" } },
+              { "n", "gF", actions.goto_file_edit, { desc = "Open the file in the previous tabpage" } },
+              { "n", "<C-w>gf", function() actions.goto_file_tab(); vim.cmd('tabclose #') end, { desc = "Open the file in a new tabpage and close diffview" } },
+              { "n", "<C-w>gF", actions.goto_file_tab, { desc = "Open the file in a new tabpage" } },
+              { "n", "<leader>b", false},
+              { "n", "<leader>h", actions.toggle_files, { desc = "Toggle the file panel" } },
             }
           },
         })
@@ -567,7 +577,7 @@ local plugins = {
       { "<leader>gD",  "<cmd>DiffviewOpen HEAD~<cr>",            desc = "[G]it [D]iff previous commit", nowait = true },
       { "<leader>gr", "<cmd>DiffviewFileHistory<cr>",            desc = "[G]it [r]epo history" },
       { "<leader>gf", "<cmd>DiffviewFileHistory --follow %<cr>", desc = "[G]it [f]ile history" },
-      { "<leader>gm", "<cmd>DiffviewOpen origin/master<cr>",            desc = "[G]it diff with [m]aster" },
+      { "<leader>gm", "<cmd>DiffviewOpen master<cr>",            desc = "[G]it diff with [m]aster" },
       { "<leader>gl", "<cmd>.DiffviewFileHistory --follow<CR>",  desc = "[G]it file history for the current [l]ine"},
       { "<leader>gl", "<Esc><cmd>'<,'>DiffviewFileHistory --follow<CR>", mode = 'v',  desc = "[G]it file history for the visual se[l]ection"},
       { "<leader>gc", ":DiffviewOpen <C-R>+<CR>",                desc = "[G]it [c]ommit from clipboard", silent = true},
@@ -731,14 +741,18 @@ local plugins = {
     cond = not_vscode
   },
   {
-    'dstein64/nvim-scrollview',
-    event = { "BufReadPre", "BufNewFile" },
+    'lewis6991/satellite.nvim',
     opts = {
-      excluded_filetypes = {},
       current_only = true,
       winblend = 0,
-      signs_on_startup = {'diagnostics', 'search', 'conflicts'},
-      diagnostics_severities = { vim.diagnostic.severity.ERROR },
+      handlers = {
+        cursor = {
+          enable = false,
+        },
+        diagnostic = {
+          min_severity = vim.diagnostic.severity.ERROR,
+        },
+      },
     },
     cond = not_vscode
   },
@@ -1024,8 +1038,19 @@ local plugins = {
         ["<Up>"] = {},
         ["<Down>"] = {},
       },
-      restricted_keys = { ["j"] = {}, ["k"] = {}, ["<C-N>"] = {}, ["<C-P>"] = {} }
+      restricted_keys = { ["j"] = {}, ["k"] = {}, ["<C-N>"] = {}, ["<C-P>"] = {} },
+      disable_mouse = false,
     },
+    cond = not_vscode,
+  },
+  {
+    'kevinhwang91/nvim-ufo',
+    event = "BufReadPost",
+    dependencies = {'kevinhwang91/promise-async'},
+    config = function()
+      require('config_plugins.folding').setup()
+      vim.opt.fillchars = vim.opt.fillchars + 'foldopen:,foldclose:'
+    end,
     cond = not_vscode,
   },
   require('debugging'),

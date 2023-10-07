@@ -1,8 +1,5 @@
 require "common"
 
--- Disable mouse
-vim.opt.mouse = ""
-
 -- Clipboard
 vim.opt.clipboard = "unnamedplus"
 
@@ -16,6 +13,10 @@ vim.opt.shiftwidth = 2
 vim.opt.tabstop = 2
 vim.opt.softtabstop = 2
 vim.opt.smartindent = false
+
+-- Highlight line number without higlighting the whole line
+vim.opt.cursorline = true
+vim.opt.cursorlineopt = "number"
 
 vim.opt.wrap = true
 vim.opt.ignorecase = true
@@ -34,14 +35,9 @@ vim.opt.laststatus = 3 -- global statusline
 vim.cmd("autocmd BufEnter * setlocal formatoptions-=cro")
 
 vim.g.mapleader = " "
+
 -- nicer diff markings
 vim.opt.fillchars = vim.opt.fillchars + 'diff:╱'
--- improve fold markings
-vim.opt.fillchars =  vim.opt.fillchars + "fold: "
--- use tree-sitter for folding. If needed to use normal folding, run :set foldmethod=syntax
-vim.opt.foldmethod = "expr"
-vim.opt.foldexpr = "nvim_treesitter#foldexpr()"
-vim.opt.foldlevelstart = 99 -- don't fold by default
 
 vim.opt.spelllang = 'en_us'
 

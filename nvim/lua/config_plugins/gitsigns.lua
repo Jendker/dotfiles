@@ -7,6 +7,8 @@ if not status_ok then
   return
 end
 
+local common = require('common')
+
 -- Reserve space for diagnostic icons
 vim.opt.signcolumn = 'yes:2'
 
@@ -47,6 +49,10 @@ gitsigns.setup {
     map('n', '<leader>hb', function() gs.blame_line{full=true} end, { desc = "show full line [b]lame", silent = true })
     map('n', '<leader>tb', gs.toggle_current_line_blame, { desc = "[t]oggle current line [b]lame", silent = true })
     map('n', '<leader>hd', gs.diffthis, { desc = "[d]iff this", silent = true })
+    map('n', '<leader>hm', function()
+      gs.change_base(common.getGitMainBranch(), true)
+      print("Changin base to master. Undo with :Gitsigns change_base HEAD true")
+    end, { desc = "Change base to master", silent = true })
     map('n', '<leader>hD', function() gs.diffthis('~') end, { desc = "Diff to previous commit", silent = true })
     map('n', '<leader>td', gs.toggle_deleted, { desc = "[t]oggle [d]eleted", silent = true })
 
