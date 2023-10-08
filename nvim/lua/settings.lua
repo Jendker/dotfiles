@@ -75,10 +75,11 @@ vim.cmd([[
   augroup end
 ]])
 -- lsp config
-vim.api.nvim_create_autocmd({"BufReadPre", "BufNewFile"}, {
+vim.api.nvim_create_autocmd('VimEnter', {
   group = augroup("misc_aucmds"),
-  callback = function()
-    require 'config_plugins.lsp-zero'
-  end,
+  pattern = '*',
   once = true,
+  callback = vim.schedule_wrap(function()
+    require 'config_plugins.lsp-zero'
+  end)
 })

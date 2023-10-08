@@ -79,7 +79,7 @@ map('v', '/', "\"fy/<C-R>f<CR>", {silent = true})
 map('v', '?', "\"fy?<C-R>f<CR>", {silent = true})
 
 local function get_system_command()
-  local system_name = vim.loop.os_uname().sysname
+  local system_name = vim.uv.os_uname().sysname
   if system_name == "Darwin" then
     return "open"
   elseif system_name == "Linux" then

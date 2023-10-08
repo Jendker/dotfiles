@@ -1,6 +1,7 @@
 require('nvim-treesitter.configs').setup({
-  ensure_installed = { "cpp", "python", "bash", "html", "json", "yaml",
-    "markdown", "markdown_inline", "lua", "vim", "vimdoc", "regex", "go"},
+  ensure_installed = { "bash", "cmake", "cpp", "css", "dockerfile", "go",
+    "html", "json", "latex", "lua", "markdown", "markdown_inline", "python",
+    "regex", "rust", "typescript", "vim", "vimdoc", "yaml" },
   textobjects = {
     select = {
       enable = true,

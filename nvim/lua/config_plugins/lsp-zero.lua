@@ -11,21 +11,25 @@ lsp_zero.preset({
   name = 'minimal',
 })
 
-local mason_ensure_installed = {
-  -- accepts only LSP servers. List of servers in
-  -- https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md
-  'bashls',
-  'clangd',
-  'pyright',
-  'lua_ls',
-  'yamlls',
-  'ruff_lsp',
-  'gopls',
+-- List LSP servers that will be automatically installed upon entering filetype for the first time.
+-- LSP servers will be installed locally via mason at: ~/.local/share/nvim/mason/packages/
+-- (lspconfig_name => { filetypes } or true)
+local auto_lsp_servers = {
+  -- @see $VIMPLUG/mason-lspconfig.nvim/lua/mason-lspconfig/mappings/filetype.lua
+  ['pyright'] = true,
+  ['ruff_lsp'] = true,
+  ['lua_ls'] = true,
+  ['bashls'] = true,
+  ['tsserver'] = true,
+  ['cssls'] = true,
+  ['clangd'] = true,
+  ['rust_analyzer'] = true,
+  ['texlab'] = true,
+  ['yamlls'] = true,
+  ['jsonlint'] = true,
+  ['lemminx'] = true,  -- xml
+  ['gopls'] = true,
 }
-
--- this will install any mason package, even formatters and linters
-local mason_install_if_system_command_not_available = {}
-local mason_install = {'black', 'jsonlint', 'prettierd'}
 
 --  This function gets run when an LSP connects to a particular buffer.
 lsp_zero.on_attach(function(client, bufnr)
@@ -86,116 +90,201 @@ lsp_zero.format_on_save({
 
 require('mason').setup({})
 require('mason-lspconfig').setup({
-  ensure_installed = mason_ensure_installed,
   handlers = {
     lsp_zero.default_setup,
     lua_ls = function()
       local lua_opts = lsp_zero.nvim_lua_ls()
       require('lspconfig').lua_ls.setup(lua_opts)
     end,
+    clangd = function()
+      require('lspconfig').clangd.setup({
+        on_attach = function(_, bufnr)
+          vim.keymap.set('n', '<A-u>', vim.cmd.ClangdSwitchSourceHeader, { buffer = bufnr, desc = "Switch between so[u]rce / header" })
+        end,
+        cmd = {
+          "clangd",
+          "--background-index",
+          "--header-insertion=never"
+        },
+      })
+    end,
+    pyright = function()
+      local function get_python_path(workspace)
+        local util = require('lspconfig/util')
+        local path = util.path
+        -- Use activated virtualenv.
+        if vim.env.VIRTUAL_ENV then
+          return path.join(vim.env.VIRTUAL_ENV, 'bin', 'python')
+        end
+        -- trick to check the current directory if workspace is unset
+        if workspace == nil then workspace = vim.fn.getcwd() end
+        -- Find and use virtualenv in workspace directory.
+        for _, pattern in ipairs({'*', '.*'}) do
+          local match = vim.fn.glob(path.join(workspace, pattern, 'pyvenv.cfg'))
+          if match ~= '' then
+            return path.join(path.dirname(match), 'bin', 'python')
+          end
+        end
+
+        -- Fallback to system Python.
+        return vim.fn.exepath('python3') or vim.fn.exepath('python') or 'python'
+      end
+
+      require('lspconfig').pyright.setup({
+        before_init = function(_, config)
+          local python_path = get_python_path(config.root_dir)
+          config.settings.python.pythonPath = python_path
+          vim.g.python_host_prog = python_path
+          vim.g.python3_host_prog = python_path
+        end
+      })
+    end,
+    ruff_lsp = function()
+      require('lspconfig').ruff_lsp.setup {
+        on_attach = function(client, _)
+          -- Disable hover in favor of Pyright
+          client.server_capabilities.hoverProvider = false
+        end,
+        init_options = {
+          settings = {
+            -- Any extra CLI arguments for `ruff` go here.
+            args = {
+              "--ignore",
+              "E501", -- line-too-long
+              "E402", -- module-import-not-at-top-of-file
+              "E731", -- lambda-assignment
+            },
+          }
+        }
+      }
+    end,
+    gopls = function()
+      require'lspconfig'.gopls.setup{
+        on_attach = function(_, _)
+          vim.cmd('TSBufEnable highlight')
+        end
+      }
+    end,
   },
 })
 
-require('lspconfig').clangd.setup({
-  on_attach = function(_, bufnr)
-    vim.keymap.set('n', '<A-u>', vim.cmd.ClangdSwitchSourceHeader, { buffer = bufnr, desc = "Switch between so[u]rce / header" })
-  end,
-  cmd = {
-    "clangd",
-    "--background-index",
-    "--header-insertion=never"
-  },
-})
-
-local function get_python_path(workspace)
-  local util = require('lspconfig/util')
-  local path = util.path
-  -- Use activated virtualenv.
-  if vim.env.VIRTUAL_ENV then
-    return path.join(vim.env.VIRTUAL_ENV, 'bin', 'python')
+-- Refresh or force-update mason-registry if needed (e.g. pkgs are missing)
+-- and execute the callback asynchronously.
+local function maybe_refresh_mason_registry_and_then(callback, opts)
+  local mason_registry = require("mason-registry")
+  local function notify(msg, opts)
+    return vim.notify_once(msg, vim.log.levels.INFO,
+      vim.tbl_deep_extend("force", { title = "config/lsp.lua" }, (opts or {})))
   end
-  -- trick to check the current directory if workspace is unset
-  if workspace == nil then workspace = vim.fn.getcwd() end
-  -- Find and use virtualenv in workspace directory.
-  for _, pattern in ipairs({'*', '.*'}) do
-    local match = vim.fn.glob(path.join(workspace, pattern, 'pyvenv.cfg'))
-    if match ~= '' then
-      return path.join(path.dirname(match), 'bin', 'python')
+  if vim.tbl_count(mason_registry.get_all_packages()) == 0 then
+    notify("Initializing mason.nvim registry for the first time,\n" ..
+               "please wait a bit until LSP servers start installed.")
+    mason_registry.update(function()
+      notify("Updating mason.nvim registry done.")
+      vim.schedule(callback)  -- must detach
+    end)
+  elseif (opts or {}).force then
+    notify("Updating mason.nvim registry ...")
+    mason_registry.update(function()
+      notify("Updating mason.nvim registry done.")
+      vim.schedule(callback)  -- must detach
+    end)
+  else
+    callback()  -- don't refresh, for fast startup
+  end
+end
+
+-- Install auto_lsp_servers on demand (FileType)
+local function ensure_mason_installed()
+  local augroup = vim.api.nvim_create_augroup('mason_autoinstall', { clear = true })
+  local lspconfig_to_package = require("mason-lspconfig.mappings.server").lspconfig_to_package
+  local filetype_mappings = require("mason-lspconfig.mappings.filetype")
+  local _requested = {}
+
+  local ft_handler = {}
+  for ft, lsp_names in pairs(filetype_mappings) do
+    lsp_names = vim.tbl_filter(function(lsp_name)
+      return auto_lsp_servers[lsp_name] == true or vim.tbl_contains(auto_lsp_servers[lsp_name] or {}, lsp_name)
+    end, lsp_names)
+
+    ft_handler[ft] = vim.schedule_wrap(function()
+      for _, lsp_name in pairs(lsp_names) do
+        local pkg_name = lspconfig_to_package[lsp_name]
+        local ok, pkg = pcall(require("mason-registry").get_package, pkg_name)
+        if ok and not pkg:is_installed() and not _requested[pkg_name] then
+          _requested[pkg_name] = true
+          require("mason-lspconfig.install").install(pkg)  -- async
+        end
+      end
+    end)
+
+    -- Create FileType handler to auto-install LSPs for the &filetype
+    if vim.tbl_count(lsp_names) > 0 then
+      vim.api.nvim_create_autocmd('FileType', {
+        pattern = ft,
+        group = augroup,
+        desc = string.format('Auto-install LSP server: %s (for %s)', table.concat(lsp_names, ","), ft),
+        callback = function() ft_handler[ft]() end,
+        once = true,
+      })
     end
   end
 
-  -- Fallback to system Python.
-  return vim.fn.exepath('python3') or vim.fn.exepath('python') or 'python'
+  -- Since this works asynchronously, apply on the already opened buffer as well
+  vim.tbl_map(function(buf)
+    local valid = vim.api.nvim_buf_is_valid(buf) and vim.api.nvim_buf_get_option(buf, 'buflisted')
+    if not valid then return end
+    local handler = ft_handler[vim.bo[buf].filetype]
+    if handler then handler() end
+  end, vim.api.nvim_list_bufs())
 end
 
-require('lspconfig').pyright.setup({
-  before_init = function(_, config)
-    local python_path = get_python_path(config.root_dir)
-    config.settings.python.pythonPath = python_path
-    vim.g.python_host_prog = python_path
-    vim.g.python3_host_prog = python_path
-  end
-})
+maybe_refresh_mason_registry_and_then(ensure_mason_installed)
 
-require('lspconfig').ruff_lsp.setup {
-  on_attach = function(client, _)
-    -- Disable hover in favor of Pyright
-    client.server_capabilities.hoverProvider = false
-  end,
-  init_options = {
-    settings = {
-      -- Any extra CLI arguments for `ruff` go here.
-      args = {
-        "--ignore",
-        "E501", -- line-too-long
-        "E402", -- module-import-not-at-top-of-file
-        "E731", -- lambda-assignment
-      },
-    }
-  }
-}
-
-require'lspconfig'.gopls.setup{
-  on_attach = function(_, _)
-    vim.cmd('TSBufEnable highlight')
-  end
-}
-
--- this has to be called after lsp_zero.setup()
--- see https://github.com/VonHeikemen/lsp-zero.nvim/issues/60#issuecomment-1363800412
-local function has_value (tab, val)
-  for _, value in ipairs(tab) do
-    if value == val then return true end
-  end
-  return false
-end
-
-local mason_installed_packages = require('mason-registry').get_installed_package_names()
-
-local Package = require "mason-core.package"
-local registry = require "mason-registry"
-local install_package = function(pkg_specifier)
-  local package_name, version = Package.Parse(pkg_specifier)
-  -- make sure that registry is downloaded by installing in refresh callback
-  require("mason-registry").refresh(function()
-    local pkg = registry.get_package(package_name)
-    if not pkg:is_installed() then
-      pkg:install{version = version}
-    end
-  end)
-end
-for _, mason_package in ipairs(mason_install_if_system_command_not_available) do
-  if not has_value(mason_installed_packages, mason_package) then
-    if vim.fn.executable(mason_package) ~= 1 then
-      install_package(mason_package)
+-- lsp configs are lazy-loaded or can be triggered after LSP installation,
+-- so we need a way to make LSP clients attached to already existing buffers.
+local attach_lsp_to_existing_buffers = vim.schedule_wrap(function()
+  -- this can be easily achieved by firing an autocmd event for the open buffers.
+  -- See lspconfig.configs (config.autostart)
+  for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
+    local valid = vim.api.nvim_buf_is_valid(bufnr) and vim.api.nvim_buf_get_option(bufnr, 'buflisted')
+    if valid and vim.bo[bufnr].buftype == "" then
+      local augroup_lspconfig = vim.api.nvim_create_augroup('lspconfig', { clear = false })
+      vim.api.nvim_exec_autocmds("FileType", { group = augroup_lspconfig, buffer = bufnr })
     end
   end
-end
-for _, mason_package in ipairs(mason_install) do
-  if not has_value(mason_installed_packages, mason_package) then
-    install_package(mason_package)
+end)
+
+--- setup all newly installed packages
+local all_known_lsps = require('mason-lspconfig.mappings.server').lspconfig_to_package
+local lsp_uninstalled = {}   --- { lspconfig name => mason package name }
+local mason_need_refresh = false
+
+for lsp_name, package_name in pairs(all_known_lsps) do
+  if not require('mason-registry').is_installed(package_name) then
+    if not require('mason-registry').has_package(package_name) then
+      mason_need_refresh = true
+    end
+    lsp_uninstalled[lsp_name] = package_name
   end
 end
+
+maybe_refresh_mason_registry_and_then(function()
+  -- mason.nvim does not launch lsp when installed for the first time
+  -- we attach a manual callback to setup LSP and launch
+  for lsp_name, package_name in pairs(lsp_uninstalled) do
+    local ok, pkg = pcall(require('mason-registry').get_package, package_name)
+    if ok then
+      pkg:on("install:success", vim.schedule_wrap(function()
+        lsp_zero.setup_servers({lsp_name})
+        attach_lsp_to_existing_buffers()  -- TODO: reload only the buffers that matches filetype.
+      end))
+    end
+  end
+
+  -- Make sure LSP clients are attached to already existing buffers prior to this config.
+  attach_lsp_to_existing_buffers()
+end, { force = mason_need_refresh })
 
 -- miscellaneous
 
