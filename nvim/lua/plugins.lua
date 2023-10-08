@@ -27,6 +27,11 @@ local plugins = {
       { "R", mode = { "o", "x" }, function() require("flash").treesitter_search() end, desc = "Treesitter Search" },
       { "<c-s>", mode = { "c" }, function() require("flash").toggle() end, desc = "Toggle Flash Search" },
     },
+    config = function(_, opts)
+      local flash = require('flash')
+      flash.setup(opts)
+      flash.toggle(false) -- disable flash in search
+    end
   },
   {
     'tpope/vim-commentary', -- gcc to comment
@@ -509,6 +514,7 @@ local plugins = {
         }
       }
     },
+    version = "^5",
     cond = not_vscode
   },
   {
@@ -1048,7 +1054,7 @@ local plugins = {
     event = "BufReadPost",
     dependencies = {'kevinhwang91/promise-async'},
     config = function()
-      require('config_plugins.folding').setup()
+      require('config_plugins.folds').setup()
       vim.opt.fillchars = vim.opt.fillchars + 'foldopen:,foldclose:'
     end,
     cond = not_vscode,

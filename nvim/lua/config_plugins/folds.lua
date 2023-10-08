@@ -197,10 +197,4 @@ function M.setup()
   M.setup_folding_keymaps()
 end
 
--- Resourcing support
-if RC and RC.should_resource() then
-  M.setup()
-end
-
-(RC or {}).folding = M
 return M
