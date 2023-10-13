@@ -7,17 +7,17 @@ if not status_ok then
   return
 end
 
-lsp_zero.preset({
-  name = 'minimal',
-})
-
 -- List LSP servers that will be automatically installed upon entering filetype for the first time.
 -- LSP servers will be installed locally via mason at: ~/.local/share/nvim/mason/packages/
 -- (lspconfig_name => { filetypes } or true)
 local auto_lsp_servers = {
   -- @see $VIMPLUG/mason-lspconfig.nvim/lua/mason-lspconfig/mappings/filetype.lua
+  -- list of LSP servers -- https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md
   ['pyright'] = true,
+  ['debugpy'] = true,
   ['ruff_lsp'] = true,
+  ['isort'] = true,
+  ['black'] = true,
   ['lua_ls'] = true,
   ['bashls'] = true,
   ['tsserver'] = true,
@@ -76,10 +76,10 @@ lsp_zero.on_attach(function(client, bufnr)
 end)
 
 lsp_zero.set_sign_icons({
-  error = '✘',
-  warn = '▲',
-  hint = '⚑',
-  info = '»'
+  error = '',
+  warn = '',
+  hint = '󰌶',
+  info = ''
 })
 
 lsp_zero.format_on_save({
@@ -146,7 +146,9 @@ require('mason-lspconfig').setup({
           client.server_capabilities.hoverProvider = false
         end,
         init_options = {
+          -- https://github.com/charliermarsh/ruff-lsp#settings
           settings = {
+            organizeImports = false,  -- let isort take care of organizeImports
             -- Any extra CLI arguments for `ruff` go here.
             args = {
               "--ignore",
@@ -168,30 +170,33 @@ require('mason-lspconfig').setup({
   },
 })
 
--- Refresh or force-update mason-registry if needed (e.g. pkgs are missing)
--- and execute the callback asynchronously.
-local function maybe_refresh_mason_registry_and_then(callback, opts)
-  local mason_registry = require("mason-registry")
-  local function notify(msg, opts)
-    return vim.notify_once(msg, vim.log.levels.INFO,
-      vim.tbl_deep_extend("force", { title = "config/lsp.lua" }, (opts or {})))
-  end
-  if vim.tbl_count(mason_registry.get_all_packages()) == 0 then
-    notify("Initializing mason.nvim registry for the first time,\n" ..
-               "please wait a bit until LSP servers start installed.")
-    mason_registry.update(function()
-      notify("Updating mason.nvim registry done.")
-      vim.schedule(callback)  -- must detach
-    end)
-  elseif (opts or {}).force then
-    notify("Updating mason.nvim registry ...")
-    mason_registry.update(function()
-      notify("Updating mason.nvim registry done.")
-      vim.schedule(callback)  -- must detach
-    end)
-  else
-    callback()  -- don't refresh, for fast startup
-  end
+local function mergeTablesWithLists(a, b)
+    local result = {}
+
+    -- Copy values from table 'a' to the result table
+    for key, value in pairs(a) do
+        result[key] = value
+    end
+
+    -- Merge values from table 'b' into the result table
+    for key, value in pairs(b) do
+        -- Check if the key already exists in 'a'
+        if result[key] ~= nil then
+            -- If the key exists in both tables, and both values are tables, merge them as arrays
+            if type(result[key]) == "table" and type(value) == "table" then
+                -- Concatenate the arrays
+                for _, v in ipairs(value) do
+                    table.insert(result[key], v)
+                end
+            else
+                result[key] = value -- Override value from 'a' with value from 'b'
+            end
+        else
+            result[key] = value -- Add key-value from 'b' if it doesn't exist in 'a'
+        end
+    end
+
+    return result
 end
 
 -- Install auto_lsp_servers on demand (FileType)
@@ -199,6 +204,13 @@ local function ensure_mason_installed()
   local augroup = vim.api.nvim_create_augroup('mason_autoinstall', { clear = true })
   local lspconfig_to_package = require("mason-lspconfig.mappings.server").lspconfig_to_package
   local filetype_mappings = require("mason-lspconfig.mappings.filetype")
+  local formatter_filetype_mappings = require("mason-null-ls.mappings.filetype")
+  filetype_mappings = mergeTablesWithLists(filetype_mappings, formatter_filetype_mappings)
+  local debugger_filetype_mappings = require("mason-nvim-dap.mappings.source").nvim_dap_to_package
+  for key, val in pairs(debugger_filetype_mappings) do
+    debugger_filetype_mappings[key] = {val}
+  end
+  filetype_mappings = mergeTablesWithLists(filetype_mappings, debugger_filetype_mappings)
   local _requested = {}
 
   local ft_handler = {}
@@ -210,10 +222,26 @@ local function ensure_mason_installed()
     ft_handler[ft] = vim.schedule_wrap(function()
       for _, lsp_name in pairs(lsp_names) do
         local pkg_name = lspconfig_to_package[lsp_name]
+        local is_lsp_server = true
+        if pkg_name == nil then
+          -- in case it's a linter or formatter
+          pkg_name = lsp_name
+          is_lsp_server = false
+        end
         local ok, pkg = pcall(require("mason-registry").get_package, pkg_name)
         if ok and not pkg:is_installed() and not _requested[pkg_name] then
           _requested[pkg_name] = true
-          require("mason-lspconfig.install").install(pkg)  -- async
+          vim.notify_once(string.format("Installating [%s]...", pkg_name), vim.log.levels.INFO)
+          pkg:install():once("closed", function()
+            if pkg:is_installed() then
+              vim.schedule(function()
+                vim.notify_once(string.format("Installation complete for [%s]", pkg_name), vim.log.levels.INFO)
+                if is_lsp_server then
+                  lsp_zero.setup_servers({lsp_name})
+                end
+              end)
+            end
+          end)
         end
       end
     end)
@@ -229,62 +257,10 @@ local function ensure_mason_installed()
       })
     end
   end
-
-  -- Since this works asynchronously, apply on the already opened buffer as well
-  vim.tbl_map(function(buf)
-    local valid = vim.api.nvim_buf_is_valid(buf) and vim.api.nvim_buf_get_option(buf, 'buflisted')
-    if not valid then return end
-    local handler = ft_handler[vim.bo[buf].filetype]
-    if handler then handler() end
-  end, vim.api.nvim_list_bufs())
 end
 
-maybe_refresh_mason_registry_and_then(ensure_mason_installed)
-
--- lsp configs are lazy-loaded or can be triggered after LSP installation,
--- so we need a way to make LSP clients attached to already existing buffers.
-local attach_lsp_to_existing_buffers = vim.schedule_wrap(function()
-  -- this can be easily achieved by firing an autocmd event for the open buffers.
-  -- See lspconfig.configs (config.autostart)
-  for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
-    local valid = vim.api.nvim_buf_is_valid(bufnr) and vim.api.nvim_buf_get_option(bufnr, 'buflisted')
-    if valid and vim.bo[bufnr].buftype == "" then
-      local augroup_lspconfig = vim.api.nvim_create_augroup('lspconfig', { clear = false })
-      vim.api.nvim_exec_autocmds("FileType", { group = augroup_lspconfig, buffer = bufnr })
-    end
-  end
-end)
-
---- setup all newly installed packages
-local all_known_lsps = require('mason-lspconfig.mappings.server').lspconfig_to_package
-local lsp_uninstalled = {}   --- { lspconfig name => mason package name }
-local mason_need_refresh = false
-
-for lsp_name, package_name in pairs(all_known_lsps) do
-  if not require('mason-registry').is_installed(package_name) then
-    if not require('mason-registry').has_package(package_name) then
-      mason_need_refresh = true
-    end
-    lsp_uninstalled[lsp_name] = package_name
-  end
-end
-
-maybe_refresh_mason_registry_and_then(function()
-  -- mason.nvim does not launch lsp when installed for the first time
-  -- we attach a manual callback to setup LSP and launch
-  for lsp_name, package_name in pairs(lsp_uninstalled) do
-    local ok, pkg = pcall(require('mason-registry').get_package, package_name)
-    if ok then
-      pkg:on("install:success", vim.schedule_wrap(function()
-        lsp_zero.setup_servers({lsp_name})
-        attach_lsp_to_existing_buffers()  -- TODO: reload only the buffers that matches filetype.
-      end))
-    end
-  end
-
-  -- Make sure LSP clients are attached to already existing buffers prior to this config.
-  attach_lsp_to_existing_buffers()
-end, { force = mason_need_refresh })
+-- refreshes registry if needed and runs command
+require("mason-registry").refresh(ensure_mason_installed)
 
 -- miscellaneous
 

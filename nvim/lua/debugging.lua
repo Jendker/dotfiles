@@ -34,17 +34,7 @@ return {
       local dap = require 'dap'
       local dapui = require 'dapui'
 
-      require('mason-nvim-dap').setup {
-        -- You can provide additional configuration to the handlers,
-        -- see mason-nvim-dap README for more information
-        handlers = {},
-        ensure_installed = {
-          -- Languages are mapped to package names automatically
-          'python',
-          'cpp',
-          'go,'
-        },
-      }
+      require('mason-nvim-dap').setup()
 
       -- TODO set colors to red
       vim.fn.sign_define('DapBreakpoint', { text = '•'})

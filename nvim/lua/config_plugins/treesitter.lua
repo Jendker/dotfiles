@@ -70,6 +70,9 @@ require('nvim-treesitter.configs').setup({
   },
   highlight = {
     enable = not vscode,
+    disable = function(_, bufnr)
+      return vim.api.nvim_buf_line_count(bufnr) > 50000
+    end
   },
   indent = {
     enable = not vscode,

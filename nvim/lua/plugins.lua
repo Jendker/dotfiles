@@ -17,10 +17,23 @@ local plugins = {
   {
     "folke/flash.nvim",
     event = "VeryLazy",
-    opts = {},
+    opts = {
+      modes = {
+        char = {
+          jump_labels = function(motion)
+            -- never show jump labels by default
+            -- return false
+            -- Always show jump labels for ftFT
+            return vim.v.count == 0 and motion:find("[ftFT]")
+            -- Show jump labels for ftFT in operator-pending mode
+            -- return vim.v.count == 0 and motion:find("[ftFT]") and vim.fn.mode(true):find("o")
+          end,
+        },
+      },
+    },
     -- stylua: ignore
     keys = {
-      { "s", mode = { "n", "o" }, function() require("flash").jump({ search = { forward = true, wrap = false, multi_window = false } }) end, desc = "Forward flash" },
+      { "s", mode = { "n", "o", "v" }, function() require("flash").jump({ search = { forward = true, wrap = false, multi_window = false } }) end, desc = "Forward flash" },
       { "S", mode = { "n", "o" }, function() require("flash").jump({ search = { forward = false, wrap = false, multi_window = false } }) end, desc = "Backwards flash" },
       { "<c-s>", mode = { "n", "x", "o" }, function() require("flash").treesitter() end, desc = "Flash Treesitter" },
       { "r", mode = "o", function() require("flash").remote() end, desc = "Remote Flash" },
@@ -140,6 +153,16 @@ local plugins = {
     cond = not_vscode
   },
   {
+    'junegunn/gv.vim',
+    cmd = 'GV',
+    keys = {
+      {"<leader>gv", "<cmd>GV<cr>", mode = 'n', desc = "Git commit browser"},
+      {"<leader>gv", "<cmd>'<,'>GV<cr>", mode = 'v', desc = "Git commit browser"},
+    },
+    dependencies = 'tpope/vim-fugitive',
+    cond = not_vscode
+  },
+  {
     'stevearc/oil.nvim',
     dependencies = { "nvim-tree/nvim-web-devicons" },
     config = function()
@@ -158,14 +181,20 @@ local plugins = {
       onedark.setup{
         transparent = true,
         toggle_style_list = { 'light', 'dark' }, -- List of styles to toggle between
+        diagnostics = {
+          undercurl = false,
+        },
+        highlights = {
+          IlluminatedWordText = {bg = '$bg3'},
+          IlluminatedWordRead = {bg = '$bg3'},
+          IlluminatedWordWrite = {bg = '$bg3'},
+          IblIndent = { fg = '$bg3', fmt = "nocombine" },
+        }
       }
       onedark.load()
       vim.keymap.set('n', '<leader>tt', function()
         onedark.setup({transparent = not vim.g.onedark_config.transparent})
         onedark.toggle()
-        vim.api.nvim_command [[ hi IlluminatedWordText gui=none ]]
-        vim.api.nvim_command [[ hi IlluminatedWordRead gui=none ]]
-        vim.api.nvim_command [[ hi IlluminatedWordWrite gui=none ]]
         require('highlight-undo').setup()
       end, {desc = "Toggle dark and light mode"})
     end,
@@ -188,6 +217,26 @@ local plugins = {
             end,
           })
       end
+      table.insert(lualine_x,
+        {
+          function()
+            local function split_string(input, delimiter)
+              local result = {}
+              for part in string.gmatch(input, "([^" .. delimiter .. "]+)") do
+                table.insert(result, part)
+              end
+              return result
+            end
+            local venv = vim.env.VIRTUAL_ENV or vim.env.CONDA_DEFAULT_ENV
+            if venv then
+              local params = split_string(venv, '/')
+              return '(' .. params[#params] .. ')'
+            else
+              return ''
+            end
+          end,
+          cond = function() return vim.bo.filetype == "python" end,
+        })
       table.insert(lualine_x,
         {
           function()
@@ -236,12 +285,31 @@ local plugins = {
   },
   {
     'lukas-reineke/indent-blankline.nvim',
-    version = "^2",
-    config = function()
-      require("indent_blankline").setup {
-        char = '┊',
-      }
-    end,
+    main = "ibl",
+    opts = {
+      indent = {
+        char = "┊",
+        tab_char = "┊",
+      },
+      exclude = {
+        filetypes = {
+          "help",
+          "Trouble",
+          "lazy",
+          "mason",
+          "notify",
+          "lspinfo",
+          "packer",
+          "checkhealth",
+          "help",
+          "man",
+          "gitcommit",
+          "TelescopePrompt",
+          "TelescopeResults",
+        },
+      },
+      scope = { enabled = false },
+    },
     cond = not_vscode
   },
   {
@@ -300,7 +368,6 @@ local plugins = {
       "molecule-man/telescope-menufacture",
       {
         "nvim-telescope/telescope-frecency.nvim",
-        dependencies = { "kkharji/sqlite.lua" },
         keys = {
           { "<leader>sfp", "<Cmd>lua require('telescope').extensions.frecency.frecency({ workspace = 'CWD' })<CR>", "n",
             noremap = true, silent = true, desc = "Telescope frecency" },
@@ -332,12 +399,17 @@ local plugins = {
       local easing_function = "sine"
       local neoscroll = require('neoscroll')
       neoscroll.setup({
-        post_hook = function(info)
-          -- this doesn't seem to do anything, for some reason
-          -- that's fine for now
-          if info ~= "no_scroll" then
-            neoscroll.zz('250', easing_function, "'no_scroll'")
-          end
+        pre_hook = function()
+          vim.opt.eventignore:append({
+              'WinScrolled',
+              'CursorMoved',
+           })
+        end,
+        post_hook = function()
+          vim.opt.eventignore:remove({
+              'WinScrolled',
+              'CursorMoved',
+          })
         end,
         easing_function = easing_function
       })
@@ -385,6 +457,7 @@ local plugins = {
 
       -- Added by me
       {'ray-x/lsp_signature.nvim', opts = { toggle_key = '<C-h>', select_signature_key = '<A-n>' } },
+      {'jay-babu/mason-null-ls.nvim'},
     },
     cond = not_vscode
   },
@@ -392,12 +465,14 @@ local plugins = {
     'stevearc/conform.nvim',
     opts = {
       formatters_by_ft = {
-        python = { "black" },
-        json = { "prettierd" },
+        css = { "prettierd" },
         html = { "prettierd" },
-        yaml = { "prettierd" },
         javascript = { "prettierd" },
+        json = { "prettierd" },
+        markdown = { "prettierd" },
+        python = { "isort", "black" },
         typescript = { "prettierd" },
+        yaml = { "prettierd" },
       },
     },
     config = function(_, opts)
@@ -514,7 +589,6 @@ local plugins = {
         }
       }
     },
-    version = "^5",
     cond = not_vscode
   },
   {
@@ -970,10 +1044,20 @@ local plugins = {
     event = { "BufReadPost", "BufNewFile" },
     opts = {
       delay = 200,
-      under_cursor = false,
       large_file_cutoff = 2000,
       large_file_overrides = {
         providers = { "lsp" },
+      },
+      filetypes_denylist = {
+        "dirvish",
+        "fugitive",
+        "lazy",
+        "Trouble",
+        "Outline",
+        "spectre_panel",
+        "toggleterm",
+        "TelescopePrompt",
+        "oil",
       },
     },
     config = function(_, opts)
@@ -996,9 +1080,6 @@ local plugins = {
           map("[[", "prev", buffer)
         end,
       })
-      vim.api.nvim_command [[ hi IlluminatedWordText gui=none ]]
-      vim.api.nvim_command [[ hi IlluminatedWordRead gui=none ]]
-      vim.api.nvim_command [[ hi IlluminatedWordWrite gui=none ]]
     end,
     keys = {
       { "]]", desc = "Next Reference" },
@@ -1058,6 +1139,47 @@ local plugins = {
       vim.opt.fillchars = vim.opt.fillchars + 'foldopen:,foldclose:'
     end,
     cond = not_vscode,
+  },
+  {
+    'mfussenegger/nvim-lint',
+    ft = {
+      "json",
+    },
+    opts = {
+      linters_by_ft = {
+        json = {'jsonlint'},
+      },
+    },
+    config = function(_, opts)
+      -- some code from https://github.com/stevearc/dotfiles/blob/2fcdaf586372a9809d3015c0cd58675a53fe0b48/.config/nvim/lua/plugins/lint.lua#L32
+      local lint = require('lint')
+      lint.linters_by_ft = opts.linters_by_ft
+      local timer = assert(vim.uv.new_timer())
+      local DEBOUNCE_MS = 500
+      local aug = vim.api.nvim_create_augroup("Lint", { clear = true })
+      vim.api.nvim_create_autocmd({ "BufEnter", "BufWritePost", "TextChanged", "InsertLeave" }, {
+        group = aug,
+        callback = function()
+          local bufnr = vim.api.nvim_get_current_buf()
+          timer:stop()
+          timer:start(
+            DEBOUNCE_MS,
+            0,
+            vim.schedule_wrap(function()
+              if vim.api.nvim_buf_is_valid(bufnr) then
+                vim.api.nvim_buf_call(bufnr, function()
+                  lint.try_lint(nil, { ignore_errors = true })
+                end)
+              end
+            end)
+          )
+        end,
+      })
+      lint.try_lint(nil, { ignore_errors = true })
+      vim.keymap.set('n', '[d', vim.diagnostic.goto_prev)
+      vim.keymap.set('n', ']d', vim.diagnostic.goto_next)
+    end,
+    cond = not_vscode
   },
   require('debugging'),
 }
