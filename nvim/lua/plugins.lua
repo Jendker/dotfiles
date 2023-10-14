@@ -173,8 +173,47 @@ local plugins = {
     cond = not_vscode
   },
   {
+    'rebelot/kanagawa.nvim',
+    priority = 100,
+    opts = {
+      undercurl = false,
+      transparent = true,
+      colors = {
+        theme = {
+          all = {
+            ui = {
+              bg_gutter = "none"
+            }
+          }
+        }
+      },
+      overrides = function(colors)
+        local theme = colors.theme
+        return {
+          -- vim-illuminate highlights
+          IlluminatedWordText = { bg = theme.ui.bg_p2 },
+          IlluminatedWordRead = { bg = theme.ui.bg_p2 },
+          IlluminatedWordWrite = { bg = theme.ui.bg_p2 },
+
+          -- This will make floating windows look nicer with default borders
+          NormalFloat = { bg = "none" },
+          FloatBorder = { bg = "none" },
+          FloatTitle = { bg = "none" },
+          TelescopeBorder = { bg = "none" },
+          TelescopeTitle = { bg = "none" },
+          NormalDark = { fg = theme.ui.fg_dim, bg = theme.ui.bg_m3 },
+          LazyNormal = { fg = theme.ui.fg_dim, bg = theme.ui.bg_m3 },
+          MasonNormal = { fg = theme.ui.fg_dim, bg = theme.ui.bg_m3 },
+        }
+      end,
+    },
+    config = function(_, opts)
+      require('kanagawa').setup(opts)
+    end,
+    cond = not_vscode
+  },
+  {
     'navarasu/onedark.nvim',
-    lazy = false, -- make sure we load this during startup, that's main colorscheme
     priority = 100,
     config = function()
       local onedark = require('onedark')
