@@ -12,7 +12,7 @@
   "codeium.vim": { "branch": "main", "commit": "18f68b837fa286f6332440a6c77a9493091dad17" },
   "conform.nvim": { "branch": "master", "commit": "4db76a68b47aa6e9777e4da4aed16f0fff74920e" },
   "diffview.nvim": { "branch": "main", "commit": "d38c1b5266850f77f75e006bcc26213684e1e141" },
-  "dropbar.nvim": { "branch": "master", "commit": "79309dccd5e5b94f9ddf5ee8587691d2bfea2858" },
+  "dropbar.nvim": { "branch": "master", "commit": "3daffc1215d715a4e9c544e2c71db16aab61d86f" },
   "flash.nvim": { "branch": "main", "commit": "6d76c5dee65181ab55cbdfb0760260e800d643f4" },
   "friendly-snippets": { "branch": "main", "commit": "43727c2ff84240e55d4069ec3e6158d74cb534b6" },
   "fugitive-gitlab.vim": { "branch": "master", "commit": "55fed481c0309b3405dd3d72921d687bf36873a8" },

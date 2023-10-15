@@ -562,6 +562,7 @@ local plugins = {
   },
   {
     'Bekaboo/dropbar.nvim',
+    commit = "3daffc1",
     opts = {
       bar = {
         sources = function(_, _)
@@ -668,7 +669,7 @@ local plugins = {
               { "n", "<C-w>gf", function() actions.goto_file_tab(); vim.cmd('tabclose #') end, { desc = "Open the file in a new tabpage and close diffview" } },
               { "n", "<C-w>gF", actions.goto_file_tab, { desc = "Open the file in a new tabpage" } },
               { "n", "<leader>b", false},
-              { "n", "<leader>h", actions.toggle_files, { desc = "Toggle the file panel" } },
+              { "n", "<leader><C-b>", actions.toggle_files, { desc = "Toggle the file panel" } },
             },
             file_history_panel = {
               { "n", "gf", function() actions.goto_file_edit(); vim.cmd('tabclose #') end, { desc = "Open the file in the previous tabpage and close diffview" } },
@@ -676,7 +677,7 @@ local plugins = {
               { "n", "<C-w>gf", function() actions.goto_file_tab(); vim.cmd('tabclose #') end, { desc = "Open the file in a new tabpage and close diffview" } },
               { "n", "<C-w>gF", actions.goto_file_tab, { desc = "Open the file in a new tabpage" } },
               { "n", "<leader>b", false},
-              { "n", "<leader>h", actions.toggle_files, { desc = "Toggle the file panel" } },
+              { "n", "<leader><C-b>", actions.toggle_files, { desc = "Toggle the file panel" } },
             },
             view = {
               -- The `view` bindings are active in the diff buffers, only when the current
@@ -686,7 +687,7 @@ local plugins = {
               { "n", "<C-w>gf", function() actions.goto_file_tab(); vim.cmd('tabclose #') end, { desc = "Open the file in a new tabpage and close diffview" } },
               { "n", "<C-w>gF", actions.goto_file_tab, { desc = "Open the file in a new tabpage" } },
               { "n", "<leader>b", false},
-              { "n", "<leader>h", actions.toggle_files, { desc = "Toggle the file panel" } },
+              { "n", "<leader><C-b>", actions.toggle_files, { desc = "Toggle the file panel" } },
             }
           },
         })
