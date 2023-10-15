@@ -55,6 +55,9 @@ telescope.setup({
           end },
       },
     },
+    grep_string = {
+      additional_args = {'-w', '--case-sensitive'}
+    },
   },
   extensions = {
     menufacture = {
