@@ -16,6 +16,21 @@ gitsigns.setup {
   signcolumn = true, -- Toggle with `:Gitsigns toggle_signs`
   current_line_blame_opts = {
     delay = 100,
+    ignore_whitespace = true,
+  },
+  diff_opts = {
+      -- smarter diff algorithm that is semantically better
+      algorithm = 'patience',
+      -- Equivalent as git diff --indent-heuristic
+      indent_heuristic = true,
+      -- Use line matching algorithm (neovim#14537)
+      linematch = vim.fn.has('nvim-0.9.0') > 0 and 60 or nil,
+      -- Include whitespace-only changes in git hunks
+      -- regardless of &diffopt (gitsigns.nvim#696)
+      ignore_whitespace_change = false,
+      ignore_blank_lines = false,
+      ignore_whitespace = false,
+      ignore_whitespace_change_at_eol = false,
   },
   on_attach = function(bufnr)
     local gs = package.loaded.gitsigns
@@ -51,7 +66,7 @@ gitsigns.setup {
     map('n', '<leader>hd', gs.diffthis, { desc = "[d]iff this", silent = true })
     map('n', '<leader>hm', function()
       gs.change_base(common.getGitMainBranch(), true)
-      print("Changin base to master. Undo with :Gitsigns change_base HEAD true")
+      vim.notify("Changing base to master. Undo with :Gitsigns change_base HEAD true", vim.log.levels.INFO)
     end, { desc = "Change base to master", silent = true })
     map('n', '<leader>hD', function() gs.diffthis('~') end, { desc = "Diff to previous commit", silent = true })
     map('n', '<leader>td', gs.toggle_deleted, { desc = "[t]oggle [d]eleted", silent = true })

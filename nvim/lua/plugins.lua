@@ -20,14 +20,12 @@ local plugins = {
     opts = {
       modes = {
         char = {
+          autohide = true,
           jump_labels = function(motion)
-            -- never show jump labels by default
-            -- return false
-            -- Always show jump labels for ftFT
-            return vim.v.count == 0 and motion:find("[ftFT]")
-            -- Show jump labels for ftFT in operator-pending mode
-            -- return vim.v.count == 0 and motion:find("[ftFT]") and vim.fn.mode(true):find("o")
+            -- Always show jump labels for ftFT if not in operator-pending mode
+            return vim.v.count == 0 and motion:find("[ftFT]") and not vim.fn.mode(true):find("o")
           end,
+          label = { exclude = "hjkliardcy" },
         },
       },
     },
@@ -72,15 +70,13 @@ local plugins = {
     build = ':TSUpdate',
   },
   'nvim-treesitter/nvim-treesitter-textobjects',
-  {
+  { -- better % on matching delimeters
     'andymass/vim-matchup',
     init = function()
       vim.g.matchup_motion_enabled = not vscode
       vim.g.matchup_matchparen_enabled = not vscode
     end
-  }, -- better % on matching delimeters
-  -- Re-enable after this is fixed https://github.com/HiPhish/nvim-ts-rainbow2/issues/49
-  -- 'HiPhish/nvim-ts-rainbow2',  -- colored brackets
+  },
   {
     "kana/vim-textobj-user",
     event = 'VeryLazy',
@@ -224,10 +220,11 @@ local plugins = {
           undercurl = false,
         },
         highlights = {
-          IlluminatedWordText = {bg = '$bg3'},
-          IlluminatedWordRead = {bg = '$bg3'},
-          IlluminatedWordWrite = {bg = '$bg3'},
+          IlluminatedWordText = {bg = '$bg2'},
+          IlluminatedWordRead = {bg = '$bg2'},
+          IlluminatedWordWrite = {bg = '$bg2'},
           IblIndent = { fg = '$bg3', fmt = "nocombine" },
+          MsgArea = { fg = '$fg' },
         }
       }
       onedark.load()
@@ -564,27 +561,37 @@ local plugins = {
     'Bekaboo/dropbar.nvim',
     commit = "3daffc1",
     opts = {
+      general = {
+        enable = function(buf, win, _)
+          return not vim.api.nvim_win_get_config(win).zindex
+              and (vim.bo[buf].buftype == '' or vim.bo[buf].buftype == 'acwrite' or vim.bo[buf].buftype == 'nowrite' or vim.bo[buf].buftype == 'terminal')
+              and vim.api.nvim_buf_get_name(buf) ~= ''
+              and not vim.wo[win].diff
+        end,
+      },
       bar = {
-        sources = function(_, _)
+        sources = function(buf, _)
           local sources = require('dropbar.sources')
+          local utils = require('dropbar.utils')
+          if vim.bo[buf].ft == 'markdown' then
+            return {
+              utils.source.fallback({
+                sources.treesitter,
+                sources.markdown,
+                sources.lsp,
+              }),
+            }
+          end
+          if vim.bo[buf].buftype == 'terminal' then
+            return {
+              sources.terminal,
+            }
+          end
           return {
-            {
-              get_symbols = function(buf, win, cursor)
-                if vim.bo[buf].ft == 'markdown' then
-                  return sources.markdown.get_symbols(buf, win, cursor)
-                end
-                for _, source in ipairs({
-                  sources.lsp,
-                  sources.treesitter,
-                }) do
-                  local symbols = source.get_symbols(buf, win, cursor)
-                  if not vim.tbl_isempty(symbols) then
-                    return symbols
-                  end
-                end
-                return {}
-              end,
-            },
+            utils.source.fallback({
+              sources.lsp,
+              sources.treesitter,
+            }),
           }
         end,
       },
@@ -697,7 +704,7 @@ local plugins = {
       { "<leader>gD",  "<cmd>DiffviewOpen HEAD~<cr>",            desc = "[G]it [D]iff previous commit", nowait = true },
       { "<leader>gr", "<cmd>DiffviewFileHistory<cr>",            desc = "[G]it [r]epo history" },
       { "<leader>gf", "<cmd>DiffviewFileHistory --follow %<cr>", desc = "[G]it [f]ile history" },
-      { "<leader>gm", "<cmd>DiffviewOpen master<cr>",            desc = "[G]it diff with [m]aster" },
+      { "<leader>gm", function() vim.cmd("DiffviewOpen " .. common.getGitMainBranch()) end,            desc = "[G]it diff with [m]aster" },
       { "<leader>gl", "<cmd>.DiffviewFileHistory --follow<CR>",  desc = "[G]it file history for the current [l]ine"},
       { "<leader>gl", "<Esc><cmd>'<,'>DiffviewFileHistory --follow<CR>", mode = 'v',  desc = "[G]it file history for the visual se[l]ection"},
       { "<leader>gc", ":DiffviewOpen <C-R>+<CR>",                desc = "[G]it [c]ommit from clipboard", silent = true},
@@ -753,6 +760,7 @@ local plugins = {
           override = {
             ["vim.lsp.util.convert_input_to_markdown_lines"] = true,
             ["vim.lsp.util.stylize_markdown"] = true,
+            ["cmp.entry.get_documentation"] = true,
           },
           hover = {
             enabled = false
@@ -778,6 +786,28 @@ local plugins = {
           mini = {
             timeout = 2500
           }
+        },
+        routes = {
+          {
+            filter = {
+              event = "msg_show",
+              any = {
+                { find = "%d+L, %d+B" },
+                { find = "; after #%d+" },
+                { find = "; before #%d+" },
+              },
+            },
+            view = "mini",
+          },
+          {
+            filter = {
+              event = "msg_show",
+              any = {
+                { find = "Keyboard interrupt" },
+              },
+            },
+            opts = { skip = true },
+          },
         },
         commands = {
           history = {
@@ -812,6 +842,7 @@ local plugins = {
       { "<leader>ol", function() require("noice").cmd("last") end, desc = "N[o]ice [l]ast message" },
       { "<leader>oh", function() require("noice").cmd("history") end, desc = "N[o]ice [h]istory" },
       { "<leader>oa", function() require("noice").cmd("all") end, desc = "N[o]ice [a]ll" },
+      { "<leader>od", function() require("noice").cmd("dismiss") end, desc = "Dismiss All" },
       { "<leader>om", "<cmd>:messages<cr>", desc = ":messages" },
     },
     cond = not_vscode
@@ -831,16 +862,14 @@ local plugins = {
           enabling = function() print "auto-save on"; vim.g.autosave_on = 1 end,
           disabling = function() if vim.g.first_autosave_disable == 1 then vim.g.first_autosave_disable = 0 else print "auto-save off"; vim.g.autosave_on = 0 end end,
           before_saving = function()
-            vim.b.lsp_zero_enable_autoformat = false
-            vim.b.disable_autoformat = true
-            vim.g.disable_autoformat = true
+            common.disableAutoformat()
             vim.b.paste_start_mark = vim.fn.getpos("'[")
             vim.b.paste_end_mark = vim.fn.getpos("']")
           end,
           after_saving = function()
-            vim.b.lsp_zero_enable_autoformat = true
-            vim.b.disable_autoformat = false
-            vim.g.disable_autoformat = false
+            if not vim.b.orbik_disable_autoformat then
+              common.enableAutoformat()
+            end
             vim.fn.setpos("'[", vim.b.paste_start_mark)
             vim.fn.setpos("']", vim.b.paste_end_mark)
           end,
@@ -1052,7 +1081,13 @@ local plugins = {
   },
   {
     'stevearc/aerial.nvim',
-    keys = { {'<leader>ba', '<cmd>AerialToggle<CR>', 'n', desc = "[b]uffer [a]erial toggle"} },
+    keys = {
+      {'<leader>ba', '<cmd>AerialToggle<CR>', 'n', desc = "[b]uffer [a]erial toggle"},
+      { "[s", function() require('aerial').prev() end, desc = "Previous aerial symbol", mode = { "n", "v" } },
+      { "]s", function() require('aerial').next() end, desc = "Next aerial symbol", mode = { "n", "v" } },
+      { "[u", function() require('aerial').prev_up() end, desc = "Previous aerial parent symbol", mode = { "n", "v" } },
+      { "]u", function() require('aerial').next_up() end, desc = "Next aerial parent symbol", mode = { "n", "v" } },
+    },
     opts = {
       layout = {
         max_width = { 80, 0.2 },
@@ -1219,6 +1254,15 @@ local plugins = {
       vim.keymap.set('n', '[d', vim.diagnostic.goto_prev)
       vim.keymap.set('n', ']d', vim.diagnostic.goto_next)
     end,
+    cond = not_vscode
+  },
+  {
+    'NvChad/nvim-colorizer.lua',
+    opts = {
+      user_default_options = {
+        names = false, -- "Name" codes like Blue or blue
+      },
+    },
     cond = not_vscode
   },
   require('debugging'),

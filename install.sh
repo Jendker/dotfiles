@@ -23,10 +23,10 @@ function add() {
 }
 
 # nvim
+config_folder="$HOME/.config/nvim"
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-  add "$SCRIPT_DIR/nvim/lua" "$HOME/.config/nvim/lua"
+  add "$SCRIPT_DIR/nvim" "$HOME/.config/nvim"
 elif [[ "$OSTYPE" == "darwin"* ]]; then
-  config_folder="$HOME/.config/nvim"
   icloud_folder="$HOME/Library/Mobile Documents/com~apple~CloudDocs/Mackup/.config/nvim"
   rm -rf "$config_folder" || true
   mkdir -p "$config_folder"

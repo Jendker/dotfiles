@@ -56,4 +56,30 @@ function M.bufferEmpty(buffer)
   return vim.api.nvim_buf_line_count(buffer) == 1 and vim.api.nvim_buf_get_lines(buffer, 0, 1, {true})[1] == ""
 end
 
+function M.shallowCopy(orig)
+  local orig_type = type(orig)
+  local copy
+  if orig_type == 'table' then
+    copy = {}
+    for orig_key, orig_value in pairs(orig) do
+      copy[orig_key] = orig_value
+    end
+  else   -- number, string, boolean, etc
+    copy = orig
+  end
+  return copy
+end
+
+function M.enableAutoformat()
+  vim.b.lsp_zero_enable_autoformat = true
+  -- conform.nvim
+  vim.b.disable_autoformat = false
+end
+
+function M.disableAutoformat()
+  vim.b.lsp_zero_enable_autoformat = false
+  -- conform.nvim
+  vim.b.disable_autoformat = true
+end
+
 return M

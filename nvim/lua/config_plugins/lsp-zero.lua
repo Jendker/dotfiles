@@ -29,6 +29,7 @@ local auto_lsp_servers = {
   ['jsonlint'] = true,
   ['lemminx'] = true,  -- xml
   ['gopls'] = true,
+  ['prettierd'] = true,
 }
 
 --  This function gets run when an LSP connects to a particular buffer.
@@ -151,10 +152,12 @@ require('mason-lspconfig').setup({
             organizeImports = false,  -- let isort take care of organizeImports
             -- Any extra CLI arguments for `ruff` go here.
             args = {
-              "--ignore",
-              "E501", -- line-too-long
-              "E402", -- module-import-not-at-top-of-file
-              "E731", -- lambda-assignment
+              "--ignore", table.concat({
+                "E501", -- line-too-long
+                "E402", -- module-import-not-at-top-of-file
+                "E731", -- lambda-assignment
+                "E402", -- module-import-not-at-top-of-file
+              }, ',')
             },
           }
         }

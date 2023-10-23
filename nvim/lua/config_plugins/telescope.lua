@@ -2,6 +2,9 @@ local common = require('common')
 local telescope = require('telescope')
 local actions = require('telescope.actions')
 local trouble = require("trouble.providers.telescope")
+
+local grep_string_default_additional_args = {'-w', '--case-sensitive'}
+
 telescope.setup({
   defaults = {
     mappings = {
@@ -56,7 +59,7 @@ telescope.setup({
       },
     },
     grep_string = {
-      additional_args = {'-w', '--case-sensitive'}
+      additional_args = grep_string_default_additional_args
     },
   },
   extensions = {
@@ -67,12 +70,28 @@ telescope.setup({
     },
   },
 })
+
+local grep_string_menu =
+  require('telescope').extensions.menufacture.add_menu_with_default_mapping(
+    require('telescope.builtin').grep_string,
+    vim.tbl_extend('force', require('telescope').extensions.menufacture.grep_string_menu, {
+      ['change glob_pattern'] = function(opts, callback)
+        local glob_value = vim.fn.input("Glob pattern: ")
+        local new_additional_args = common.shallowCopy(grep_string_default_additional_args)
+        table.insert(new_additional_args, '--glob')
+        table.insert(new_additional_args, glob_value)
+        opts['additional_args'] = new_additional_args
+        callback(opts)
+      end,
+    })
+  )
+
 -- vim_booksmarks
 telescope.load_extension('vim_bookmarks')
 -- more keymaps
-vim.keymap.set('n', '<leader>?', require('telescope').extensions.menufacture.grep_string, { desc = '[?] search for word under cursor'})
+vim.keymap.set('n', '<leader>?', grep_string_menu, { desc = '[?] search for word under cursor'})
 vim.keymap.set('v', '<leader>?', function()
-    require('telescope').extensions.menufacture.grep_string({ search = common.getVisualSelection() })
+    grep_string_menu({ search = common.getVisualSelection() })
   end,
   { desc = '[?] search for selection' })
 vim.keymap.set('n', '<leader>/', function()

@@ -18,18 +18,14 @@ vim.opt.smartindent = false
 vim.opt.cursorline = true
 vim.opt.cursorlineopt = "number"
 
+-- Miscellaneous
 vim.opt.wrap = true
 vim.opt.ignorecase = true
 vim.opt.smartcase = true
 vim.opt.scrolloff = 4
 vim.opt.termguicolors = true
 vim.opt.laststatus = 3 -- global statusline
-
--- Prefer ripgrep if it exists
--- if fn.executable("rg") > 0 then
---   vim.o.grepprg = "rg --hidden --glob '!.git' --no-heading --smart-case --vimgrep --follow $*"
---   vim.opt.grepformat = vim.opt.grepformat ^ { "%f:%l:%c:%m" }
--- end
+vim.o.updatetime = 200 -- CursorHold time default is 4s. Way too long
 
 -- don't continue comment on newline
 vim.cmd("autocmd BufEnter * setlocal formatoptions-=cro")
@@ -81,4 +77,17 @@ vim.api.nvim_create_autocmd({"BufReadPre", "BufNewFile"}, {
     require 'config_plugins.lsp-zero'
   end,
   once = true,
+})
+
+-- improve file reloads
+vim.api.nvim_create_autocmd({ "FocusGained", "TermClose", "TermLeave" }, {
+-- vim.api.nvim_create_autocmd("FocusGained", {
+  desc = "Reload files from disk when we focus vim",
+  group = augroup("checktime_focus"),
+  command = "if getcmdwintype() == '' | checktime | endif",
+})
+vim.api.nvim_create_autocmd("BufEnter", {
+  desc = "Every time we enter an unmodified buffer, check if it changed on disk",
+  group = augroup("checktime_enter"),
+  command = "if &buftype == '' && !&modified && expand('%') != '' | exec 'checktime ' . expand('<abuf>') | endif",
 })

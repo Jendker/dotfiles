@@ -37,6 +37,17 @@ map({"n", "v"}, "<leader>C", [["_C]])
 map("n", "<leader>tq", "<cmd>tabclose<cr>", { desc = "[T]ab [q] close" })
 map("n", "<leader>tc", "<cmd>tabnew<CR>", { desc = "[T]ab [n]ew"})
 map("n", "<leader>tn", "<cmd>tabnew<CR>", { desc = "[T]ab [c]reate"})
+map("n", "<leader>tf", function()
+  if vim.b.orbik_disable_autoformat then
+    common.enableAutoformat()
+    vim.b.orbik_disable_autoformat = false
+    vim.notify("Enabled autoformat for the buffer", vim.log.levels.INFO)
+  else
+    common.disableAutoformat()
+    vim.b.orbik_disable_autoformat = true
+    vim.notify("Disabled autoformat for the buffer", vim.log.levels.INFO)
+  end
+end, { desc = "[T]oggle auto[f]ormat" })
 
 -- center after buffer movements
 -- vim.keymap.set("n", "n", "nzzzv")
@@ -77,6 +88,11 @@ map("n", "<leader>qq", "<cmd>qa<cr>", { desc = "Quit all" })
 -- search for selected text
 map('v', '/', "\"fy/<C-R>f<CR>", {silent = true})
 map('v', '?', "\"fy?<C-R>f<CR>", {silent = true})
+
+-- Save jumps > 5 lines to the jumplist
+-- Jumps <= 5 respect line wraps
+map("n", "j", [[(v:count > 5 ? "m'" . v:count . 'j' : 'gj')]], { expr = true })
+map("n", "k", [[(v:count > 5 ? "m'" . v:count . 'k' : 'gk')]], { expr = true })
 
 local function get_system_command()
   local system_name = vim.uv.os_uname().sysname
