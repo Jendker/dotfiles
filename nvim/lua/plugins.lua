@@ -20,7 +20,7 @@ local plugins = {
     opts = {
       modes = {
         char = {
-          autohide = true,
+          autohide = function() return vim.fn.mode(true):find("o") end,
           jump_labels = function(motion)
             -- Always show jump labels for ftFT if not in operator-pending mode
             return vim.v.count == 0 and motion:find("[ftFT]") and not vim.fn.mode(true):find("o")
@@ -31,8 +31,8 @@ local plugins = {
     },
     -- stylua: ignore
     keys = {
-      { "s", mode = { "n", "o", "v" }, function() require("flash").jump({ search = { forward = true, wrap = false, multi_window = false } }) end, desc = "Forward flash" },
-      { "S", mode = { "n", "o" }, function() require("flash").jump({ search = { forward = false, wrap = false, multi_window = false } }) end, desc = "Backwards flash" },
+      { "s", mode = { "n", "v" }, function() require("flash").jump({ search = { forward = true, wrap = false, multi_window = false } }) end, desc = "Forward flash" },
+      { "S", mode = { "n" }, function() require("flash").jump({ search = { forward = false, wrap = false, multi_window = false } }) end, desc = "Backwards flash" },
       { "<c-s>", mode = { "n", "x", "o" }, function() require("flash").treesitter() end, desc = "Flash Treesitter" },
       { "r", mode = "o", function() require("flash").remote() end, desc = "Remote Flash" },
       { "R", mode = { "o", "x" }, function() require("flash").treesitter_search() end, desc = "Treesitter Search" },
@@ -115,7 +115,32 @@ local plugins = {
       vim.keymap.set("x", "gr", substitute.visual, { noremap = true, desc = "[r]eplace selected"})
     end
   },
-  'mg979/vim-visual-multi',
+  {
+    'mg979/vim-visual-multi',
+    init = function()
+      -- https://github.com/mg979/vim-visual-multi/issues/172
+      vim.g.VM_maps = {
+        ["I BS"] = '',      -- disable backspace mapping which conflicts with nvim-autopairs
+        ["Exit"] = '<C-C>', -- quit VM
+      }
+    end,
+    config = function()
+      -- https://github.com/nvim-lualine/lualine.nvim/issues/951
+      vim.api.nvim_create_autocmd({ 'User' }, {
+        pattern = 'visual_multi_start',
+        callback = function()
+          require('lualine').hide()
+        end
+      })
+
+      vim.api.nvim_create_autocmd({ 'User' }, {
+        pattern = 'visual_multi_exit',
+        callback = function()
+          require('lualine').hide({ unhide = true })
+        end
+      })
+    end
+  },
   {"romainl/vim-cool", event = 'BufReadPost'}, -- auto hide highlight after search
   -- without VSCode
   -- auto trail whitespace
@@ -170,7 +195,7 @@ local plugins = {
   },
   {
     'rebelot/kanagawa.nvim',
-    priority = 100,
+    event = 'VeryLazy',
     opts = {
       undercurl = false,
       transparent = true,
@@ -725,7 +750,14 @@ local plugins = {
         ["<leader>s"] = { name = "+search" },
         ["<leader>sf"] = { name = "+go to file" },
         ["<leader>sb"] = { name = "+bookmarks" },
-        ["<leader>t"] = { name = "+toogle/tab"}
+        ["<leader>t"] = { name = "+toogle/tab"},
+        ["<leader>o"] = { name = "+overseer/noice"},
+        ["<leader>os"] = { name = "+noice"},
+        ["<leader>b"] = { name = "+buffer/bookmarks"},
+        ["<leader>g"] = { name = "+diffview"},
+        ["<leader>h"] = { name = "+hunks"},
+        ["<leader>w"] = { name = "+workspace"},
+        ["<leader>x"] = { name = "+trouble"},
       })
     end,
     cond = not_vscode
@@ -839,18 +871,18 @@ local plugins = {
       })
     end,
     keys = {
-      { "<leader>ol", function() require("noice").cmd("last") end, desc = "N[o]ice [l]ast message" },
-      { "<leader>oh", function() require("noice").cmd("history") end, desc = "N[o]ice [h]istory" },
-      { "<leader>oa", function() require("noice").cmd("all") end, desc = "N[o]ice [a]ll" },
-      { "<leader>od", function() require("noice").cmd("dismiss") end, desc = "Dismiss All" },
-      { "<leader>om", "<cmd>:messages<cr>", desc = ":messages" },
+      { "<leader>osl", function() require("noice").cmd("last") end, desc = "N[o]ice [s]how [l]ast message" },
+      { "<leader>osh", function() require("noice").cmd("history") end, desc = "N[o]ice [s]how [h]istory" },
+      { "<leader>osa", function() require("noice").cmd("all") end, desc = "N[o]ice [s]how [a]ll" },
+      { "<leader>osm", "<cmd>:messages<cr>", desc = ":messages" },
     },
     cond = not_vscode
   },
   {
     "zoriya/auto-save.nvim",
+    cmd = 'ASToggle',
     keys = {
-      { "<leader>ta", ":ASToggle<CR>", desc = "[T]oggle [a]utosave", silent = true },
+      { "<leader>ta", "<cmd>ASToggle<CR>", desc = "[T]oggle [a]utosave", silent = true },
     },
     config = function()
       vim.g.first_autosave_disable = 1
@@ -1191,20 +1223,20 @@ local plugins = {
     opts = {},
     cond = not_vscode
   },
-  {
-    'm4xshen/hardtime.nvim',
-    opts = {
-      disabled_keys = {
-        ["<Left>"] = { "n", "x" },
-        ["<Right>"] = { "n", "x" },
-        ["<Up>"] = {},
-        ["<Down>"] = {},
-      },
-      restricted_keys = { ["j"] = {}, ["k"] = {}, ["<C-N>"] = {}, ["<C-P>"] = {} },
-      disable_mouse = false,
-    },
-    cond = not_vscode,
-  },
+  -- {
+  --   'm4xshen/hardtime.nvim',
+  --   opts = {
+  --     disabled_keys = {
+  --       ["<Left>"] = { "n", "x" },
+  --       ["<Right>"] = { "n", "x" },
+  --       ["<Up>"] = {},
+  --       ["<Down>"] = {},
+  --     },
+  --     restricted_keys = { ["j"] = {}, ["k"] = {}, ["<C-N>"] = {}, ["<C-P>"] = {} },
+  --     disable_mouse = false,
+  --   },
+  --   cond = not_vscode,
+  -- },
   {
     'kevinhwang91/nvim-ufo',
     event = "BufReadPost",
@@ -1260,9 +1292,217 @@ local plugins = {
     'NvChad/nvim-colorizer.lua',
     opts = {
       user_default_options = {
+        RGB   = false, -- #RGB hex codes
         names = false, -- "Name" codes like Blue or blue
       },
     },
+    cond = not_vscode
+  },
+  {
+    "stevearc/overseer.nvim",
+    cmd = {
+      "Grep",
+      "Make",
+      "OverseerDebugParser",
+      "OverseerInfo",
+      "OverseerOpen",
+      "OverseerRun",
+      "OverseerRunCmd",
+      "OverseerToggle",
+    },
+    keys = {
+      { "<leader>oo", "<cmd>OverseerToggle<CR>", mode = "n", desc = "OverseerToggle" },
+      { "<leader>or", "<cmd>OverseerRun<CR>", mode = "n", desc = "OverseerRun" },
+      { "<leader>oc", "<cmd>OverseerRunCmd<CR>", mode = "n", desc = "OverseerRunCmd" },
+      { "<leader>ol", "<cmd>OverseerLoadBundle<CR>", mode = "n", desc = "OverseerLoadBundle" },
+      { "<leader>ob", "<cmd>OverseerToggle! bottom<CR>", mode = "n", desc = "OverseerToggle" },
+      { "<leader>od", "<cmd>OverseerQuickAction<CR>", mode = "n", desc = "OverseerQuickAction" },
+      { "<leader>os", "<cmd>OverseerTaskAction<CR>", mode = "n", desc = "OverseerTaskAction" },
+    },
+    opts = {
+      templates = { builtin = true },
+      strategy = { "jobstart" },
+      dap = false,
+      log = {
+        {
+          type = "echo",
+          level = vim.log.levels.WARN,
+        },
+        {
+          type = "file",
+          filename = "overseer.log",
+          level = vim.log.levels.DEBUG,
+        },
+      },
+      task_launcher = {
+        bindings = {
+          n = {
+            ["<leader>c"] = "Cancel",
+          },
+        },
+      },
+      component_aliases = {
+        default = {
+          { "display_duration", detail_level = 2 },
+          "on_output_summarize",
+          "on_exit_set_status",
+          { "on_complete_notify", system = "unfocused" },
+          "on_complete_dispose",
+        },
+        default_neotest = {
+          "unique",
+          { "on_complete_notify", system = "unfocused", on_change = true },
+          "default",
+        },
+      },
+      post_setup = {},
+    },
+    config = function(_, opts)
+      opts.templates = vim.tbl_keys(opts.templates)
+      local overseer = require("overseer")
+      overseer.setup(opts)
+      for _, cb in pairs(opts.post_setup) do
+        cb()
+      end
+      vim.api.nvim_create_user_command("OverseerDebugParser", 'lua require("overseer").debug_parser()', {})
+      vim.api.nvim_create_user_command("Grep", function(params)
+        local args = vim.fn.expandcmd(params.args)
+        -- Insert args at the '$*' in the grepprg
+        local cmd, num_subs = vim.o.grepprg:gsub("%$%*", args)
+        if num_subs == 0 then
+          cmd = cmd .. " " .. args
+        end
+        local cwd
+        local has_oil, oil = pcall(require, "oil")
+        if has_oil then
+          cwd = oil.get_current_dir()
+        end
+        local task = overseer.new_task({
+          cmd = cmd,
+          cwd = cwd,
+          name = "grep " .. args,
+          components = {
+            {
+              "on_output_quickfix",
+              errorformat = vim.o.grepformat,
+              open = not params.bang,
+              open_height = 8,
+              items_only = true,
+            },
+            -- We don't care to keep this around as long as most tasks
+            { "on_complete_dispose", timeout = 30 },
+            "default",
+          },
+        })
+        task:start()
+      end, { nargs = "*", bang = true, bar = true, complete = "file" })
+
+      vim.api.nvim_create_user_command("Make", function(params)
+        -- Insert args at the '$*' in the makeprg
+        local cmd, num_subs = vim.o.makeprg:gsub("%$%*", params.args)
+        if num_subs == 0 then
+          cmd = cmd .. " " .. params.args
+        end
+        local task = require("overseer").new_task({
+          cmd = vim.fn.expandcmd(cmd),
+          components = {
+            { "on_output_quickfix", open = not params.bang, open_height = 8 },
+            "unique",
+            "default",
+          },
+        })
+        task:start()
+      end, {
+        desc = "Run your makeprg as an Overseer task",
+        nargs = "*",
+        bang = true,
+      })
+    end,
+  },
+  {
+    -- Prettier vim.ui.select() and vim.ui.input()
+    -- https://github.com/stevearc/dressing.nvim#configuration
+    "stevearc/dressing.nvim",
+    opts = {
+      input = {
+        -- messes up menufacture glob input
+        enabled = false,
+        -- win_options = {
+        --   sidescrolloff = 4,
+        -- },
+        -- get_config = function()
+        --   if vim.api.nvim_win_get_width(0) < 50 then
+        --     return {
+        --       relative = "editor",
+        --     }
+        --   end
+        -- end,
+      },
+    },
+    config = function(_, opts)
+      require("dressing").setup(opts)
+      vim.keymap.set("n", "z=", function()
+        local word = vim.fn.expand("<cword>")
+        local suggestions = vim.fn.spellsuggest(word)
+        vim.ui.select(
+          suggestions,
+          {},
+          vim.schedule_wrap(function(selected)
+            if selected then
+              vim.cmd.normal({ args = { "ciw" .. selected }, bang = true })
+            end
+          end)
+        )
+      end)
+    end,
+    init = function()
+      -- Shim for vim.ui.open
+      if vim.ui.open then
+        return
+      end
+
+      ---Copied from vim.ui.open in Neovim 0.10+
+      ---@param path string
+      ---@return nil|string[] cmd
+      ---@return nil|string error
+      local function get_open_cmd(path)
+        if vim.fn.has("mac") == 1 then
+          return { "open", path }
+        elseif vim.fn.has("win32") == 1 then
+          if vim.fn.executable("rundll32") == 1 then
+            return { "rundll32", "url.dll,FileProtocolHandler", path }
+          else
+            return nil, "rundll32 not found"
+          end
+        elseif vim.fn.executable("wslview") == 1 then
+          return { "wslview", path }
+        elseif vim.fn.executable("xdg-open") == 1 then
+          return { "xdg-open", path }
+        else
+          return nil, "no handler found"
+        end
+      end
+
+      vim.ui.open = function(path)
+        local is_uri = path:match("%w+:")
+        if not is_uri then
+          path = vim.fn.expand(path)
+        end
+        local cmd, err = get_open_cmd(path)
+        if not cmd or err then
+          return nil, err
+        end
+        local jid = vim.fn.jobstart(cmd, { detach = true })
+        if jid <= 0 then
+          return nil, "Failed to start job"
+        end
+      end
+    end,
+    cond = not_vscode
+  },
+  {
+    'stevearc/stickybuf.nvim',
+    opts = {},
     cond = not_vscode
   },
   require('debugging'),

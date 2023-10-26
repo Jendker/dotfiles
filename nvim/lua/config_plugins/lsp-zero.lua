@@ -131,13 +131,59 @@ require('mason-lspconfig').setup({
         return vim.fn.exepath('python3') or vim.fn.exepath('python') or 'python'
       end
 
+      -- filtering from https://www.reddit.com/r/neovim/comments/108tjy0/comment/j42cod9/?utm_source=share&utm_medium=web2x&context=3
+      local function filter(arr, func)
+        -- Filter in place
+        -- https://stackoverflow.com/questions/49709998/how-to-filter-a-lua-array-inplace
+        local new_index = 1
+        local size_orig = #arr
+        for old_index, v in ipairs(arr) do
+          if func(v, old_index) then
+            arr[new_index] = v
+            new_index = new_index + 1
+          end
+        end
+        for i = new_index, size_orig do arr[i] = nil end
+      end
+
+      local function pyright_accessed_filter(diagnostic)
+        -- Allow kwargs to be unused, sometimes you want many functions to take the
+        -- same arguments but you don't use all the arguments in all the functions,
+        -- so kwargs is used to suck up all the extras
+        -- if diagnostic.message == '"kwargs" is not accessed' then
+        -- 	return false
+        -- end
+        --
+        -- Allow variables starting with an underscore
+        -- if string.match(diagnostic.message, '"_.+" is not accessed') then
+        -- 	return false
+        -- end
+
+
+        -- For all messages "is not accessed"
+        if string.match(diagnostic.message, '".+" is not accessed') then
+          return false
+        end
+
+        return true
+      end
+
+      local function custom_on_publish_diagnostics(a, params, client_id, c, config)
+        filter(params.diagnostics, pyright_accessed_filter)
+        vim.lsp.diagnostic.on_publish_diagnostics(a, params, client_id, c, config)
+      end
+
       require('lspconfig').pyright.setup({
         before_init = function(_, config)
           local python_path = get_python_path(config.root_dir)
           config.settings.python.pythonPath = python_path
           vim.g.python_host_prog = python_path
           vim.g.python3_host_prog = python_path
-        end
+        end,
+        on_attach = function(_, _)
+          vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
+            custom_on_publish_diagnostics, {})
+        end,
       })
     end,
     ruff_lsp = function()
@@ -156,7 +202,6 @@ require('mason-lspconfig').setup({
                 "E501", -- line-too-long
                 "E402", -- module-import-not-at-top-of-file
                 "E731", -- lambda-assignment
-                "E402", -- module-import-not-at-top-of-file
               }, ',')
             },
           }
