@@ -9,9 +9,6 @@ end
 
 local common = require('common')
 
--- Reserve space for diagnostic icons
-vim.opt.signcolumn = 'yes:2'
-
 gitsigns.setup {
   signcolumn = true, -- Toggle with `:Gitsigns toggle_signs`
   current_line_blame_opts = {
