@@ -1505,6 +1505,38 @@ local plugins = {
     opts = {},
     cond = not_vscode
   },
+  {
+    "luukvbaal/statuscol.nvim",
+    opts = function()
+      -- based on https://github.com/gxt-kt/dotfiles/blob/77c091f95b360ac65866c2183ac9a9ef1e9dfcb2/lvim/.config/lvim/my_plugins.lua
+      local builtin = require("statuscol.builtin")
+      return {
+        relculright = true,
+        segments = {
+          { text = { "%C" }, click = "v:lua.ScFa" },
+          {
+            sign = { name = { ".*" } },
+            click = "v:lua.ScLa",
+          },
+          {
+            sign = { name = { "Diagnostic" } },
+            click = "v:lua.ScSa"
+          },
+          {
+            text = { builtin.lnumfunc, " " },
+            condition = { true, builtin.not_empty },
+            click = "v:lua.ScLa",
+          },
+          {
+            -- Ref: https://github.com/luukvbaal/statuscol.nvim/issues/71
+            sign = { name = { "GitSign*" } },
+            click = "v:lua.ScLa",
+          },
+        },
+      }
+    end,
+    cond = not_vscode
+  },
   require('debugging'),
 }
 
