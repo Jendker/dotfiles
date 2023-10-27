@@ -105,7 +105,7 @@ vim.api.nvim_create_autocmd({ "BufWritePre" }, {
   end,
 })
 
-vim.g.breakpoints_separate = false
+vim.g.breakpoints_separate = true
 -- Reserve space for diagnostic icons
 if vim.g.breakpoints_separate then
   vim.opt.signcolumn = 'yes:3'
@@ -127,7 +127,7 @@ local function get_signs(buf, lnum)
   for _, sign in pairs(signs_placed) do
     local ret = vim.fn.sign_getdefined(sign.name)[1]
     ret.priority = sign.priority
-    if vim.g.breakpoints_separate and ret.name == "DapBreakpoint" then
+    if vim.g.breakpoints_separate and ret.name:find("Diagnostic") then
       breakpoints[#breakpoints+1] = ret
     else
       signs[#signs+1] = ret
