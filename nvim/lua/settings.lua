@@ -105,9 +105,9 @@ vim.api.nvim_create_autocmd({ "BufWritePre" }, {
   end,
 })
 
-vim.g.breakpoints_separate = false
+vim.g.diagnostics_separate = false
 -- Reserve space for diagnostic icons
-if vim.g.breakpoints_separate then
+if vim.g.diagnostics_separate then
   vim.opt.signcolumn = 'yes:3'
 else
   vim.opt.signcolumn = 'yes'
@@ -115,22 +115,25 @@ end
 
 -- statuscolumn stuff taken and adjusted from https://github.com/LazyVim/LazyVim/blob/7831fc94ca5989baf766c0bb6ad36a70838c3d5a/lua/lazyvim/util/ui.lua
 -- Returns a list of regular and extmark signs sorted by priority (low to high)
----@return Sign[], Sign[]
+---@return Sign[], Sign?, Sign[]
 ---@param buf number
 ---@param lnum number
 local function get_signs(buf, lnum)
   -- Get regular signs
   ---@type Sign[]
   local signs_placed = vim.fn.sign_getplaced(buf, { group = "*", lnum = lnum })[1].signs
-  local signs = {}
-  local breakpoints = {}
+  local other_signs = {}
+  local diagnostic_signs = {}
+  local git_sign = nil
   for _, sign in pairs(signs_placed) do
     local ret = vim.fn.sign_getdefined(sign.name)[1]
     ret.priority = sign.priority
-    if vim.g.breakpoints_separate and ret.name == "DapBreakpoint" then
-      breakpoints[#breakpoints+1] = ret
+    if vim.g.diagnostics_separate and ret.name and ret.name:find("Diagnostic") then
+      diagnostic_signs[#diagnostic_signs+1] = ret
+    elseif ret.name and ret.name:find("GitSign") then
+      git_sign = ret
     else
-      signs[#signs+1] = ret
+      other_signs[#other_signs+1] = ret
     end
   end
 
@@ -143,7 +146,7 @@ local function get_signs(buf, lnum)
     { details = true, type = "sign" }
   )
   for _, extmark in pairs(extmarks) do
-    signs[#signs + 1] = {
+    other_signs[#other_signs + 1] = {
       name = extmark[4].sign_hl_group or "",
       text = extmark[4].sign_text,
       texthl = extmark[4].sign_hl_group,
@@ -152,11 +155,11 @@ local function get_signs(buf, lnum)
   end
 
   -- Sort by priority
-  table.sort(signs, function(a, b)
+  table.sort(other_signs, function(a, b)
     return (a.priority or 0) < (b.priority or 0)
   end)
 
-  return signs, breakpoints
+  return diagnostic_signs, git_sign, other_signs
 end
 
 ---@return Sign?
@@ -188,25 +191,19 @@ function Statuscolumn()
   local is_file = vim.bo[buf].buftype == ""
   local show_signs = vim.wo[win].signcolumn ~= "no"
 
-  local components = { "%C", "", "", "", "" } -- foldcolumn, left, breakpoints, middle, right
+  local components = { "%C", "", "", "", "" } -- foldcolumn, other_signs, diagnostics, line no., git signs
 
   if show_signs then
     local left, right
-    local signs, breakpoints = get_signs(buf, vim.v.lnum)
-    for _, s in ipairs(signs) do
-      if s.name and s.name:find("GitSign") then
-        right = s
-      else
-        left = s
-      end
-    end
+    local diagnostic_signs, git_sign, other_signs = get_signs(buf, vim.v.lnum)
+    right = git_sign
+    left = other_signs[#other_signs]
     if vim.v.virtnum ~= 0 then
       left = nil
       right = nil
     end
-    -- Breakpoints
-    if next(breakpoints) ~= nil then
-      components[3] = icon(breakpoints[1])
+    if next(diagnostic_signs) ~= nil then
+      components[3] = icon(diagnostic_signs[1])
     end
     -- Left: mark or non-git sign
     components[2] = icon(get_mark(buf, vim.v.lnum) or left)
