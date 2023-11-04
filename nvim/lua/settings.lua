@@ -1,5 +1,10 @@
 require "common"
 
+-- Add luarocks to rtp
+local home = vim.uv.os_homedir()
+package.path = package.path .. ";" .. home .. "/.luarocks/share/lua/5.1/?/init.lua;"
+package.path = package.path .. ";" .. home .. "/.luarocks/share/lua/5.1/?.lua;"
+
 -- Clipboard
 vim.opt.clipboard = "unnamedplus"
 
@@ -26,6 +31,8 @@ vim.opt.scrolloff = 4
 vim.opt.termguicolors = true
 vim.opt.laststatus = 3 -- global statusline
 vim.o.updatetime = 200 -- CursorHold time default is 4s. Way too long
+vim.opt.showcmd = false -- prevent flickering if j/k is being held
+vim.opt.title = true -- turn on for tmux and terminal apps tab title
 
 -- don't continue comment on newline
 vim.cmd("autocmd BufEnter * setlocal formatoptions-=cro")

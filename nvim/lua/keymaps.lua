@@ -48,7 +48,15 @@ map("n", "<leader>tf", function()
     vim.notify("Disabled autoformat for the buffer", vim.log.levels.INFO)
   end
 end, { desc = "[T]oggle auto[f]ormat" })
-
+map("n", "<leader>tm", function()
+  if vim.o.mouse == "nvi" then
+    vim.opt.mouse = ""
+    vim.notify("Disabled vim mouse", vim.log.levels.INFO)
+  else
+    vim.opt.mouse = "nvi"
+    vim.notify("Enabled vim mouse", vim.log.levels.INFO)
+  end
+end, { desc = "[T]oggle [m]ouse" })
 -- center after buffer movements
 -- vim.keymap.set("n", "n", "nzzzv")
 -- vim.keymap.set("n", "N", "Nzzzv")
@@ -163,4 +171,45 @@ else
   map("v", "<A-j>", ":m '>+1<cr>gv=gv", { silent = true, desc = "Move down" })
   map("v", "<A-k>", ":m '<-2<cr>gv=gv", { silent = true, desc = "Move up" })
   map("n", "<leader>V", function() vim.system({"code", vim.fn.getcwd()}, {detach=true, cwd=vim.fn.expand('~')}) end, { desc = "Start VSCode in root folder"})
+
+  -- from https://www.reddit.com/r/neovim/comments/17hjcng/comment/k6nywnx/?utm_source=share&utm_medium=web2x&context=3
+  -- Compare clipboard to current buffer
+  vim.api.nvim_create_user_command("NewCleanBufferInSplit", function()
+    vim.cmd([[
+      execute 'vsplit | enew'
+      setlocal buftype=nofile
+      setlocal bufhidden=hide
+      setlocal noswapfile
+    ]])
+  end, { nargs = 0 })
+
+  vim.api.nvim_create_user_command("CompareClipboard", function()
+    local ftype = vim.api.nvim_eval("&filetype") -- original filetype
+    vim.cmd([[
+      tabnew %
+      NewCleanBufferInSplit
+      normal! P
+      windo diffthis
+    ]])
+    vim.cmd("set filetype=" .. ftype)
+  end, { nargs = 0 })
+  vim.keymap.set("n", "<leader>vc", "<cmd>CompareClipboard<cr>", { desc = "Compare clipboard", silent = true })
+  -- Compare clipboard to visual selection
+  vim.api.nvim_create_user_command("CompareClipboardSelection", function()
+    vim.cmd([[
+      " yank visual selection to z register
+      normal! gv"zy
+      " open new tab, set options to prevent save prompt when closing
+      execute 'tabnew | setlocal buftype=nofile bufhidden=hide noswapfile'
+      " paste z register into new buffer
+      normal! V"zp
+      NewCleanBufferInSplit
+      normal! Vp
+      windo diffthis
+    ]])
+  end, {
+    nargs = 0,
+    range = true,
+  })
+  vim.keymap.set("v", "<leader>vc", "<esc><cmd>CompareClipboardSelection<cr>", { desc = "Compare clipboard", silent = true })
 end

@@ -62,8 +62,13 @@ gitsigns.setup {
     map('n', '<leader>tb', gs.toggle_current_line_blame, { desc = "[t]oggle current line [b]lame", silent = true })
     map('n', '<leader>hd', gs.diffthis, { desc = "[d]iff this", silent = true })
     map('n', '<leader>hm', function()
-      gs.change_base(common.getGitMainBranch(), true)
-      vim.notify("Changing base to master. Undo with :Gitsigns change_base HEAD true", vim.log.levels.INFO)
+      local main_branch_name = common.getGitMainBranch()
+      if main_branch_name ~= nil then
+        gs.change_base(main_branch_name, true)
+        vim.notify("Changing base to master. Undo with :Gitsigns reset_base true", vim.log.levels.INFO)
+      else
+        vim.api.nvim_err_writeln("Not a git repository")
+      end
     end, { desc = "Change base to master", silent = true })
     map('n', '<leader>hD', function() gs.diffthis('~') end, { desc = "Diff to previous commit", silent = true })
     map('n', '<leader>td', gs.toggle_deleted, { desc = "[t]oggle [d]eleted", silent = true })

@@ -13,7 +13,13 @@ return {
       'mfussenegger/nvim-dap-python',
 
       -- Miscellaneous
-      'Weissle/persistent-breakpoints.nvim'
+      'Weissle/persistent-breakpoints.nvim',
+      {
+        "theHamsta/nvim-dap-virtual-text",
+        opts = {
+          virt_text_pos = 'eol',
+        },
+      },
     },
     keys = {
       { '<F5>',       function() require('dap').continue() end,          desc = 'Debug: Start/Continue' },
@@ -24,11 +30,11 @@ return {
       { '<F11>',      function() require('dap').step_into() end,         desc = 'Debug: Step into' },
       { '<F10>',      function() require('dap').step_over() end,         desc = 'Debug: Step over' },
       { '<F23>',      function() require('dap').step_out() end,          desc = 'Debug: Step out' }, --SHIFT+F11
-      { '<leader>db', function() require('persistent-breakpoints.api').toggle_breakpoint() end, desc = 'Debug: Toggle breakpoint' },
       { '<F8>',       function() require('persistent-breakpoints.api').toggle_breakpoint() end, desc = 'Debug: Toggle breakpoint' },
-      { '<leader>dc', function() require('persistent-breakpoints.api').set_conditional_breakpoint() end, desc = 'Debug: Set conditional breakpoint' },
-      { '<leader>dr', function() require('persistent-breakpoints.api').clear_all_breakpoints() end, desc = 'Debug: Remove all breakpoints' },
-      { '<leader>dt', function() require('dapui').toggle() end,          desc = 'Debug: UI toggle' },
+      { '<leader>eb', function() require('persistent-breakpoints.api').toggle_breakpoint() end, desc = 'Debug: Toggle breakpoint' },
+      { '<leader>ec', function() require('persistent-breakpoints.api').set_conditional_breakpoint() end, desc = 'Debug: Set conditional breakpoint' },
+      { '<leader>er', function() require('persistent-breakpoints.api').clear_all_breakpoints() end, desc = 'Debug: Remove all breakpoints' },
+      { '<leader>et', function() require('dapui').toggle() end,          desc = 'Debug: UI toggle' },
     },
     config = function()
       local dap = require 'dap'
@@ -80,5 +86,5 @@ return {
       }
     end,
     cond = not_vscode
-  }
+  },
 }

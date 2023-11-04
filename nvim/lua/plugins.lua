@@ -15,17 +15,19 @@ vim.opt.rtp:prepend(lazypath)
 
 local plugins = {
   {
+    'rhysd/clever-f.vim',
+    event = 'VeryLazy',
+    config = function()
+      vim.g.clever_f_smart_case = 1
+    end,
+  },
+  {
     "folke/flash.nvim",
     event = "VeryLazy",
     opts = {
       modes = {
         char = {
-          autohide = function() return vim.fn.mode(true):find("o") end,
-          jump_labels = function(motion)
-            -- Always show jump labels for ftFT if not in operator-pending mode
-            return vim.v.count == 0 and motion:find("[ftFT]") and not vim.fn.mode(true):find("o")
-          end,
-          label = { exclude = "hjkliardcy" },
+          enabled = false,
         },
       },
     },
@@ -162,11 +164,11 @@ local plugins = {
       vim.keymap.set("n", "<leader>hM", function()
           local main_branch_name = common.getGitMainBranch()
           if main_branch_name ~= nil then
-            local keys_string = "<C-W>v<C-W>l<cmd>Gedit " .. main_branch_name .. ":%<cr>"
-            local keys = vim.api.nvim_replace_termcodes(keys_string, true, false, true)
-            vim.api.nvim_feedkeys(keys, 'm', false)
+            local file_path = vim.fn.expand('%')
+            vim.cmd("NewCleanBufferInSplit")
+            vim.cmd("Gedit " .. main_branch_name .. ":" .. file_path)
           else
-            vim.api.nvim_err_writeln("Not git repository")
+            vim.api.nvim_err_writeln("Not a git repository")
           end
         end,
         { desc = "Current file main version" })
@@ -265,19 +267,8 @@ local plugins = {
     'nvim-lualine/lualine.nvim',
     dependencies = { 'nvim-tree/nvim-web-devicons', lazy = true},
     config = function()
-      -- specify lualine_x depending on existance of Noice plugin
+      vim.opt.showmode = false -- don't display mode, e.g. '-- INSERT --', lualine takes care of it
       local lualine_x = {}
-      local is_ok, noice = pcall(require, 'noice')
-      if is_ok then
-        table.insert(lualine_x,
-          {
-            noice.api.status.mode.get,
-            cond = function()
-              -- Don't show if status is e.g. -- INSERT -- or -- VISUAL LINE --
-              return noice.api.status.mode.has() and noice.api.status.mode.get():find("^-- .+ --$") == nil
-            end,
-          })
-      end
       table.insert(lualine_x,
         {
           function()
@@ -550,28 +541,19 @@ local plugins = {
         end
         require("conform").format({ async = true, lsp_fallback = true, range = range })
       end, { range = true })
-      -- python's black does not support range formatting
-      vim.keymap.set('v', '=', function ()
-        if vim.bo.filetype ~= "python" then
+      vim.keymap.set('v', '=', function()
           require("conform").format({async = true, lsp_fallback = true })
           vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<ESC>", true, true, true), "n", true)
           return '<Ignore>'
-        else
-          return '='
-        end
       end, {expr = true})
       vim.keymap.set("n", "==", function()
-        if vim.bo.filetype ~= "python" then
-          conform.format({
-            range = {
-              ["start"] = vim.api.nvim_win_get_cursor(0),
-              ["end"] = vim.api.nvim_win_get_cursor(0),
-            }, async = true, lsp_fallback = true
-          })
-          return '<Ignore>'
-        else
-          return '=='
-        end
+        conform.format({
+          range = {
+            ["start"] = vim.api.nvim_win_get_cursor(0),
+            ["end"] = vim.api.nvim_win_get_cursor(0),
+          }, async = true, lsp_fallback = true
+        })
+        return '<Ignore>'
       end, {expr = true})
       vim.keymap.set("n", "<F3>", function()
         conform.format({ async = true, lsp_fallback = true })
@@ -729,7 +711,7 @@ local plugins = {
       { "<leader>gD",  "<cmd>DiffviewOpen HEAD~<cr>",            desc = "[G]it [D]iff previous commit", nowait = true },
       { "<leader>gr", "<cmd>DiffviewFileHistory<cr>",            desc = "[G]it [r]epo history" },
       { "<leader>gf", "<cmd>DiffviewFileHistory --follow %<cr>", desc = "[G]it [f]ile history" },
-      { "<leader>gm", function() vim.cmd("DiffviewOpen " .. common.getGitMainBranch()) end,            desc = "[G]it diff with [m]aster" },
+      { "<leader>gm", function() vim.cmd("DiffviewOpen " .. (common.getGitMainBranch() or "")) end,            desc = "[G]it diff with [m]aster" },
       { "<leader>gl", "<cmd>.DiffviewFileHistory --follow<CR>",  desc = "[G]it file history for the current [l]ine"},
       { "<leader>gl", "<Esc><cmd>'<,'>DiffviewFileHistory --follow<CR>", mode = 'v',  desc = "[G]it file history for the visual se[l]ection"},
       { "<leader>gc", ":DiffviewOpen <C-R>+<CR>",                desc = "[G]it [c]ommit from clipboard", silent = true},
@@ -747,17 +729,19 @@ local plugins = {
       }
       wk.register({
         mode = { "n", "v" },
+        ["<leader>w"] = { name = "+workspace"},
+        ["<leader>e"] = { name = "+debug"},
+        ["<leader>t"] = { name = "+toogle/tab"},
+        ["<leader>o"] = { name = "+overseer/noice"},
+        -- ["<leader>os"] = { name = "+noice"},
         ["<leader>s"] = { name = "+search" },
         ["<leader>sf"] = { name = "+go to file" },
         ["<leader>sb"] = { name = "+bookmarks" },
-        ["<leader>t"] = { name = "+toogle/tab"},
-        ["<leader>o"] = { name = "+overseer/noice"},
-        ["<leader>os"] = { name = "+noice"},
-        ["<leader>b"] = { name = "+buffer/bookmarks"},
         ["<leader>g"] = { name = "+diffview"},
         ["<leader>h"] = { name = "+hunks"},
-        ["<leader>w"] = { name = "+workspace"},
+        ["<leader>b"] = { name = "+buffer/bookmarks"},
         ["<leader>x"] = { name = "+trouble"},
+        ["<leader>v"] = { name = "+compare"},
       })
     end,
     cond = not_vscode
@@ -777,105 +761,6 @@ local plugins = {
     config = function()
       vim.keymap.set("n", "<leader>u", "<cmd>UndotreeToggle<CR><C-w>h<CR>")
     end,
-    cond = not_vscode
-  },
-  {
-    "folke/noice.nvim",
-    event = "VeryLazy",
-    dependencies = {
-      "MunifTanjim/nui.nvim",
-    },
-    config = function()
-      require("noice").setup({
-        lsp = {
-          -- override markdown rendering so that **cmp** and other plugins use **Treesitter**
-          override = {
-            ["vim.lsp.util.convert_input_to_markdown_lines"] = true,
-            ["vim.lsp.util.stylize_markdown"] = true,
-            ["cmp.entry.get_documentation"] = true,
-          },
-          hover = {
-            enabled = false
-          },
-          signature = {
-            enabled = false,
-          },
-          progress = {
-            enabled = false,
-          }
-        },
-        -- you can enable a preset for easier configuration
-        presets = {
-          bottom_search = true, -- use a classic bottom cmdline for search
-          command_palette = true, -- position the cmdline and popupmenu together
-          long_message_to_split = true, -- if long messages should be sent to a split
-        },
-        messages = {
-          enabled = true,
-          view_search = "mini",
-        },
-        views = {
-          mini = {
-            timeout = 2500
-          }
-        },
-        routes = {
-          {
-            filter = {
-              event = "msg_show",
-              any = {
-                { find = "%d+L, %d+B" },
-                { find = "; after #%d+" },
-                { find = "; before #%d+" },
-              },
-            },
-            view = "mini",
-          },
-          {
-            filter = {
-              event = "msg_show",
-              any = {
-                { find = "Keyboard interrupt" },
-              },
-            },
-            opts = { skip = true },
-          },
-        },
-        commands = {
-          history = {
-            filter = {
-              any = {
-                { event = "notify" },
-                { error = true },
-                { warning = true },
-                { event = "msg_show", kind = {"", "echo" } },
-                { event = "lsp", kind = "message" },
-              },
-            },
-            filter_opts = { count = 500 },
-          },
-          -- :Noice last
-          last = {
-            filter = {
-              any = {
-                { event = "notify" },
-                { error = true },
-                { warning = true },
-                { event = "msg_show", kind = {"", "echo" } },
-                { event = "lsp", kind = "message" },
-              },
-            },
-            filter_opts = { count = 1 },
-          },
-        }
-      })
-    end,
-    keys = {
-      { "<leader>osl", function() require("noice").cmd("last") end, desc = "N[o]ice [s]how [l]ast message" },
-      { "<leader>osh", function() require("noice").cmd("history") end, desc = "N[o]ice [s]how [h]istory" },
-      { "<leader>osa", function() require("noice").cmd("all") end, desc = "N[o]ice [s]how [a]ll" },
-      { "<leader>osm", "<cmd>:messages<cr>", desc = ":messages" },
-    },
     cond = not_vscode
   },
   {
@@ -1202,12 +1087,13 @@ local plugins = {
     keys = {
       { "<leader>R", function() require("spectre").open() end, desc = "[R]eplace in files (Spectre)" },
       { "<leader>R", '<esc><cmd>lua require("spectre").open_visual()<CR>', mode = 'v', desc = "[R]eplace selection (Spectre)" },
-    }
+    },
+    cond = not_vscode
   },
   {
     'xiyaowong/virtcolumn.nvim',
-    cond = not_vscode,
-    config = function() vim.cmd("autocmd filetype python setlocal colorcolumn=88") end,
+    config = function() vim.cmd("autocmd FileType python setlocal colorcolumn=88") end,
+    cond = not_vscode
   },
   {
     "folke/todo-comments.nvim",
@@ -1418,6 +1304,7 @@ local plugins = {
         bang = true,
       })
     end,
+    cond = not_vscode
   },
   {
     -- Prettier vim.ui.select() and vim.ui.input()
