@@ -39,8 +39,13 @@ vim.cmd("autocmd BufEnter * setlocal formatoptions-=cro")
 
 vim.g.mapleader = " "
 
--- nicer diff markings
-vim.opt.fillchars = vim.opt.fillchars + 'diff:╱'
+-- nicer markings
+vim.opt.fillchars = {
+  foldopen = "",
+  foldclose = "",
+  fold = " ",
+  diff = "╱",
+}
 
 vim.opt.spelllang = 'en_us'
 
@@ -238,3 +243,54 @@ if vim.fn.has("nvim-0.9.0") == 1 then
   vim.opt.statuscolumn = [[%!v:lua.Statuscolumn()]]
 end
 ---- end of statuscolumn stuff
+
+-- folding
+local skip_foldexpr = {} ---@type table<number,boolean>
+local skip_check = assert(vim.loop.new_check())
+
+-- TODO maybe make it a separate module, similarly like folke?
+-- https://github.com/LazyVim/LazyVim/blob/68ff818a5bb7549f90b05e412b76fe448f605ffb/lua/lazyvim/util/ui.lua#L147
+function Foldexpr()
+  local buf = vim.api.nvim_get_current_buf()
+
+  -- still in the same tick and no parser
+  if skip_foldexpr[buf] then
+    return "0"
+  end
+
+  -- don't use treesitter folds for non-file buffers
+  if vim.bo[buf].buftype ~= "" then
+    return "0"
+  end
+
+  -- as long as we don't have a filetype, don't bother
+  -- checking if treesitter is available (it won't)
+  if vim.bo[buf].filetype == "" then
+    return "0"
+  end
+
+  local ok = pcall(vim.treesitter.get_parser, buf)
+
+  if ok then
+    return vim.treesitter.foldexpr()
+  end
+
+  -- no parser available, so mark it as skip
+  -- in the next tick, all skip marks will be reset
+  skip_foldexpr[buf] = true
+  skip_check:start(function()
+    skip_foldexpr = {}
+    skip_check:stop()
+  end)
+  return "0"
+end
+
+-- use tree-sitter for folding. If needed to use normal folding, run :set foldmethod=syntax
+vim.opt.foldmethod = "expr"
+if vim.fn.has("nvim-0.10") == 1 then
+  vim.opt.foldexpr = "v:lua.Foldexpr()"
+else
+  vim.opt.foldexpr = "nvim_treesitter#foldexpr()"
+end
+vim.opt.foldlevelstart = 99 -- don't fold by default
+-- end folding

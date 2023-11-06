@@ -826,7 +826,7 @@ local plugins = {
   {
     "rmagatti/auto-session",
     init = function()
-      vim.o.sessionoptions=vim.o.sessionoptions .. ",winpos,terminal,folds"
+      vim.o.sessionoptions = vim.o.sessionoptions .. ",winpos"
     end,
     opts = {
       pre_save_cmds =
@@ -1123,16 +1123,6 @@ local plugins = {
   --   },
   --   cond = not_vscode,
   -- },
-  {
-    'kevinhwang91/nvim-ufo',
-    event = "BufReadPost",
-    dependencies = {'kevinhwang91/promise-async'},
-    config = function()
-      require('config_plugins.folds').setup()
-      vim.opt.fillchars = vim.opt.fillchars + 'foldopen:,foldclose:'
-    end,
-    cond = not_vscode,
-  },
   {
     'mfussenegger/nvim-lint',
     ft = {
