@@ -47,6 +47,8 @@ vim.opt.fillchars = {
   diff = "╱",
 }
 
+vim.opt.sessionoptions = { "buffers", "curdir", "tabpages", "winsize", "help", "globals", "skiprtp", "folds" }
+
 vim.opt.spelllang = 'en_us'
 
 local function augroup(name)

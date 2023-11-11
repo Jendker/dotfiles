@@ -127,3 +127,13 @@ vim.keymap.set('n', '<leader>sl',
     })
   ), { desc = 'Search with [l]ive grep' }
 )
+vim.keymap.set('n', '<leader>sg', function()
+  local git_root = common.getGitRoot()
+  if git_root then
+    require('telescope.builtin').live_grep({
+      search_dirs = {git_root},
+    })
+  else
+    vim.api.nvim_err_writeln("Not a git repository")
+  end
+end, {desc = 'Search with live grep on [g]it root'})

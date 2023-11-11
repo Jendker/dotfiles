@@ -15,8 +15,8 @@ require('nvim-treesitter.configs').setup({
         ["if"] = "@function.inner",
         ["ac"] = "@class.outer",
         ["ic"] = "@class.inner",
-        ["aj"] = "@conditional.outer",
-        ["ij"] = "@conditional.inner",
+        ["ai"] = "@conditional.outer",
+        ["ii"] = "@conditional.inner",
         ["ao"] = "@loop.outer",
         ["io"] = "@loop.inner",
       },
@@ -83,9 +83,9 @@ require('nvim-treesitter.configs').setup({
     disable_virtual_text = vscode,
   },
 })
-local ts_repeat_move = require "nvim-treesitter.textobjects.repeatable_move"
 
 -- Repeat movement with ; and ,
 -- vim way: ; goes to the direction you were moving.
+local ts_repeat_move = require "nvim-treesitter.textobjects.repeatable_move"
 vim.keymap.set({ "n", "x", "o" }, ";", ts_repeat_move.repeat_last_move, {silent = true})
 vim.keymap.set({ "n", "x", "o" }, ",", ts_repeat_move.repeat_last_move_opposite, {silent = true})

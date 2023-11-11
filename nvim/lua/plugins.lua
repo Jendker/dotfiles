@@ -85,7 +85,6 @@ local plugins = {
     dependencies = {
       "kana/vim-textobj-entire",             -- e - entire
       "kana/vim-textobj-line",               -- l - line
-      "kana/vim-textobj-indent",             -- i - indent block, I - same indent (won't select sub indent)
       "Julian/vim-textobj-variable-segment", -- v - segment
     },
   },
@@ -149,9 +148,6 @@ local plugins = {
   {
       'lewis6991/spaceless.nvim',
       event = 'VeryLazy',
-      config = function()
-          require'spaceless'.setup()
-      end,
       cond = not_vscode
   },
   {
@@ -252,6 +248,7 @@ local plugins = {
           IlluminatedWordWrite = {bg = '$bg2'},
           IblIndent = { fg = '$bg3', fmt = "nocombine" },
           MsgArea = { fg = '$fg' },
+          MatchParen = {fg = '$orange', bg = 'none', fmt = "bold" },
         }
       }
       onedark.load()
@@ -400,10 +397,9 @@ local plugins = {
 
       -- search
       {'<leader>sl', desc = 'Search with [l]ive grep'},
-      {'<leader>sg', "<cmd>lua require('telescope').extensions.menufacture.grep_string({ search = vim.fn.input('Grep > ') })<cr>", 'n', desc = "Search after [g]rep with string"},
+      {'<leader>sg', 'n', desc = 'Search with live grep on [g]it root'},
       {'<leader>sh', "<cmd>lua require('telescope.builtin').help_tags()<cr>", 'n', desc = 'Search [h]elp'},
       {'<leader>sd', "<cmd>lua require('telescope.builtin').diagnostics()<cr>", 'n', desc = 'Search [d]iagnostics'},
-      {'<leader>so', "<cmd>lua require('telescope').extensions.menufacture.live_grep({grep_open_files=true})<cr>", 'n', desc = 'Search with live grep in [o]pen buffers'},
       {'<leader>sr', "<cmd>lua require('telescope.builtin').resume()<cr>", 'n', desc = 'Search [r]esume'},
       {'<leader>ss', "<cmd>lua require('telescope.builtin').lsp_document_symbols()<cr>", '[s]ymbols in document'},
       {'<leader>sS', "<cmd>lua require('telescope.builtin').lsp_dynamic_workspace_symbols()<cr>", '[S]ymbols in workspace'},
@@ -824,13 +820,12 @@ local plugins = {
   },
   {"tpope/vim-sleuth", init = function() vim.g.sleuth_cpp_heuristics = 0 end, cond = not_vscode}, -- automatically detect tabwidth
   {
-    "rmagatti/auto-session",
-    init = function()
-      vim.o.sessionoptions = vim.o.sessionoptions .. ",winpos"
-    end,
+    -- from https://github.com/madmaxieee/nvim-config/blob/e6933861623375/lua/custom/autocmd/persistence.lua#L4
+    "folke/persistence.nvim",
     opts = {
-      pre_save_cmds =
-      { function()
+      dir = vim.fn.expand(vim.fn.stdpath "state" .. "/sessions/"), -- directory where session files are saved
+      options = vim.opt.sessionoptions:get(),    -- sessionoptions used for saving
+      pre_save = function()
         local tabpages = vim.api.nvim_list_tabpages()
         for _, tabpage in ipairs(tabpages) do
           local windows = vim.api.nvim_tabpage_list_wins(tabpage)
@@ -850,23 +845,43 @@ local plugins = {
             end
           end
         end
-      end },
-      post_restore_cmds =
-      { function()
-        -- close if buffer is empty and is not the last window
-        local tabpages = vim.api.nvim_list_tabpages()
-        for _, tabpage in ipairs(tabpages) do
-          local windows = vim.api.nvim_tabpage_list_wins(tabpage)
-          for _, window in ipairs(windows) do
-            local buffer = vim.api.nvim_win_get_buf(window)
-            if common.bufferEmpty(buffer) and #vim.api.nvim_list_wins() ~= 1 then
-              vim.api.nvim_win_close(window, false)
-            end
-          end
-        end
-      end }
+      end,
     },
-    cond = not_vscode,
+    config = function(_, opts)
+      require('persistence').setup(opts)
+      local persistence_group = vim.api.nvim_create_augroup("Persistence", { clear = true })
+
+      -- disable persistence for certain directories
+      local home = vim.uv.os_homedir()
+      local disabled_dirs = {
+        [home] = true,
+        [home .. "/Downloads"] = true,
+        ["/private/tmp"] = true,
+        ["/tmp"] = true,
+      }
+
+      vim.api.nvim_create_autocmd({ "VimEnter" }, {
+        group = persistence_group,
+        callback = function()
+          local cwd = vim.fn.getcwd()
+          if vim.fn.argc() == 0 and not vim.g.started_with_stdin and not disabled_dirs[cwd] then
+            require("persistence").load()
+          else
+            require("persistence").stop()
+          end
+        end,
+        nested = true,
+      })
+
+      -- disable persistence if nvim started with stdin
+      vim.api.nvim_create_autocmd({ "StdinReadPre" }, {
+        group = persistence_group,
+        callback = function()
+          vim.g.started_with_stdin = true
+        end,
+      })
+    end,
+    cond = not_vscode
   },
   {
     "chrisgrieser/nvim-early-retirement",
@@ -1081,6 +1096,7 @@ local plugins = {
   },
   {
     "nvim-pack/nvim-spectre",
+    build = false,
     cmd = "Spectre",
     opts = { open_cmd = "noswapfile vnew" },
     -- stylua: ignore
