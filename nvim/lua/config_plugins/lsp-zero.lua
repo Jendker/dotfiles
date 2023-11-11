@@ -13,6 +13,8 @@ end
 local auto_lsp_servers = {
   -- @see $VIMPLUG/mason-lspconfig.nvim/lua/mason-lspconfig/mappings/filetype.lua
   -- list of LSP servers -- https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md
+  -- list of formatters -- https://github.com/jay-babu/mason-null-ls.nvim/blob/main/lua/mason-null-ls/mappings/filetype.lua
+  -- list of DAP mappings -- https://github.com/jay-babu/mason-nvim-dap.nvim/blob/main/lua/mason-nvim-dap/mappings/filetypes.lua
   ['pyright'] = true,
   ['debugpy'] = true,
   ['ruff_lsp'] = true,
@@ -23,6 +25,8 @@ local auto_lsp_servers = {
   ['tsserver'] = true,
   ['cssls'] = true,
   ['clangd'] = true,
+  ['codelldb'] = true, -- cpp debugger
+  ['cpptools'] = true, -- cpp debugger
   ['rust_analyzer'] = true,
   ['texlab'] = true,
   ['yamlls'] = true,
@@ -254,9 +258,20 @@ local function ensure_mason_installed()
   local filetype_mappings = require("mason-lspconfig.mappings.filetype")
   local formatter_filetype_mappings = require("mason-null-ls.mappings.filetype")
   filetype_mappings = mergeTablesWithLists(filetype_mappings, formatter_filetype_mappings)
-  local debugger_filetype_mappings = require("mason-nvim-dap.mappings.source").nvim_dap_to_package
-  for key, val in pairs(debugger_filetype_mappings) do
-    debugger_filetype_mappings[key] = {val}
+  local debugger_filetype_mappings_flipped = require("mason-nvim-dap.mappings.filetypes")
+  local debugger_filetype_dap_to_pkg = require("mason-nvim-dap.mappings.source").nvim_dap_to_package
+  local debugger_filetype_mappings = {}
+  for debugger, filetypes in pairs(debugger_filetype_mappings_flipped) do
+    -- TODO may need to do the same thing with formatters above
+    if debugger_filetype_dap_to_pkg[debugger] ~= nil then
+      debugger = debugger_filetype_dap_to_pkg[debugger]
+    end
+    for _, filetype in pairs(filetypes) do
+      if debugger_filetype_mappings[filetype] == nil then
+        debugger_filetype_mappings[filetype] = {}
+      end
+      table.insert(debugger_filetype_mappings[filetype], debugger)
+    end
   end
   filetype_mappings = mergeTablesWithLists(filetype_mappings, debugger_filetype_mappings)
   local _requested = {}

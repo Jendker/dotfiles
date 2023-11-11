@@ -48,25 +48,7 @@ return {
 
       -- Dap UI setup
       -- For more information, see |:help nvim-dap-ui|
-      dapui.setup {
-        -- Set icons to characters that are more likely to work in every terminal.
-        --    Feel free to remove or use ones that you like more! :)
-        --    Don't feel like these are good choices.
-        icons = { expanded = '▾', collapsed = '▸', current_frame = '*' },
-        controls = {
-          icons = {
-            pause = '⏸',
-            play = '▶',
-            step_into = '⏎',
-            step_over = '⏭',
-            step_out = '⏮',
-            step_back = 'b',
-            run_last = '▶▶',
-            terminate = '⏹',
-            disconnect = '⏏',
-          },
-        },
-      }
+      dapui.setup({})
 
       dap.listeners.after.event_initialized['dapui_config'] = dapui.open
       dap.listeners.before.event_terminated['dapui_config'] = dapui.close
@@ -75,6 +57,143 @@ return {
       -- Set up adapter specific configs
       require('dap-go').setup()
       require('dap-python').setup(vim.fn.stdpath('data') .. "/mason/packages/debugpy/venv/bin/python3")
+      -- a lot of it comes from https://github.com/mfussenegger/dotfiles/blob/488c0a432ee8b569806707eae260055576777017/vim/.config/nvim/lua/me/dap.lua
+      local last_program = vim.fn.getcwd() .. '/'
+      local function program()
+        local this_program = vim.fn.input({
+          prompt = 'Path to executable: ',
+          default = last_program,
+          completion = 'file'
+        })
+        last_program = this_program
+        return this_program
+      end
+      local last_args = ""
+      local function args()
+        local this_args = vim.fn.input({
+          prompt = 'Arguments: ',
+          default = last_args,
+        })
+        last_args = this_args
+        return vim.split(this_args, " ")
+      end
+      local configs = {
+        {
+          name = "cppdbg: Launch",
+          type = "cppdbg",
+          request = "launch",
+          program = program,
+          cwd = '${workspaceFolder}',
+          args = {},
+        },
+        {
+          name = "cppdbg: Launch with args",
+          type = "cppdbg",
+          request = "launch",
+          program = program,
+          cwd = '${workspaceFolder}',
+          args = args,
+        },
+        {
+          name = "cppdbg: Attach",
+          type = "cppdbg",
+          request = "Attach",
+          processId = function()
+            return tonumber(vim.fn.input({ prompt = "Pid: "}))
+          end,
+          program = program,
+          cwd = '${workspaceFolder}',
+          args = {},
+        },
+        {
+          name = "codelldb: Launch",
+          type = "codelldb",
+          request = "launch",
+          program = program,
+          cwd = '${workspaceFolder}',
+          args = {},
+        },
+        {
+          name = "codelldb: Launch with args",
+          type = "codelldb",
+          request = "launch",
+          program = program,
+          cwd = '${workspaceFolder}',
+          args = args,
+        },
+        {
+          name = "codelldb: Attach (select process)",
+          type = 'codelldb',
+          request = 'attach',
+          pid = require('dap.utils').pick_process,
+          args = {},
+        },
+        {
+          name = "codelldb: Attach (input pid)",
+          type = 'codelldb',
+          request = 'attach',
+          pid = function()
+            return tonumber(vim.fn. input({ prompt = 'pid: '}))
+          end,
+          args = {},
+        },
+        {
+          name = "lldb: Launch (integratedTerminal)",
+          type = "lldb",
+          request = "launch",
+          program = program,
+          cwd = '${workspaceFolder}',
+          stopOnEntry = false,
+          args = {},
+          runInTerminal = true,
+        },
+        {
+          name = "lldb: Launch (console)",
+          type = "lldb",
+          request = "launch",
+          program = program,
+          cwd = '${workspaceFolder}',
+          stopOnEntry = false,
+          args = {},
+          runInTerminal = false,
+        },
+        {
+          name = "lldb: Attach to process",
+          type = 'lldb',
+          request = 'attach',
+          pid = require('dap.utils').pick_process,
+          args = {},
+        },
+      }
+      dap.adapters.cppdbg = {
+        id = 'cppdbg',
+        type = 'executable',
+        command = vim.fn.stdpath('data') .. '/mason/packages/cpptools/extension/debugAdapters/bin/OpenDebugAD7',
+      }
+      dap.adapters.codelldb = {
+        type = 'server',
+        port = "${port}",
+        executable = {
+          command = vim.fn.stdpath('data') .. '/mason/packages/codelldb/extension/adapter/codelldb',
+          args = {"--port", "${port}"},
+        }
+      }
+      dap.adapters.lldb = {
+        type = 'executable',
+        command = '/usr/bin/lldb-vscode',
+        name = "lldb"
+      }
+      dap.configurations.c = configs
+      dap.configurations.rust = configs
+      dap.configurations.cpp = configs
+      require('dap.ext.vscode').type_to_filetypes = {
+        lldb = { 'rust', 'c', 'cpp' },
+      }
+      vim.schedule(function()
+        require("dap.ext.vscode").json_decode = require("overseer.json").decode
+        require("dap.ext.vscode").load_launchjs(nil, { node = { "typescript", "javascript" } })
+        require("overseer").patch_dap(true)
+      end)
     end,
     cond = not_vscode
   },
