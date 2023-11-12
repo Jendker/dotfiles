@@ -1041,9 +1041,10 @@ local plugins = {
     cond = not_vscode
   },
   {
-    'simrat39/symbols-outline.nvim',
-    keys = { {'<leader>bo', '<cmd>SymbolsOutline<CR>', 'n', desc = "[b]uffer symbols [o]outline"} },
-    opts = { auto_close = true, },
+    'hedyhli/outline.nvim',
+    cmd = { "Outline", "OutlineOpen" },
+    keys = { {'<leader>bo', '<cmd>Outline<CR>', 'n', desc = "[b]uffer symbols [o]outline"} },
+    opts = { outline_window = { auto_close = true, auto_goto = true, }, },
     cond = not_vscode,
   },
   {
