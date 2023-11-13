@@ -1142,9 +1142,7 @@ local plugins = {
   -- },
   {
     'mfussenegger/nvim-lint',
-    ft = {
-      "json",
-    },
+    event = 'VeryLazy',
     opts = {
       linters_by_ft = {
         json = {'jsonlint'},
@@ -1153,6 +1151,14 @@ local plugins = {
     config = function(_, opts)
       -- some code from https://github.com/stevearc/dotfiles/blob/2fcdaf586372a9809d3015c0cd58675a53fe0b48/.config/nvim/lua/plugins/lint.lua#L32
       local lint = require('lint')
+      vim.g.try_lint = function(args)
+        args = args or {}
+        lint.try_lint(nil, args)
+        if vim.g.codespell_active then
+          lint.try_lint("codespell", args)
+        end
+      end
+      vim.g.codespell_active = true -- enabled by default
       lint.linters_by_ft = opts.linters_by_ft
       local timer = assert(vim.uv.new_timer())
       local DEBOUNCE_MS = 500
@@ -1166,18 +1172,28 @@ local plugins = {
             DEBOUNCE_MS,
             0,
             vim.schedule_wrap(function()
-              if vim.api.nvim_buf_is_valid(bufnr) then
+              if vim.api.nvim_buf_is_valid(bufnr) and not vim.bo[bufnr].readonly then
                 vim.api.nvim_buf_call(bufnr, function()
-                  lint.try_lint(nil, { ignore_errors = true })
+                  vim.g.try_lint()
                 end)
               end
             end)
           )
         end,
       })
-      lint.try_lint(nil, { ignore_errors = true })
+      vim.g.try_lint({ ignore_errors = true })
       vim.keymap.set('n', '[d', vim.diagnostic.goto_prev)
       vim.keymap.set('n', ']d', vim.diagnostic.goto_next)
+      vim.keymap.set('n', '<leader>ts', function()
+        vim.g.codespell_active = not vim.g.codespell_active
+        if vim.g.codespell_active then
+          vim.notify("Enabled codespell", vim.log.levels.INFO)
+          vim.g.try_lint()
+        else
+          vim.notify("Disabled codespell", vim.log.levels.INFO)
+          vim.diagnostic.reset(nil, 0)
+        end
+      end, {desc = "[T]oggle code[s]pell"})
     end,
     cond = not_vscode
   },

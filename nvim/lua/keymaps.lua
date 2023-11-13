@@ -83,7 +83,6 @@ map("v", "<", "<gv")
 map("v", ">", ">gv")
 
 -- toggle settings
-map("n", "<leader>ts", function() toggle("spell", true) end, { desc = "[T]oggle [s]pelling" })
 map("n", "<leader>tw", function() toggle("wrap") end, { desc = "[T]oggle word [w]rap" })
 map("n", "<leader>to", function() vim.cmd("ASToggle"); require('gitsigns').toggle_current_line_blame() end, { desc = "[T]oggle development [o]ptions" })
 if vim.fn.has("nvim-0.9.0") == 1 then
