@@ -33,8 +33,7 @@ local plugins = {
     },
     -- stylua: ignore
     keys = {
-      { "s", mode = { "n", "v" }, function() require("flash").jump({ search = { forward = true, wrap = false, multi_window = false } }) end, desc = "Forward flash" },
-      { "S", mode = { "n" }, function() require("flash").jump({ search = { forward = false, wrap = false, multi_window = false } }) end, desc = "Backwards flash" },
+      { "s", mode = { "n", "v" }, function() require("flash").jump() end, desc = "Flash" },
       { "<c-s>", mode = { "n", "x", "o" }, function() require("flash").treesitter() end, desc = "Flash Treesitter" },
       { "r", mode = "o", function() require("flash").remote() end, desc = "Remote Flash" },
       { "R", mode = { "o", "x" }, function() require("flash").treesitter_search() end, desc = "Treesitter Search" },
@@ -186,7 +185,6 @@ local plugins = {
     dependencies = { "nvim-tree/nvim-web-devicons" },
     config = function()
       require("oil").setup({default_file_explorer = false})
-      vim.keymap.set("n", "-", require("oil").open, { desc = "Open parent directory" })
       vim.keymap.set("n", "<leader>pv", require("oil").open, { desc = "Open directory view" })
     end,
     cond = not_vscode
@@ -384,6 +382,7 @@ local plugins = {
   {
     'nvim-telescope/telescope.nvim',
     cmd = 'Telescope',
+    branch = '0.1.x',
     keys = {
       -- bookmarks
       {'<leader>sB', "<cmd>lua require('telescope').extensions.vim_bookmarks.all()<cr>", 'n', desc = "Show [b]ookmarks in workspace"},
@@ -667,6 +666,7 @@ local plugins = {
             diff_buf_read = function(_)
               -- Change local options in diff buffers
               vim.opt_local.wrap = false -- wrapping causes hunk misalignment
+              require('gitsigns').reset_base()
             end,
           },
           keymaps = {
@@ -977,6 +977,8 @@ local plugins = {
             ['l'] = actions.jump,
             ['h'] = actions.close_fold,
             ['<C-c>'] = actions.close,
+            ['<C-n>'] = actions.next,
+            ['<C-p>'] = actions.previous,
           },
         },
       })
@@ -1172,7 +1174,7 @@ local plugins = {
             DEBOUNCE_MS,
             0,
             vim.schedule_wrap(function()
-              if vim.api.nvim_buf_is_valid(bufnr) and not vim.bo[bufnr].readonly then
+              if vim.api.nvim_buf_is_valid(bufnr) and vim.bo[bufnr].modifiable then
                 vim.api.nvim_buf_call(bufnr, function()
                   vim.g.try_lint()
                 end)

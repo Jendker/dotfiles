@@ -23,7 +23,7 @@ return {
     },
     keys = {
       { '<F5>',       function() require('dap').continue() end,          desc = 'Debug: Start/Continue' },
-      { '<F17>',      function() require('dap').close() end,             desc = 'Debug: Stop' },     -- SHIFT+F5
+      { '<F17>',      function() require('dap').terminate() end,         desc = 'Debug: Stop' }, -- SHIFT+F5
       { '<F29>',      function() require('dap').run_last() end,          desc = 'Debug: Run last' }, -- CTRL+F5
       { '<F6>',       function() require('dap').pause() end,             desc = 'Debug: Pause' },
       { '<F9>',       function() require('dap').continue() end,          desc = 'Debug: Start/Continue' },
@@ -35,6 +35,8 @@ return {
       { '<leader>ec', function() require('persistent-breakpoints.api').set_conditional_breakpoint() end, desc = 'Debug: Set conditional breakpoint' },
       { '<leader>er', function() require('persistent-breakpoints.api').clear_all_breakpoints() end, desc = 'Debug: Remove all breakpoints' },
       { '<leader>et', function() require('dapui').toggle() end,          desc = 'Debug: UI toggle' },
+      { '<leader>ee', function() require('dapui').eval() end, mode = {'n', 'x'},    desc = 'Debug: Eval current expression' },
+      { '<leader>ei', function() require('dapui').eval(vim.fn.input("Expression to eval: ")) end, mode = {'n', 'x'},    desc = 'Debug: Eval input expression' },
     },
     config = function()
       local dap = require 'dap'
@@ -133,7 +135,7 @@ return {
           type = 'codelldb',
           request = 'attach',
           pid = function()
-            return tonumber(vim.fn. input({ prompt = 'pid: '}))
+            return tonumber(vim.fn.input({ prompt = 'pid: '}))
           end,
           args = {},
         },
