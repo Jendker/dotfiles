@@ -10,7 +10,7 @@ end
 -- List LSP servers that will be automatically installed upon entering filetype for the first time.
 -- LSP servers will be installed locally via mason at: ~/.local/share/nvim/mason/packages/
 -- (lspconfig_name => { filetypes } or true)
-local auto_lsp_servers = {
+local auto_filetype_packages = {
   -- @see $VIMPLUG/mason-lspconfig.nvim/lua/mason-lspconfig/mappings/filetype.lua
   -- list of LSP servers -- https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md
   -- list of formatters -- https://github.com/jay-babu/mason-null-ls.nvim/blob/main/lua/mason-null-ls/mappings/filetype.lua
@@ -34,6 +34,10 @@ local auto_lsp_servers = {
   ['lemminx'] = true,  -- xml
   ['gopls'] = true,
   ['prettierd'] = true,
+}
+
+local always_installed = {
+  'codespell'
 }
 
 --  This function gets run when an LSP connects to a particular buffer.
@@ -274,51 +278,58 @@ local function ensure_mason_installed()
     end
   end
   filetype_mappings = mergeTablesWithLists(filetype_mappings, debugger_filetype_mappings)
+
   local _requested = {}
 
-  local ft_handler = {}
-  for ft, lsp_names in pairs(filetype_mappings) do
-    lsp_names = vim.tbl_filter(function(lsp_name)
-      return auto_lsp_servers[lsp_name] == true or vim.tbl_contains(auto_lsp_servers[lsp_name] or {}, lsp_name)
-    end, lsp_names)
-
-    ft_handler[ft] = vim.schedule_wrap(function()
-      for _, lsp_name in pairs(lsp_names) do
-        local pkg_name = lspconfig_to_package[lsp_name]
-        local is_lsp_server = true
-        if pkg_name == nil then
-          -- in case it's a linter or formatter
-          pkg_name = lsp_name
-          is_lsp_server = false
-        end
-        local ok, pkg = pcall(require("mason-registry").get_package, pkg_name)
-        if ok and not pkg:is_installed() and not _requested[pkg_name] then
-          _requested[pkg_name] = true
-          vim.notify_once(string.format("Installating [%s]...", pkg_name), vim.log.levels.INFO)
-          pkg:install():once("closed", function()
-            if pkg:is_installed() then
-              vim.schedule(function()
-                vim.notify_once(string.format("Installation complete for [%s]", pkg_name), vim.log.levels.INFO)
-                if is_lsp_server then
-                  lsp_zero.setup_servers({lsp_name})
-                end
-              end)
+  local function installPackage(package_name)
+    local lsp_pkg_name = lspconfig_to_package[package_name]
+    local mason_package_name = package_name
+    if (lsp_pkg_name ~= nil) then
+      mason_package_name = lsp_pkg_name
+    end
+    local ok, pkg = pcall(require("mason-registry").get_package, mason_package_name)
+    if ok and not pkg:is_installed() and not _requested[mason_package_name] then
+      _requested[mason_package_name] = true
+      vim.notify_once(string.format("Installating [%s]...", mason_package_name), vim.log.levels.INFO)
+      pkg:install():once("closed", function()
+        if pkg:is_installed() then
+          vim.schedule(function()
+            vim.notify_once(string.format("Installation complete for [%s]", mason_package_name), vim.log.levels.INFO)
+            if lsp_pkg_name ~= nil then
+              -- is LSP server
+              lsp_zero.setup_servers({ package_name })
             end
           end)
         end
+      end)
+    end
+  end
+
+  local ft_handler = {}
+  for ft, package_names in pairs(filetype_mappings) do
+    package_names = vim.tbl_filter(function(package_name)
+      return auto_filetype_packages[package_name] == true or vim.tbl_contains(auto_filetype_packages[package_name] or {}, package_name)
+    end, package_names)
+
+    ft_handler[ft] = vim.schedule_wrap(function()
+      for _, package_name in pairs(package_names) do
+        installPackage(package_name)
       end
     end)
 
     -- Create FileType handler to auto-install LSPs for the &filetype
-    if vim.tbl_count(lsp_names) > 0 then
+    if vim.tbl_count(package_names) > 0 then
       vim.api.nvim_create_autocmd('FileType', {
         pattern = ft,
         group = augroup,
-        desc = string.format('Auto-install LSP server: %s (for %s)', table.concat(lsp_names, ","), ft),
+        desc = string.format('Auto-install LSP server: %s (for %s)', table.concat(package_names, ","), ft),
         callback = function() ft_handler[ft]() end,
         once = true,
       })
     end
+  end
+  for _, package_name in pairs(always_installed) do
+    installPackage(package_name)
   end
 end
 

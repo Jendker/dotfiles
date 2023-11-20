@@ -1157,7 +1157,7 @@ local plugins = {
         args = args or {}
         lint.try_lint(nil, args)
         if vim.g.codespell_active then
-          lint.try_lint("codespell", args)
+          lint.try_lint("codespell", {ignore_errors = true})
         end
       end
       vim.g.codespell_active = true -- enabled by default
