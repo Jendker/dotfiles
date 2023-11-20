@@ -10,7 +10,7 @@ end
 -- List LSP servers that will be automatically installed upon entering filetype for the first time.
 -- LSP servers will be installed locally via mason at: ~/.local/share/nvim/mason/packages/
 -- (lspconfig_name => { filetypes } or true)
-local auto_lsp_servers = {
+local auto_filetype_lsp_servers = {
   -- @see $VIMPLUG/mason-lspconfig.nvim/lua/mason-lspconfig/mappings/filetype.lua
   -- list of LSP servers -- https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md
   -- list of formatters -- https://github.com/jay-babu/mason-null-ls.nvim/blob/main/lua/mason-null-ls/mappings/filetype.lua
@@ -34,6 +34,10 @@ local auto_lsp_servers = {
   ['lemminx'] = true,  -- xml
   ['gopls'] = true,
   ['prettierd'] = true,
+}
+
+local always_installed = {
+  'codespell'
 }
 
 --  This function gets run when an LSP connects to a particular buffer.
@@ -279,7 +283,7 @@ local function ensure_mason_installed()
   local ft_handler = {}
   for ft, lsp_names in pairs(filetype_mappings) do
     lsp_names = vim.tbl_filter(function(lsp_name)
-      return auto_lsp_servers[lsp_name] == true or vim.tbl_contains(auto_lsp_servers[lsp_name] or {}, lsp_name)
+      return auto_filetype_lsp_servers[lsp_name] == true or vim.tbl_contains(auto_filetype_lsp_servers[lsp_name] or {}, lsp_name)
     end, lsp_names)
 
     ft_handler[ft] = vim.schedule_wrap(function()
