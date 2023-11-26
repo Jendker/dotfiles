@@ -118,4 +118,23 @@ M.getGitRoot = function()
   return git_root
 end
 
+M.getSystemCommand = function()
+  local system_name = vim.uv.os_uname().sysname
+  if system_name == "Darwin" then
+    return "open"
+  elseif system_name == "Linux" then
+    return "xdg-open"
+  end
+  vim.api.nvim_err_writeln("System not known: " .. system_name)
+  return nil
+end
+
+M.openWithDefault = function(text)
+  local command = M.getSystemCommand()
+  if command == nil then
+    return
+  end
+  vim.fn.jobstart(command .. " " .. text)
+end
+
 return M

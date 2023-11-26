@@ -50,11 +50,11 @@ telescope.setup({
       mappings = {
         i = { ["<c-o>"] =  function()
             local selection = require('telescope.actions.state').get_selected_entry()
-            vim.fn.jobstart("xdg-open " .. selection.path)
+            common.openWithDefault(selection.path)
           end },
         n = { ["<c-o>"] =  function()
             local selection = require('telescope.actions.state').get_selected_entry()
-            vim.fn.jobstart("xdg-open " .. selection.path)
+            common.openWithDefault(selection.path)
           end },
       },
     },

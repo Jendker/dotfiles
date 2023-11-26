@@ -183,9 +183,23 @@ local plugins = {
   {
     'stevearc/oil.nvim',
     dependencies = { "nvim-tree/nvim-web-devicons" },
-    config = function()
-      require("oil").setup({default_file_explorer = false})
-      vim.keymap.set("n", "<leader>pv", require("oil").open, { desc = "Open directory view" })
+    opts = {
+      default_file_explorer = false,
+      keymaps = {
+        ["<leader>o"] = function()
+          local oil = require("oil")
+          local cwd = oil.get_current_dir()
+          local entry = oil.get_cursor_entry()
+          if cwd and entry then
+            common.openWithDefault(string.format("%s/%s", cwd, entry.name))
+          end
+        end,
+      },
+    },
+    config = function(_, opts)
+      local oil = require("oil")
+      oil.setup(opts)
+      vim.keymap.set("n", "<leader>pv", oil.open, { desc = "Open directory view" })
     end,
     cond = not_vscode
   },

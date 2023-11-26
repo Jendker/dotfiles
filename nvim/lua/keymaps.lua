@@ -101,27 +101,8 @@ map('v', '?', "\"fy?<C-R>f<CR>", {silent = true})
 map("n", "j", [[(v:count > 5 ? "m'" . v:count . 'j' : 'gj')]], { expr = true })
 map("n", "k", [[(v:count > 5 ? "m'" . v:count . 'k' : 'gk')]], { expr = true })
 
-local function get_system_command()
-  local system_name = vim.uv.os_uname().sysname
-  if system_name == "Darwin" then
-    return "open"
-  elseif system_name == "Linux" then
-    return "xdg-open"
-  end
-  vim.api.nvim_err_writeln("System not known: " .. system_name)
-  return nil
-end
-
-
-local function open_with_default(text)
-  local command = get_system_command()
-  if command == nil then
-    return
-  end
-  vim.fn.jobstart(command .. " " .. text)
-end
-map('n', '<leader>o',  function() open_with_default(vim.fn.expand('<cWORD>')) end, { desc = "Open with default application" })
-map('v', '<leader>o', function() open_with_default(common.getVisualSelection()) end, { desc = "Open with default application" })
+map('n', '<leader>o',  function() common.openWithDefault(vim.fn.expand('<cWORD>')) end, { desc = "Open with default application" })
+map('v', '<leader>o', function() common.openWithDefault(common.getVisualSelection()) end, { desc = "Open with default application" })
 
 if vscode then
   map('n', '<leader>?', "<Cmd>call VSCodeNotify('workbench.action.findInFiles', { 'query': expand('<cword>')})<CR>")

@@ -39,3 +39,7 @@ defaults write com.apple.desktopservices DSDontWriteUSBStores -bool true
 
 # Disable the sound effects on boot
 sudo nvram StartupMute=%01
+
+# Disable crash report windows
+# https://stackoverflow.com/questions/6084497/silencing-osx-crash-report-window
+defaults write com.apple.CrashReporter DialogType server
