@@ -94,20 +94,6 @@ vim.keymap.set('v', '<leader>?', function()
     grep_string_menu({ search = common.getVisualSelection() })
   end,
   { desc = '[?] search for selection' })
-vim.keymap.set('n', '<leader>/', function()
-  -- You can pass additional configuration to telescope to change theme, layout, etc.
-  require('telescope.builtin').current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
-    winblend = 10,
-    previewer = false,
-  })
-end, { desc = '[/] Search in current buffer' })
-vim.keymap.set('v', '<leader>/', function()
-  require('telescope.builtin').current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
-    winblend = 10,
-    previewer = false,
-    default_text = common.getVisualSelection(),
-  })
-end, { desc = '[/] Search for selection in current buffer' })
 vim.keymap.set('n', '<leader>sl',
   require('telescope').extensions.menufacture.add_menu_with_default_mapping(
     require('telescope.builtin').live_grep,

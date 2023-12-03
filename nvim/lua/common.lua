@@ -52,6 +52,13 @@ function M.getVisualSelection()
   end
 end
 
+function M.escape(text, additional_char)
+  if not additional_char then
+    additional_char = ''
+  end
+  return vim.fn.escape(text, '/' .. additional_char)
+end
+
 function M.bufferEmpty(buffer)
   return vim.api.nvim_buf_line_count(buffer) == 1 and vim.api.nvim_buf_get_lines(buffer, 0, 1, {true})[1] == ""
 end

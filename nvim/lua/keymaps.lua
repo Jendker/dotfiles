@@ -92,10 +92,6 @@ end
 -- quit
 map("n", "<leader>qq", "<cmd>qa<cr>", { desc = "Quit all" })
 
--- search for selected text
-map('v', '/', "\"fy/<C-R>f<CR>", {silent = true})
-map('v', '?', "\"fy?<C-R>f<CR>", {silent = true})
-
 -- Save jumps > 5 lines to the jumplist
 -- Jumps <= 5 respect line wraps
 map("n", "j", [[(v:count > 5 ? "m'" . v:count . 'j' : 'gj')]], { expr = true })
@@ -104,45 +100,64 @@ map("n", "k", [[(v:count > 5 ? "m'" . v:count . 'k' : 'gk')]], { expr = true })
 map('n', '<leader>o',  function() common.openWithDefault(vim.fn.expand('<cWORD>')) end, { desc = "Open with default application" })
 map('v', '<leader>o', function() common.openWithDefault(common.getVisualSelection()) end, { desc = "Open with default application" })
 
-if vscode then
-  map('n', '<leader>?', "<Cmd>call VSCodeNotify('workbench.action.findInFiles', { 'query': expand('<cword>')})<CR>")
-  map('v', '<leader>?', "\"fy<Cmd>call VSCodeNotify('workbench.action.findInFiles', { 'query': eval('@f')})<CR>")
-  -- Get folding working with vscode neovim plugin
-  map('n', 'zM', ":call VSCodeNotify('editor.foldAll')<CR>")
-  map('n', 'zR', ":call VSCodeNotify('editor.unfoldAll')<CR>")
-  map('n', 'zc', ":call VSCodeNotify('editor.fold')<CR>")
-  map('n', 'zC', ":call VSCodeNotify('editor.foldRecursively')<CR>")
-  map('n', 'zo', ":call VSCodeNotify('editor.unfold')<CR>")
-  map('n', 'zO', ":call VSCodeNotify('editor.unfoldRecursively')<CR>")
-  map('n', 'za', ":call VSCodeNotify('editor.toggleFold')<CR>")
-  -- Fix issues with undo https://github.com/vscode-neovim/vscode-neovim/issues/1192
-  map('n', 'u', ":call VSCodeNotify('undo')<CR>")
-  map('n', '<C-r>', ":call VSCodeNotify('redo')<CR>")
-  local function moveCursor(direction)
-    if (vim.fn.reg_recording() == '' and vim.fn.reg_executing() == '') then
-      return ('g' .. direction)
-    else
-      return direction
-    end
+local function type_no_escape(text)
+  vim.api.nvim_feedkeys(text, "n", false)
+end
+local function type_escape(text)
+  vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes(text, true, true, true), "n", false)
+end
+
+-- replace keymaps
+local function replace_keymap(confirmation, visual)
+  local text = [[:%s/\<]]
+  local search_string = ''
+  if visual then
+    search_string = common.getVisualSelection()
+  else
+    search_string = vim.fn.expand('<cword>')
   end
-  -- don't use for now - it breaks going up down
-  -- map('n', 'k', function() return moveCursor('k') end, { expr = true, remap = true })
-  -- map('n', 'j', function() return moveCursor('j') end, { expr = true, remap = true })
-  -- end folds helpers. Comes from https://github.com/vscode-neovim/vscode-neovim/issues/58#issuecomment-989481648
-  -- and https://github.com/vscode-neovim/vscode-neovim/issues/58#issuecomment-1053940452
-  map('n', "<leader>r", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI]], { desc = 'Find and [C]hange word under cursor'})
-  map('n', "<leader>rc", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gcI]], { desc = 'Find and [C]hange word under cursor with confirmation'})
-  map('v', "<leader>r", [["fy:%s/<C-r>f/<C-r>f/gI]], { desc = 'Find and [C]hange selected'})
-  map('v', "<leader>rc", [["fy:%s/<C-r>f/<C-r>f/gcI]], { desc = 'Find and [C]hange selected with confirmation'})
-  map({'n', 'x'}, "<leader>ca", ":call VSCodeNotify('editor.action.quickFix')<CR>")
-  map({'n', 'x'}, 'go', ":call VSCodeNotify('editor.action.goToTypeDefinition')<CR>")
-  map({'n', 'x'}, 'gl', ":call VSCodeNotify('editor.action.showHover')<CR>")
-else
+  text = text .. common.escape(search_string, '[]') .. [[\>/]] .. common.escape(search_string, '&')
+  if confirmation then
+    text = text .. [[/gcI]]
+  else
+    text = text .. [[/gI]]
+  end
+  type_no_escape(text)
+
+  if not_vscode() then
+    local move_text = [[<Left><Left><Left>]]
+    if confirmation then
+      move_text = move_text .. [[<Left>]]
+    end
+    type_escape(move_text)
+  end
+end
+map('n', "<leader>r", function() replace_keymap(false, false) end, { desc = 'Find and [r]eplace word under cursor'})
+map('n', "<leader>rc", function() replace_keymap(true, false) end, { desc = 'Find and [r]eplace word under cursor with [c]onfirmation'})
+map('v', "<leader>r", function() replace_keymap(false, true) end, { desc = 'Find and [r]eplace selected'})
+map('v', "<leader>rc", function() replace_keymap(true, true) end, { desc = 'Find and [r]eplace selected with [c]onfirmation'})
+
+-- custom search mappings
+map('n', "<leader>/", function()
+  type_no_escape("/" .. common.escape(vim.fn.getreg("+")))
+  type_escape("<CR>")
+end, { desc = "Search for clipboard content"})
+
+-- Makes * and # work in visual mode - comes from https://github.com/stevearc/dotfiles/blob/66f2a389bb0647c0b88ee23d0f264d67b8e8cec3/.config/nvim/init.lua#L287-L295
+-- could be improved
+function VisualSetSearch(cmdtype)
+  local tmp = vim.fn.getreg("s")
+  vim.cmd.normal({ args = { 'gv"sy' }, bang = true })
+  vim.fn.setreg("/", "\\V" .. vim.fn.escape(vim.fn.getreg("s"), cmdtype .. "\\"):gsub("\n", "\\n"))
+  vim.fn.setreg("s", tmp)
+end
+map("x", "*", ':lua VisualSetSearch("/")<CR>/<C-R>=@/<CR><CR>')
+map("x", "#", ':lua VisualSetSearch("?")<CR>?<C-R>=@/<CR><CR>')
+
+map("n", "S", '"_cc')
+
+if not vscode then
   map('i', '<C-c>', "<Esc>")
-  map("n", "<leader>r", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]], { desc = 'Find and Change word under cursor'})
-  map("n", "<leader>rc", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gcI<Left><Left><Left>]], { desc = 'Find and Change word under cursor with confirmation'})
-  map('v', "<leader>r", [["fy:%s/<C-r>f/<C-r>f/gI<Left><Left><Left>]], { desc = 'Find and Change selected'})
-  map('v', "<leader>rc", [["fy:%s/<C-r>f/<C-r>f/gcI<Left><Left><Left>]], { desc = 'Find and Change selected with confirmation'})
   -- Move Lines - this messes up VSCode pasting for some reason. Leave it here or find some plugin to do the same better
   map("n", "<A-j>", "<cmd>m .+1<cr>==", { desc = "Move down" })
   map("n", "<A-k>", "<cmd>m .-2<cr>==", { desc = "Move up" })
@@ -192,4 +207,30 @@ else
     range = true,
   })
   vim.keymap.set("v", "<leader>vc", "<esc><cmd>CompareClipboardSelection<cr>", { desc = "Compare clipboard", silent = true })
+  map("i", "<S-Tab>", "<C-d>")
+else
+  map('n', '<leader>?', "<Cmd>call VSCodeNotify('workbench.action.findInFiles', { 'query': expand('<cword>')})<CR>")
+  map('v', '<leader>?', "\"fy<Cmd>call VSCodeNotify('workbench.action.findInFiles', { 'query': eval('@f')})<CR>")
+  -- Get folding working with vscode neovim plugin
+  map('n', 'zM', ":call VSCodeNotify('editor.foldAll')<CR>")
+  map('n', 'zR', ":call VSCodeNotify('editor.unfoldAll')<CR>")
+  map('n', 'zc', ":call VSCodeNotify('editor.fold')<CR>")
+  map('n', 'zC', ":call VSCodeNotify('editor.foldRecursively')<CR>")
+  map('n', 'zo', ":call VSCodeNotify('editor.unfold')<CR>")
+  map('n', 'zO', ":call VSCodeNotify('editor.unfoldRecursively')<CR>")
+  map('n', 'za', ":call VSCodeNotify('editor.toggleFold')<CR>")
+  -- Fix issues with undo https://github.com/vscode-neovim/vscode-neovim/issues/1192
+  -- Update: seems fixed for now
+  -- map('n', 'u', ":call VSCodeNotify('undo')<CR>")
+  -- map('n', '<C-r>', ":call VSCodeNotify('redo')<CR>")
+  local function moveCursor(direction)
+    if (vim.fn.reg_recording() == '' and vim.fn.reg_executing() == '') then
+      return ('g' .. direction)
+    else
+      return direction
+    end
+  end
+  map({'n', 'x'}, "<leader>ca", ":call VSCodeNotify('editor.action.quickFix')<CR>")
+  map({'n', 'x'}, 'go', ":call VSCodeNotify('editor.action.goToTypeDefinition')<CR>")
+  map({'n', 'x'}, 'gl', ":call VSCodeNotify('editor.action.showHover')<CR>")
 end

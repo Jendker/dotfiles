@@ -372,9 +372,6 @@ local cmp_mappings = {
       elseif cmp.visible() then
         -- select first item if visible
         cmp.confirm({ select = true, behavior = cmp.ConfirmBehavior.Replace })
-      elseif has_words_before() then
-        -- show autocomplete
-        cmp.complete()
       else
         fallback()
       end
@@ -386,6 +383,43 @@ local cmp_mappings = {
   ['<C-f>'] = cmp_action.luasnip_jump_forward(),
   ['<C-b>'] = cmp_action.luasnip_jump_backward(),
 }
+
+-- Custom sorting/ranking for completion items.
+local cmp_helper = {}
+cmp_helper.compare = {
+  ---Deprioritize items starting with underscores (private or protected)
+  deprioritize_underscore = function(lhs, rhs)
+    local l = (lhs.completion_item.label:find "^_+") and 1 or 0
+    local r = (rhs.completion_item.label:find "^_+") and 1 or 0
+    if l ~= r then return l < r end
+  end,
+
+  ---Prioritize items that ends with "= ..." (usually for argument completion).
+  prioritize_argument = function(lhs, rhs)
+    local l = (lhs.completion_item.label:find "=$") and 1 or 0
+    local r = (rhs.completion_item.label:find "=$") and 1 or 0
+    if l ~= r then return l > r end
+  end,
+}
+local cmp_sorting = {
+  -- see https://github.com/hrsh7th/nvim-cmp/blob/main/lua/cmp/config/compare.lua
+  -- and https://github.com/hrsh7th/nvim-cmp/blob/main/lua/cmp/config/default.lua
+  priority_weight = 2,
+  comparators = {
+    cmp.config.compare.offset,
+    cmp.config.compare.exact,
+    cmp.config.compare.score,
+    function(...) return cmp_helper.compare.prioritize_argument(...) end,
+    function(...) return cmp_helper.compare.deprioritize_underscore(...) end,
+    cmp.config.compare.recently_used,
+    cmp.config.compare.locality,
+    cmp.config.compare.kind,
+    cmp.config.compare.sort_text,
+    cmp.config.compare.length,
+    cmp.config.compare.order,
+  },
+}
+
 cmp.setup({
   mapping = cmp_mappings,
   formatting = {
@@ -413,6 +447,7 @@ cmp.setup({
   performance = {
     max_view_entries = 15,
   },
+  sorting = cmp_sorting,
 })
 
 -- Use buffer source for `/`.

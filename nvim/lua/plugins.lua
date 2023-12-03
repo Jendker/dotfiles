@@ -106,9 +106,14 @@ local plugins = {
   {
     "gbprod/substitute.nvim",
     version = "*",
-    config = function()
+    opts = {
+      highlight_substituted_text = {
+        enabled = not_vscode(),
+      },
+    },
+    config = function(_, opts)
       local substitute = require("substitute")
-      substitute.setup()
+      substitute.setup(opts)
       vim.keymap.set("n", "gr", substitute.operator, { noremap = true, desc = "[r]eplace <motion>" })
       vim.keymap.set("n", "grr", substitute.line, { noremap = true, desc = "[r]eplace whole line"})
       vim.keymap.set("n", "gR", substitute.eol, { noremap = true,  desc = "[R]eplace until end of line"})
@@ -142,6 +147,10 @@ local plugins = {
     end
   },
   {"romainl/vim-cool", event = 'BufReadPost'}, -- auto hide highlight after search
+  {
+    'tzachar/highlight-undo.nvim',
+    config = true
+  },
   -- without VSCode
   -- auto trail whitespace
   {
@@ -185,6 +194,7 @@ local plugins = {
     dependencies = { "nvim-tree/nvim-web-devicons" },
     opts = {
       default_file_explorer = false,
+      delete_to_trash = true,
       keymaps = {
         ["<leader>o"] = function()
           local oil = require("oil")
@@ -261,6 +271,12 @@ local plugins = {
           IblIndent = { fg = '$bg3', fmt = "nocombine" },
           MsgArea = { fg = '$fg' },
           MatchParen = {fg = '$orange', bg = 'none', fmt = "bold" },
+          -- make floating windows transparent
+          NormalFloat = { bg = "none" },
+          FloatBorder = { bg = "none" },
+          -- but keep background for Lazy and Mason
+          LazyNormal = { fg = '$fg', bg = '$bg1' },
+          MasonNormal = { fg = '$fg', bg = '$bg1' },
         }
       }
       onedark.load()
@@ -456,38 +472,27 @@ local plugins = {
   {'farmergreg/vim-lastplace', cond = not_vscode},
   {
     'karb94/neoscroll.nvim',
-    config = function()
-      local easing_function = "sine"
-      local neoscroll = require('neoscroll')
-      neoscroll.setup({
-        pre_hook = function()
-          vim.opt.eventignore:append({
-              'WinScrolled',
-              'CursorMoved',
-           })
-        end,
-        post_hook = function()
-          vim.opt.eventignore:remove({
-              'WinScrolled',
-              'CursorMoved',
-          })
-        end,
-        easing_function = easing_function
-      })
-      local mappings = {}
-      mappings['zt']  = { 'zt', { '250', easing_function, "'no_scroll'" } }
-      mappings['zb']  = { 'zb', { '250', easing_function, "'no_scroll'" } }
-      mappings["<C-y>"] = { "scroll", { "-0.10", "false", "100", easing_function, "'no_scroll'" } }
-      mappings["<C-e>"] = { "scroll", { "0.10", "false", "100", easing_function, "'no_scroll'" } }
-      require('neoscroll.config').set_mappings(mappings)
-    end,
+    opts = {
+      pre_hook = function()
+        vim.opt.eventignore:append({
+          'WinScrolled',
+          'CursorMoved',
+        })
+      end,
+      post_hook = function()
+        vim.opt.eventignore:remove({
+          'WinScrolled',
+          'CursorMoved',
+        })
+      end,
+      easing_function = "sine"
+    },
     cond = not_vscode
   },
   {
     'windwp/nvim-autopairs',
-    event = 'VeryLazy',
-    lazy = false,
-    config = function() require('nvim-autopairs').setup {} end,
+    event = "InsertEnter",
+    opts = {},
     cond = not_vscode
   },
   {
@@ -552,7 +557,7 @@ local plugins = {
       end, { range = true })
       vim.keymap.set('v', '=', function()
           require("conform").format({async = true, lsp_fallback = true })
-          vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<ESC>", true, true, true), "n", true)
+          vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<ESC>", true, true, true), "n", false)
           return '<Ignore>'
       end, {expr = true})
       vim.keymap.set("n", "==", function()
@@ -1023,12 +1028,8 @@ local plugins = {
     cond = not_vscode
   },
   {
-    'tzachar/highlight-undo.nvim',
-    config = true,
-    cond = not_vscode
-  },
-  {
     'stevearc/aerial.nvim',
+    cmd = { "AerialToggle", "AerialOpen", "AerialNavToogle", "AerialNavOpen", "AerialNext", "AerialPrev" },
     keys = {
       {'<leader>ba', '<cmd>AerialToggle<CR>', 'n', desc = "[b]uffer [a]erial toggle"},
       { "[s", function() require('aerial').prev() end, desc = "Previous aerial symbol", mode = { "n", "v" } },
@@ -1131,6 +1132,7 @@ local plugins = {
   {
     "folke/todo-comments.nvim",
     cmd = { "TodoTrouble", "TodoTelescope" },
+    event = { "BufReadPre", "BufNewFile" },
     keys = {
       { "]t", function() require("todo-comments").jump_next() end, desc = "Next todo comment" },
       { "[t", function() require("todo-comments").jump_prev() end, desc = "Previous todo comment" },
@@ -1139,7 +1141,16 @@ local plugins = {
       { "<leader>st", ':exe ":TodoTelescope cwd=" .. fnameescape(expand("%:p"))<cr>', desc = "Todo current file", silent = true },
       { "<leader>sT", "<cmd>TodoTelescope<cr>", desc = "Todo in workspace", silent = true },
     },
-    opts = {},
+    opts = {
+      highlight = {
+        multiline = false, -- rarely useful
+        pattern = [[.*<(KEYWORDS)\s*(\s|:)]],
+        keyword = "fg", -- make it less flashy
+      },
+      search = {
+        pattern = [[\b(KEYWORDS)(\s|:)]],
+      }
+    },
     cond = not_vscode
   },
   -- {
@@ -1157,7 +1168,8 @@ local plugins = {
   --   cond = not_vscode,
   -- },
   {
-    'mfussenegger/nvim-lint',
+    'Jendker/nvim-lint',
+    commit = 'ddd8c70',
     event = 'VeryLazy',
     opts = {
       linters_by_ft = {
@@ -1428,6 +1440,7 @@ local plugins = {
   },
   {
     'stevearc/stickybuf.nvim',
+    cmd = { "PinBuffer", "PinBuftype", "PinFiletype" },
     opts = {},
     cond = not_vscode
   },
@@ -1435,11 +1448,6 @@ local plugins = {
 }
 
 -- use the lazy_opts until this is fixed: https://github.com/rmagatti/auto-session/issues/223
-local lazy_opts = {
-  install = {
-    -- don't install missing plugins on startup as a workaround to auto-session issues with lazy
-    missing = false,
-  },
-}
+local lazy_opts = {}
 
 require("lazy").setup(plugins, lazy_opts)

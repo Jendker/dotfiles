@@ -124,24 +124,24 @@ end
 ---@param buf number
 ---@param lnum number
 local function get_signs(buf, lnum)
-  -- Get regular signs
-  ---@type Sign[]
   local signs_placed = vim.fn.sign_getplaced(buf, { group = "*", lnum = lnum })[1].signs
   local other_signs = {}
   local diagnostic_signs = {}
   local git_sign = nil
-  for _, sign in pairs(signs_placed) do
-    local ret = vim.fn.sign_getdefined(sign.name)[1]
-    ret.priority = sign.priority
-    if vim.g.diagnostics_separate and ret.name and ret.name:find("Diagnostic") then
-      diagnostic_signs[#diagnostic_signs+1] = ret
-    elseif ret.name and ret.name:find("GitSign") then
-      git_sign = ret
-    else
-      other_signs[#other_signs+1] = ret
+
+  if vim.fn.has("nvim-0.10") == 0 or vim.g.old_nightly == 1 then
+    for _, sign in pairs(signs_placed) do
+      local ret = vim.fn.sign_getdefined(sign.name)[1]
+      ret.priority = sign.priority
+      if vim.g.diagnostics_separate and ret.name and ret.name:find("Diagnostic") then
+        diagnostic_signs[#diagnostic_signs+1] = ret
+      elseif ret.name and ret.name:find("GitSign") then
+        git_sign = ret
+      else
+        other_signs[#other_signs+1] = ret
+      end
     end
   end
-
   -- Get extmark signs
   local extmarks = vim.api.nvim_buf_get_extmarks(
     buf,
@@ -151,12 +151,20 @@ local function get_signs(buf, lnum)
     { details = true, type = "sign" }
   )
   for _, extmark in pairs(extmarks) do
-    other_signs[#other_signs + 1] = {
+    local sign = {
       name = extmark[4].sign_hl_group or "",
       text = extmark[4].sign_text,
       texthl = extmark[4].sign_hl_group,
       priority = extmark[4].priority,
     }
+
+    if vim.g.diagnostics_separate and sign.name and sign.name:find("Diagnostic") then
+      diagnostic_signs[#diagnostic_signs + 1] = sign
+    elseif sign.name and sign.name:find("GitSign") then
+      git_sign = sign
+    else
+      other_signs[#other_signs + 1] = sign
+    end
   end
 
   -- Sort by priority
@@ -241,7 +249,7 @@ end
 local skip_foldexpr = {} ---@type table<number,boolean>
 local skip_check = assert(vim.loop.new_check())
 
--- TODO maybe make it a separate module, similarly like folke?
+-- TODO maybe make it a separate module similarly like folke?
 -- https://github.com/LazyVim/LazyVim/blob/68ff818a5bb7549f90b05e412b76fe448f605ffb/lua/lazyvim/util/ui.lua#L147
 function Foldexpr()
   local buf = vim.api.nvim_get_current_buf()
