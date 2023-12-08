@@ -78,6 +78,9 @@ local grep_string_menu =
       ['change glob_pattern'] = function(opts, callback)
         local glob_value = vim.fn.input("Glob pattern: ")
         local new_additional_args = common.shallowCopy(grep_string_default_additional_args)
+        if opts["orbik_visual_mode"] == true then
+          common.removeTableValue(new_additional_args, '-w')
+        end
         table.insert(new_additional_args, '--glob')
         table.insert(new_additional_args, glob_value)
         opts['additional_args'] = new_additional_args
@@ -91,7 +94,9 @@ telescope.load_extension('vim_bookmarks')
 -- more keymaps
 vim.keymap.set('n', '<leader>?', grep_string_menu, { desc = '[?] search for word under cursor'})
 vim.keymap.set('v', '<leader>?', function()
-    grep_string_menu({ search = common.getVisualSelection() })
+    local additional_args = common.shallowCopy(grep_string_default_additional_args)
+    common.removeTableValue(additional_args, '-w')
+    grep_string_menu({ search = common.getVisualSelection(), additional_args = additional_args, orbik_visual_mode = true})
   end,
   { desc = '[?] search for selection' })
 vim.keymap.set('n', '<leader>sl',

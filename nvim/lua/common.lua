@@ -144,4 +144,24 @@ M.openWithDefault = function(text)
   vim.fn.jobstart(command .. " " .. text)
 end
 
+M.getTableIndex = function(tab, val)
+    local index = nil
+    for k, v in ipairs (tab) do
+        if (v == val) then
+          index = k
+          break
+        end
+    end
+    return index
+end
+
+M.removeTableValue = function(tab, val)
+  local idx = M.getTableIndex(tab, val)
+  if idx == nil then
+      print("Value does not exist")
+  else
+      table.remove(tab, idx)
+  end
+end
+
 return M

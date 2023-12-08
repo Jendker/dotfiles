@@ -271,6 +271,10 @@ local plugins = {
           IblIndent = { fg = '$bg3', fmt = "nocombine" },
           MsgArea = { fg = '$fg' },
           MatchParen = {fg = '$orange', bg = 'none', fmt = "bold" },
+          -- winbar needs to be set on current nightly
+          -- TODO check if this is still needed https://github.com/neovim/neovim/issues/26378
+          Winbar = { bg = "none" },
+          WinbarNC = { bg = "none" },
           -- make floating windows transparent
           NormalFloat = { bg = "none" },
           FloatBorder = { bg = "none" },
@@ -434,7 +438,7 @@ local plugins = {
       {'<leader>sS', "<cmd>lua require('telescope.builtin').lsp_dynamic_workspace_symbols()<cr>", '[S]ymbols in workspace'},
 
       -- miscellaneous
-      {'<leader>/', desc = '[/] Fuzzily search in current buffer'},
+      {'<leader>/', desc = 'Search for clipboard content'},
       {'<leader>?', mode = 'n', desc = '[?] search for word under cursor'},
       {'<leader>?', mode = 'v', desc = '[?] search for selection'},
     },
@@ -580,7 +584,6 @@ local plugins = {
   },
   {
     'Bekaboo/dropbar.nvim',
-    commit = "3daffc1",
     opts = {
       general = {
         enable = function(buf, win, _)
@@ -779,7 +782,8 @@ local plugins = {
     cond = not_vscode
   },
   {
-    "zoriya/auto-save.nvim",
+    -- original author moved to another fork. consider https://github.com/zoriya/flake/blob/320bedb075a06a0d83b1f75d55933c63695f0ce5/modules/misc/nvim/lua/plugins/misc.lua#L3
+    "Jendker/auto-save.nvim",
     cmd = 'ASToggle',
     keys = {
       { "<leader>ta", "<cmd>ASToggle<CR>", desc = "[T]oggle [a]utosave", silent = true },

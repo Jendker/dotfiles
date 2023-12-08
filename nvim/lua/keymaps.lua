@@ -41,20 +41,20 @@ map("n", "<leader>tf", function()
   if vim.b.orbik_disable_autoformat then
     common.enableAutoformat()
     vim.b.orbik_disable_autoformat = false
-    vim.notify("Enabled autoformat for the buffer", vim.log.levels.INFO)
+    vim.notify("Autoformat enabled for the buffer", vim.log.levels.INFO)
   else
     common.disableAutoformat()
     vim.b.orbik_disable_autoformat = true
-    vim.notify("Disabled autoformat for the buffer", vim.log.levels.INFO)
+    vim.notify("Autoformat disabled for the buffer", vim.log.levels.INFO)
   end
 end, { desc = "[T]oggle auto[f]ormat" })
 map("n", "<leader>tm", function()
   if vim.o.mouse == "nvi" then
     vim.opt.mouse = ""
-    vim.notify("Disabled vim mouse", vim.log.levels.INFO)
+    vim.notify("Vim mouse disabled", vim.log.levels.INFO)
   else
     vim.opt.mouse = "nvi"
-    vim.notify("Enabled vim mouse", vim.log.levels.INFO)
+    vim.notify("Vim mouse enabled", vim.log.levels.INFO)
   end
 end, { desc = "[T]oggle [m]ouse" })
 -- center after buffer movements
@@ -109,14 +109,19 @@ end
 
 -- replace keymaps
 local function replace_keymap(confirmation, visual)
-  local text = [[:%s/\<]]
+  local text = [[:%s/]]
   local search_string = ''
   if visual then
     search_string = common.getVisualSelection()
   else
+    text = text .. [[\<]]
     search_string = vim.fn.expand('<cword>')
   end
-  text = text .. common.escape(search_string, '[]') .. [[\>/]] .. common.escape(search_string, '&')
+  text = text .. common.escape(search_string, '[]')
+  if not visual then
+    text = text .. [[\>]]
+  end
+  text = text.. "/" .. common.escape(search_string, '&')
   if confirmation then
     text = text .. [[/gcI]]
   else
