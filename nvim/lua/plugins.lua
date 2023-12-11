@@ -273,8 +273,8 @@ local plugins = {
           MatchParen = {fg = '$orange', bg = 'none', fmt = "bold" },
           -- winbar needs to be set on current nightly
           -- TODO check if this is still needed https://github.com/neovim/neovim/issues/26378
-          Winbar = { bg = "none" },
-          WinbarNC = { bg = "none" },
+          WinBar = { fg = "none", bg = "none", fmt = "bold" },
+          WinBarNC = { fg = "none", bg = "none", fmt = "bold" },
           -- make floating windows transparent
           NormalFloat = { bg = "none" },
           FloatBorder = { bg = "none" },
