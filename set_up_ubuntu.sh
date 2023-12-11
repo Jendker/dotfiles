@@ -14,6 +14,10 @@ function install_nvim_source() {
   sudo apt-get install ninja-build gettext cmake unzip curl -y
   cd /tmp && rm -rf neovim && git clone https://github.com/neovim/neovim.git $branch_str --single-branch
   cd neovim
+  if [ "$1" == "master" ]; then
+    # don't use latest stuff which breaks highlights
+    git reset --hard 17f3a3a
+  fi
   make CMAKE_BUILD_TYPE=RelWithDebInfo
   sudo make install
   cd .. && rm -rf neovim
