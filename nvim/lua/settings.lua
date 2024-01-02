@@ -34,6 +34,19 @@ vim.o.updatetime = 200 -- CursorHold time default is 4s. Way too long
 vim.opt.showcmd = false -- prevent flickering if j/k is being held
 vim.opt.title = true -- turn on for tmux and terminal apps tab title
 
+-- Use OSC 52 clipboard for easy sharing over SSH
+vim.g.clipboard = {
+  name = 'OSC 52',
+  copy = {
+    ['+'] = require('vim.ui.clipboard.osc52').copy('+'),
+    ['*'] = require('vim.ui.clipboard.osc52').copy('*'),
+  },
+  paste = {
+    ['+'] = require('vim.ui.clipboard.osc52').paste('+'),
+    ['*'] = require('vim.ui.clipboard.osc52').paste('*'),
+  },
+}
+
 -- don't continue comment on newline
 vim.cmd("autocmd BufEnter * setlocal formatoptions-=cro")
 
