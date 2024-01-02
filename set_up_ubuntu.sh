@@ -150,7 +150,7 @@ if [ -d ~/.oh-my-zsh ]; then
  else
  	echo "installing oh-my-zsh"
   sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
-  sudo chsh -s $(which zsh) || true
+  sudo chsh -s $(which zsh) $(whoami) || true
   git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
   git clone https://github.com/MenkeTechnologies/zsh-expand.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-expand
   pip3 install thefuck --user
@@ -182,7 +182,7 @@ export ZPWR_EXPAND_TO_HISTORY=true # expand to history also on enter
 .
 wq
 IN
-  sed -i 's/plugins=(git)/plugins=(git ubuntu zsh-syntax-highlighting zsh-expand)/g' $HOME/.zshrc
+  sed -i 's/plugins=(git)/plugins=(git ubuntu zsh-syntax-highlighting zsh-expand conda-zsh-completion)/g' $HOME/.zshrc
   sed -i '/mode auto/s/^# //g' $HOME/.zshrc
 fi
 
@@ -199,25 +199,37 @@ if ! [ -x "$(command -v nvim)" ]; then
   update_dotfiles
 fi
 
-# set up pyenv
-if [ ! -d "$HOME/.pyenv" ]; then
-  sudo apt install libreadline-dev libbz2-dev -y
-  curl https://pyenv.run | bash
-echo '# Load pyenv
-export PYENV_ROOT="$HOME/.pyenv"
-command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"
-eval "$(pyenv init -)"
-
-# Load pyenv-virtualenv automatically
-eval "$(pyenv virtualenv-init -)"' >> $HOME/.zshrc
-fi
-
+# set up pyenv only on bionic
 if [[ $(lsb_release -cs) == "bionic" ]]; then
+  if [ ! -d "$HOME/.pyenv" ]; then
+    sudo apt install libreadline-dev libbz2-dev -y
+    curl https://pyenv.run | bash
+  echo '# Load pyenv
+  export PYENV_ROOT="$HOME/.pyenv"
+  command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"
+  eval "$(pyenv init -)"
+
+  # Load pyenv-virtualenv automatically
+  eval "$(pyenv virtualenv-init -)"' >> $HOME/.zshrc
+  fi
   pyenv global 3.8.15 || pyenv install 3.8.15 && pyenv global 3.8.15
 fi
+
+
+# set up miniconda
+if [ ! -d "$HOME/miniconda3" ]; then
+  mkdir -p ~/miniconda3
+  wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda3/miniconda.sh
+  bash ~/miniconda3/miniconda.sh -b -u -p ~/miniconda3
+  rm -rf ~/miniconda3/miniconda.sh
+  ~/miniconda3/bin/conda init zsh
+  ~/miniconda3/bin/conda config --set auto_activate_base false
+  # zsh autocomplete
+  git clone https://github.com/esc/conda-zsh-completion ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/conda-zsh-completion
+fi
+
 git config --global user.name "Jedrzej Orbik"
-git config --global user.email jedrzej.orbik@roboception.de
-# git config --global user.email Jendker@users.noreply.github.com
+git config --global user.email Jendker@users.noreply.github.com
 
 # set up fzf for zsh
 if [ ! -d "$HOME/.fzf" ]; then
@@ -225,21 +237,5 @@ if [ ! -d "$HOME/.fzf" ]; then
   $HOME/.fzf/install --key-bindings --completion --update-rc --no-bash
 fi
 
-# random
-
-function clean_build_lib {
-  rm -r build
-  mkdir build && cd build
-  cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=1 ..
-  make -j12 package
-}
-
-function clean_build_ros {
-  rm -r build
-  mkdir build && cd build
-  cmake -DCATKIN_BUILD_BINARY_PACKAGE="1" -DCMAKE_INSTALL_PREFIX="/opt/ros/$ROS_DISTRO" -DCMAKE_PREFIX_PATH="/opt/ros/$ROS_DISTRO" -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=1 ..
-  make -j12 package
-}
-
-alias suprl="supervisorctl reload"
-alias supre="supervisorctl restart pipeline"
+# install git lfs
+curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash && sudo apt-get install git-lfs && git lfs install
