@@ -176,7 +176,7 @@ ZSH_HIGHLIGHT_STYLES[path]=none
 ZSH_HIGHLIGHT_STYLES[path_prefix]=none
 
 # zsh-expand
-export ZPWR_EXPAND_BLACKLIST=(ls vim rg)
+export ZPWR_EXPAND_BLACKLIST=(ls vim grep)
 export ZPWR_EXPAND_TO_HISTORY=true # expand to history also on enter
 
 .
