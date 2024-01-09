@@ -321,23 +321,6 @@ local plugins = {
       table.insert(lualine_x,
         {
           function()
-            local codeium_str = vim.fn['codeium#GetStatusString']()
-            if codeium_str == "" then
-              return ""
-            elseif string.find(codeium_str, "/") then
-              return "Codeium: " .. codeium_str
-            -- elseif codeium_str == " * " then
-            --   return "Codeium thinking..."
-            -- elseif codeium_str == " 0 " then
-            --   return "No suggestions"
-            else
-              return ""
-            end
-          end
-        })
-      table.insert(lualine_x,
-        {
-          function()
             if vim.g.autosave_on == 1 then
               return "󱑜"
             else
@@ -1015,20 +998,13 @@ local plugins = {
     cond = not_vscode
   },
   {
-    'Exafunction/codeium.vim',
-    event = { "BufReadPre", "BufNewFile" },
-    init = function()
-      -- disable by default - enable manually in machine_settings.lua
-      vim.g.codeium_enabled = false
-      vim.g.codeium_disable_bindings = 1
-    end,
-    config = function()
-      vim.keymap.set('i', '<a-]>', function() return vim.fn['codeium#CycleCompletions'](1) end, { expr = true, desc = "Codeium next suggestion" })
-      vim.keymap.set('i', '<a-[>', function() return vim.fn['codeium#CycleCompletions'](-1) end, { expr = true, desc = "Codeium previous suggestion"})
-      vim.keymap.set('i', '<a-x>', function() return vim.fn['codeium#Clear']() end, { expr = true, desc = "Codeium clear suggestion" })
-      vim.keymap.set('i', '<a-Bslash>', function() return vim.fn['codeium#Complete']() end, { expr = true, desc = "Codeium trigger complete"})
-      vim.keymap.set('i', '<a-a>', function () return vim.fn['codeium#Accept']() end, { expr = true, silent = true, desc = "Codeium accept"})
-    end,
+    "Exafunction/codeium.nvim",
+    event = "VeryLazy",
+    dependencies = {
+        "nvim-lua/plenary.nvim",
+        "hrsh7th/nvim-cmp",
+    },
+    opts = {},
     cond = not_vscode
   },
   {

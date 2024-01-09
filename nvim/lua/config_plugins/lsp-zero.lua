@@ -430,7 +430,7 @@ cmp.setup({
 
       local short_name = {
         nvim_lsp = 'LSP',
-        nvim_lua = 'nvim'
+        nvim_lua = 'nvim',
       }
       local menu_name = short_name[entry.source.name] or entry.source.name
       vim_item.menu = string.format('[%s]', menu_name)
@@ -441,6 +441,7 @@ cmp.setup({
   sources = {
     {name = 'path'},
     {name = 'nvim_lsp'},
+    {name = 'codeium'},
     {name = 'buffer', keyword_length = 3},
     {name = 'luasnip', keyword_length = 2},
   },
