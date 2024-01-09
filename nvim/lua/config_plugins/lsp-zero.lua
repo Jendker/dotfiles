@@ -357,7 +357,7 @@ local has_words_before = function()
   return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
 end
 
-local cmp_mappings = {
+local cmp_mappings = cmp.mapping.preset.insert({
   ['<C-Space>'] = cmp.mapping.complete(),
   ['<CR>'] = cmp.mapping.confirm(),
   ['<Tab>'] = cmp.mapping(
@@ -365,10 +365,6 @@ local cmp_mappings = {
       if cmp.visible() and cmp.get_active_entry() then
         -- completion if a cmp item is selected
         cmp.confirm({ select = false, behavior = cmp.ConfirmBehavior.Replace })
-      elseif vim.fn.exists('b:_codeium_completions') ~= 0 then
-        -- accept codeium completion if visible
-        vim.api.nvim_input(vim.fn['codeium#Accept']() .. "<ESC>")
-        -- vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes(vim.fn['codeium#Accept']() .. "<ESC>", true, true, true), "n", true)
       elseif cmp.visible() then
         -- select first item if visible
         cmp.confirm({ select = true, behavior = cmp.ConfirmBehavior.Replace })
@@ -382,7 +378,7 @@ local cmp_mappings = {
   -- jump between placeholders
   ['<C-f>'] = cmp_action.luasnip_jump_forward(),
   ['<C-b>'] = cmp_action.luasnip_jump_backward(),
-}
+})
 
 -- Custom sorting/ranking for completion items.
 local cmp_helper = {}
