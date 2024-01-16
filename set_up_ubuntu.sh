@@ -104,6 +104,34 @@ function install_nvim_binary() {
   update_git
 }
 
+function install_yazi_source() {
+  sudo test || true
+  if ! command -v rustc > /dev/null 2>&1; then
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+  fi
+  cd /tmp && rm -rf yazi && git clone https://github.com/sxyazi/yazi.git
+  cd yazi
+  version_to_install=v0.2.1
+  git checkout $version_to_install
+
+  cargo build --release
+  sudo cp ./target/release/yazi /usr/local/bin/
+  cd .. && rm -rf yazi
+
+  if ! grep -Fxq 'function ya() {' $HOME/.zshrc; then
+    sudo tee -a $HOME/.zshrc > /dev/null <<'EOT'
+function ya() {
+  tmp="$(mktemp -t "yazi-cwd.XXXXX")"
+  yazi "$@" --cwd-file="$tmp"
+  if cwd="$(cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
+    cd -- "$cwd"
+  fi
+  rm -f -- "$tmp"
+}
+EOT
+  fi
+}
+
 if [[ ! $# -eq 0 ]]; then
   if [[ $1 == "--update" ]]; then
     echo "Updating dotfiles..."
@@ -128,6 +156,10 @@ if [[ ! $# -eq 0 ]]; then
   elif [[ $1 == "--update-git" ]]; then
     echo "Updating git if necessary..."
     update_git
+    exit 0
+  elif [[ $1 == "--install-yazi" ]]; then
+    echo "Installing yazi..."
+    install_yazi_source
     exit 0
   else
     echo "Option \"$1\" not recognized."
