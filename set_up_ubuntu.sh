@@ -2,6 +2,10 @@
 set -x
 set -e
 
+function get_highest_tag_version() {
+  git tag | sort -V | tail -n 1
+}
+
 function is_installed() {
      dpkg --verify "$1" 2>/dev/null
 }
@@ -117,8 +121,8 @@ function install_yazi_source() {
   fi
   cd /tmp && rm -rf yazi && git clone https://github.com/sxyazi/yazi.git
   cd yazi
-  version_to_install=v0.2.1
-  git checkout $version_to_install
+  highest_tag=$(get_highest_tag_version)
+  git checkout $highest_tag
 
   cargo build --release
   sudo cp ./target/release/yazi /usr/local/bin/
