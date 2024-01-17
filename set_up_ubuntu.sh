@@ -104,6 +104,12 @@ function install_nvim_binary() {
   update_git
 }
 
+function install_zoxide() {
+  if ! command -v zoxide > /dev/null 2>&1; then
+    curl -sS https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | bash
+  fi
+}
+
 function install_yazi_source() {
   sudo test || true
   if ! command -v rustc > /dev/null 2>&1; then
@@ -130,6 +136,7 @@ function ya() {
 }
 EOT
   fi
+  install_zoxide
 }
 
 if [[ ! $# -eq 0 ]]; then
