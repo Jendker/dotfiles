@@ -68,6 +68,9 @@ telescope.setup({
         main_menu = { [{ 'i', 'n' }] = '<C-e>' },
       },
     },
+    frecency = {
+      db_safe_mode = false, -- don't ask for confirmation when pruning entries
+    }
   },
 })
 
