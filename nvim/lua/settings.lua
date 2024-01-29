@@ -35,7 +35,14 @@ vim.opt.showcmd = false -- prevent flickering if j/k is being held
 vim.opt.title = true -- turn on for tmux and terminal apps tab title
 
 -- Use OSC 52 clipboard for easy sharing over SSH
-local paste = function() return {vim.fn.split(vim.fn.getreg(''), '\n'), vim.fn.getregtype('')} end
+local paste = function(register)
+  if vim.env.TMUX == nil then
+    return require('vim.ui.clipboard.osc52').paste(register)
+  else
+    return {vim.fn.split(vim.fn.getreg(''), '\n'), vim.fn.getregtype('')}
+  end
+end
+
 vim.g.clipboard = {
   name = 'OSC 52',
   copy = {
@@ -49,8 +56,8 @@ vim.g.clipboard = {
   -- },
   -- temporarily
   paste = {
-    ['+'] = paste,
-    ['*'] = paste,
+    ['+'] = paste('+'),
+    ['*'] = paste('*'),
   }
 }
 
