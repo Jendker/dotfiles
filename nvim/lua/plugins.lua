@@ -260,7 +260,7 @@ local plugins = {
     config = function()
       local onedark = require('onedark')
       onedark.setup{
-        transparent = true,
+        transparent = not tmux,
         toggle_style_list = { 'light', 'dark' }, -- List of styles to toggle between
         diagnostics = {
           undercurl = false,
@@ -286,7 +286,7 @@ local plugins = {
       }
       onedark.load()
       vim.keymap.set('n', '<leader>tt', function()
-        onedark.setup({transparent = not vim.g.onedark_config.transparent})
+        onedark.setup({transparent = not vim.g.onedark_config.transparent and not tmux})
         onedark.toggle()
         require('highlight-undo').setup()
       end, {desc = "Toggle dark and light mode"})
