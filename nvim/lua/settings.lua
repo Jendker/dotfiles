@@ -39,7 +39,7 @@ local paste = function(register)
   if vim.env.TMUX == nil then
     return require('vim.ui.clipboard.osc52').paste(register)
   else
-    return {vim.fn.split(vim.fn.getreg(''), '\n'), vim.fn.getregtype('')}
+    return function() return {vim.fn.split(vim.fn.getreg(''), '\n'), vim.fn.getregtype('')} end
   end
 end
 
