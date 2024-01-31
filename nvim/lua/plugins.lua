@@ -999,17 +999,6 @@ local plugins = {
     cond = not_vscode
   },
   {
-    "Exafunction/codeium.nvim",
-    event = "VeryLazy",
-    build = ":Codeium Auth",
-    dependencies = {
-        "nvim-lua/plenary.nvim",
-        "hrsh7th/nvim-cmp",
-    },
-    opts = {},
-    cond = not_vscode
-  },
-  {
     'stevearc/aerial.nvim',
     cmd = { "AerialToggle", "AerialOpen", "AerialNavToogle", "AerialNavOpen", "AerialNext", "AerialPrev" },
     keys = {
