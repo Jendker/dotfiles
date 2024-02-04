@@ -5,9 +5,6 @@ local home = vim.uv.os_homedir()
 package.path = package.path .. ";" .. home .. "/.luarocks/share/lua/5.1/?/init.lua;"
 package.path = package.path .. ";" .. home .. "/.luarocks/share/lua/5.1/?.lua;"
 
--- Clipboard
-vim.opt.clipboard = "unnamedplus"
-
 -- Line Numbers
 vim.opt.number = true
 vim.opt.relativenumber = true
@@ -34,32 +31,42 @@ vim.o.updatetime = 200 -- CursorHold time default is 4s. Way too long
 vim.opt.showcmd = false -- prevent flickering if j/k is being held
 vim.opt.title = true -- turn on for tmux and terminal apps tab title
 
--- Use OSC 52 clipboard for easy sharing over SSH
-local paste = function(register)
-  if vim.env.TMUX == nil then
-    return require('vim.ui.clipboard.osc52').paste(register)
-  else
-    return function() return {vim.fn.split(vim.fn.getreg(''), '\n'), vim.fn.getregtype('')} end
-  end
-end
+-- Clipboard
+vim.opt.clipboard = "unnamedplus"
 
-vim.g.clipboard = {
-  name = 'OSC 52',
-  copy = {
-    ['+'] = require('vim.ui.clipboard.osc52').copy('+'),
-    ['*'] = require('vim.ui.clipboard.osc52').copy('*'),
-  },
-  -- enable when paste over OSC52 is supported in tmux
-  -- paste = {
-  --   ['+'] = require('vim.ui.clipboard.osc52').paste('+'),
-  --   ['*'] = require('vim.ui.clipboard.osc52').paste('*'),
-  -- },
-  -- temporarily
-  paste = {
-    ['+'] = paste('+'),
-    ['*'] = paste('*'),
+if vim.env.SSH_CONNECTION then
+  local function copy(register)
+    if vim.env.TMUX == nil then
+      return require('vim.ui.clipboard.osc52').copy(register)
+    else
+      return function(lines)
+        -- Set both OSC 52 to copy to host and to tmux to use on remote
+        require('vim.ui.clipboard.osc52').copy(register)(lines)
+        local cmd = {"tmux", "load-buffer", "-"}
+        vim.fn.system(cmd, lines)
+      end
+    end
+  end
+  local function paste(register)
+    if vim.env.TMUX == nil then
+      return require('vim.ui.clipboard.osc52').paste(register)
+    else
+      return {'tmux', 'save-buffer', '-'}
+    end
+  end
+
+  vim.g.clipboard = {
+    name = 'OSC 52 with tmux',
+    copy = {
+      ['+'] = copy('+'),
+      ['*'] = copy('*'),
+    },
+    paste = {
+      ['+'] = paste('+'),
+      ['*'] = paste('*'),
+    }
   }
-}
+end
 
 -- don't continue comment on newline
 vim.cmd("autocmd BufEnter * setlocal formatoptions-=cro")
