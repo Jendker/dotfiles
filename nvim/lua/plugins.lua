@@ -524,7 +524,7 @@ local plugins = {
         javascript = { "prettierd" },
         json = { "prettierd" },
         markdown = { "prettierd" },
-        python = { "isort", "black" },
+        python = { "ruff_fix", "isort", "black" },
         typescript = { "prettierd" },
         yaml = { "prettierd" },
       },

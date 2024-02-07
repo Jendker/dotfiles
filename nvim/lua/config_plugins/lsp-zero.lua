@@ -17,6 +17,7 @@ local auto_filetype_packages = {
   -- list of DAP mappings -- https://github.com/jay-babu/mason-nvim-dap.nvim/blob/main/lua/mason-nvim-dap/mappings/filetypes.lua
   ['pyright'] = true,
   ['debugpy'] = true,
+  ['ruff'] = true, -- auto fix errors with conform.nvim
   ['ruff_lsp'] = true,
   ['isort'] = true,
   ['black'] = true,
