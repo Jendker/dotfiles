@@ -6,6 +6,7 @@ local status_ok, lsp_zero = pcall(require, 'lsp-zero')
 if not status_ok then
   return
 end
+local common = require('common')
 
 -- List LSP servers that will be automatically installed upon entering filetype for the first time.
 -- LSP servers will be installed locally via mason at: ~/.local/share/nvim/mason/packages/
@@ -123,8 +124,13 @@ require('mason-lspconfig').setup({
         local util = require('lspconfig/util')
         local path = util.path
         -- Use activated virtualenv.
-        if vim.env.VIRTUAL_ENV then
-          return path.join(vim.env.VIRTUAL_ENV, 'bin', 'python')
+        local virtualenv_env_vars = {vim.env.VIRTUAL_ENV, vim.env.CONDA_DEFAULT_ENV}
+        for _, virtualenv_env_var in pairs(virtualenv_env_vars) do
+          if virtualenv_env_var then
+            local parts = common.split_string(virtualenv_env_var, '/')
+            vim.g.virtualenv_name = parts[#parts]
+            return path.join(virtualenv_env_var, 'bin', 'python')
+          end
         end
         -- trick to check the current directory if workspace is unset
         if workspace == nil then workspace = vim.fn.getcwd() end

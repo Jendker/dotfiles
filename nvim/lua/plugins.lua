@@ -302,17 +302,8 @@ local plugins = {
       table.insert(lualine_x,
         {
           function()
-            local function split_string(input, delimiter)
-              local result = {}
-              for part in string.gmatch(input, "([^" .. delimiter .. "]+)") do
-                table.insert(result, part)
-              end
-              return result
-            end
-            local venv = vim.env.VIRTUAL_ENV or vim.env.CONDA_DEFAULT_ENV
-            if venv then
-              local params = split_string(venv, '/')
-              return '(' .. params[#params] .. ')'
+            if vim.g.virtualenv_name then
+              return '(' .. vim.g.virtualenv_name .. ')'
             else
               return ''
             end

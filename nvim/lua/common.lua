@@ -165,4 +165,12 @@ M.removeTableValue = function(tab, val)
   end
 end
 
+M.split_string = function(input, delimiter)
+  local result = {}
+  for part in string.gmatch(input, "([^" .. delimiter .. "]+)") do
+    table.insert(result, part)
+  end
+  return result
+end
+
 return M
