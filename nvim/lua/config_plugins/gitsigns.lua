@@ -15,6 +15,7 @@ gitsigns.setup {
     delay = 100,
     ignore_whitespace = true,
   },
+  current_line_blame = common.is_dev_dir,
   diff_opts = {
       -- smarter diff algorithm that is semantically better
       algorithm = 'patience',

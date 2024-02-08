@@ -313,7 +313,7 @@ local plugins = {
       table.insert(lualine_x,
         {
           function()
-            if vim.g.autosave_on == 1 then
+            if vim.g.autosave_on then
               return "󱑜"
             else
               return ""
@@ -757,46 +757,61 @@ local plugins = {
     cond = not_vscode
   },
   {
-    -- original author moved to another fork. consider https://github.com/zoriya/flake/blob/320bedb075a06a0d83b1f75d55933c63695f0ce5/modules/misc/nvim/lua/plugins/misc.lua#L3
-    "Jendker/auto-save.nvim",
-    cmd = 'ASToggle',
+    "okuuva/auto-save.nvim",
+    event = { "InsertLeave", "TextChanged" },
     keys = {
-      { "<leader>ta", "<cmd>ASToggle<CR>", desc = "[T]oggle [a]utosave", silent = true },
+      {"<leader>ta", function()
+        vim.cmd("ASToggle")
+        vim.g.autosave_on = not vim.g.autosave_on
+        if vim.g.autosave_on then
+          vim.notify("auto-save on")
+        else
+          vim.notify("auto-save off")
+        end
+      end, desc = "[T]oggle [a]utosave"},
     },
-    config = function()
-      vim.g.first_autosave_disable = 1
-      vim.g.autosave_on = 0
-      require("auto-save").setup {
-        enabled = false,  -- this doesn't seem to work
-        print_enabled = false,
-        callbacks = {
-          enabling = function() print "auto-save on"; vim.g.autosave_on = 1 end,
-          disabling = function() if vim.g.first_autosave_disable == 1 then vim.g.first_autosave_disable = 0 else print "auto-save off"; vim.g.autosave_on = 0 end end,
-          before_saving = function()
-            common.disableAutoformat()
-            vim.b.paste_start_mark = vim.fn.getpos("'[")
-            vim.b.paste_end_mark = vim.fn.getpos("']")
-          end,
-          after_saving = function()
-            if not vim.b.orbik_disable_autoformat then
-              common.enableAutoformat()
-            end
-            vim.fn.setpos("'[", vim.b.paste_start_mark)
-            vim.fn.setpos("']", vim.b.paste_end_mark)
-          end,
-        },
-        condition = function(buf)
-          local fn = vim.fn
-          local utils = require("auto-save.utils.data")
-
-          -- return true means will auto-save
-          if fn.getbufvar(buf, "&modifiable") == 1 and utils.not_in(fn.getbufvar(buf, "&filetype"), {'oil'}) then
-            return true
-          end
-          return false
+    init = function ()
+      vim.g.autosave_on = common.is_dev_dir
+    end,
+    opts = {
+      execution_message = { enabled = false },
+      write_all_buffers = true,
+      condition = function(buf)
+        local ft = vim.fn.getbufvar(buf, "&filetype")
+        local modifiable = vim.fn.getbufvar(buf, "&modifiable") == 1
+        local utils = require("auto-save.utils.data")
+        -- return true means will auto-save
+        return modifiable and utils.not_in(ft, {'oil'})
+      end,
+      },
+    config = function(_, opts)
+      require("auto-save").setup(opts)
+      if not vim.g.autosave_on then
+        -- disable autosave
+        vim.cmd("ASToggle")
+      end
+      -- set callbacks
+      local group = vim.api.nvim_create_augroup('autosave', {})
+      vim.api.nvim_create_autocmd('User', {
+        pattern = 'AutoSaveWritePre',
+        group = group,
+        callback = function(_)
+          common.disableAutoformat()
+          vim.b.paste_start_mark = vim.fn.getpos("'[")
+          vim.b.paste_end_mark = vim.fn.getpos("']")
         end,
-      }
-      vim.cmd('ASToggle') -- called manually because 'enabled = false' does not work
+      })
+      vim.api.nvim_create_autocmd('User', {
+        pattern = 'AutoSaveWritePost',
+        group = group,
+        callback = function(_)
+          if not vim.b.orbik_disable_autoformat then
+            common.enableAutoformat()
+          end
+          vim.fn.setpos("'[", vim.b.paste_start_mark)
+          vim.fn.setpos("']", vim.b.paste_end_mark)
+        end,
+      })
     end,
     cond = not_vscode
   },

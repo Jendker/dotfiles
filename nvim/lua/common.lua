@@ -21,6 +21,18 @@ end
 
 local M = {}
 
+local function is_dev_dir()
+  local cwd_parts = vim.split(vim.fn.getcwd(), "/")
+  vim.g.debug = cwd_parts
+  local directory = cwd_parts[#cwd_parts]
+  vim.g.directory_name = directory
+  if directory:match('^myo_(.*)') then
+    return true
+  end
+  return false
+end
+M.is_dev_dir = is_dev_dir()
+
 function M.getGitMainBranch()
   -- get git main branch name
   local get_main_branch_shell_command = [[command git rev-parse --git-dir &>/dev/null || return
