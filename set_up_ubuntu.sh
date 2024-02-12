@@ -112,7 +112,7 @@ function install_zoxide() {
   if ! command -v zoxide > /dev/null 2>&1; then
     curl -sS https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | bash
   fi
-  grep -qxF 'eval "$(zoxide init zsh)"' $HOME/.zshrc || printf 'source eval "$(zoxide init zsh)"' >> $HOME/.zshrc
+  grep -qxF 'eval "$(zoxide init zsh)"' $HOME/.zshrc || printf 'eval "$(zoxide init zsh)"' >> $HOME/.zshrc
 }
 
 function install_yazi_source() {
@@ -163,7 +163,7 @@ if [[ ! $# -eq 0 ]]; then
     install_node
     exit 0
   elif [[ $1 == "--install-cargo" ]]; then
-    echo "Installing cargo and rust..."
+    echo "Installing rust and cargo..."
     install_rust
     exit 0
   elif [[ $1 == "--update-git" ]]; then
@@ -221,7 +221,7 @@ ZSH_HIGHLIGHT_STYLES[path]=none
 ZSH_HIGHLIGHT_STYLES[path_prefix]=none
 
 # zsh-expand
-export ZPWR_EXPAND_BLACKLIST=(ls vim grep z)
+export ZPWR_EXPAND_BLACKLIST=(ls vim grep z zi)
 export ZPWR_EXPAND_TO_HISTORY=true # expand to history also on enter
 
 .
