@@ -90,10 +90,10 @@ function update_git() {
   fi
 }
 
-function install_cargo() {
+function install_rust() {
   if ! [ -x "$(command -v cargo)" ]; then
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-    grep -qxF 'source "$HOME/.cargo/env"' $HOME/.zshrc || printf "source "$HOME/.cargo/env"" >> $HOME/.zshrc
+    grep -qxF 'source "$HOME/.cargo/env"' $HOME/.zshrc || printf 'source "$HOME/.cargo/env"' >> $HOME/.zshrc
     echo "Please source ~/.zshrc or ~/.bashrc"
   fi
 }
@@ -112,10 +112,12 @@ function install_zoxide() {
   if ! command -v zoxide > /dev/null 2>&1; then
     curl -sS https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | bash
   fi
+  grep -qxF 'eval "$(zoxide init zsh)"' $HOME/.zshrc || printf 'source eval "$(zoxide init zsh)"' >> $HOME/.zshrc
 }
 
 function install_yazi_source() {
   sudo test || true
+  install_rust
   if ! command -v rustc > /dev/null 2>&1; then
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
   fi
@@ -162,7 +164,7 @@ if [[ ! $# -eq 0 ]]; then
     exit 0
   elif [[ $1 == "--install-cargo" ]]; then
     echo "Installing cargo and rust..."
-    install_cargo
+    install_rust
     exit 0
   elif [[ $1 == "--update-git" ]]; then
     echo "Updating git if necessary..."
@@ -219,13 +221,13 @@ ZSH_HIGHLIGHT_STYLES[path]=none
 ZSH_HIGHLIGHT_STYLES[path_prefix]=none
 
 # zsh-expand
-export ZPWR_EXPAND_BLACKLIST=(ls vim grep)
+export ZPWR_EXPAND_BLACKLIST=(ls vim grep z)
 export ZPWR_EXPAND_TO_HISTORY=true # expand to history also on enter
 
 .
 wq
 IN
-  sed -i 's/plugins=(git)/plugins=(git ubuntu zsh-syntax-highlighting zsh-expand conda-zsh-completion)/g' $HOME/.zshrc
+  sed -i 's/plugins=(git)/plugins=(git ubuntu zsh-syntax-highlighting zsh-expand conda-zsh-completion git-auto-fetch)/g' $HOME/.zshrc
   sed -i '/mode auto/s/^# //g' $HOME/.zshrc
 fi
 
@@ -282,3 +284,5 @@ fi
 
 # install git lfs
 curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash && sudo apt-get install git-lfs && git lfs install
+
+install_zoxide
