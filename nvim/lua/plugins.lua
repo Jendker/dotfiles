@@ -76,7 +76,6 @@ local plugins = {
     init = function()
       vim.g.matchup_motion_enabled = not vscode
       vim.g.matchup_matchparen_enabled = not vscode
-      vim.g.matchup_matchparen_pumvisible = 0 -- to fix cmp-nvim autocomplete with codeium
     end
   },
   {
