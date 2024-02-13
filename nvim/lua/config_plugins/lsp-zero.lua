@@ -425,22 +425,6 @@ local cmp_sorting = {
 
 cmp.setup({
   mapping = cmp_mappings,
-  formatting = {
-    fields = {'abbr', 'menu', 'kind'},
-    -- max 100 characters in item abbreviation
-    format = function(entry, vim_item)
-      vim_item.abbr = string.sub(vim_item.abbr, 1, 100)
-
-      local short_name = {
-        nvim_lsp = 'LSP',
-        nvim_lua = 'nvim',
-      }
-      local menu_name = short_name[entry.source.name] or entry.source.name
-      vim_item.menu = string.format('[%s]', menu_name)
-
-      return vim_item
-    end
-  },
   sources = {
     {name = 'path'},
     {name = 'nvim_lsp'},
