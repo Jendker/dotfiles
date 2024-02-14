@@ -66,11 +66,11 @@ gitsigns.setup {
       local main_branch_name = common.getGitMainBranch()
       if main_branch_name ~= nil then
         gs.change_base(main_branch_name, true)
-        vim.notify("Changing base to master. Undo with :Gitsigns reset_base true", vim.log.levels.INFO)
+        vim.notify("Changing base to main. Undo with :Gitsigns reset_base true", vim.log.levels.INFO)
       else
         vim.api.nvim_err_writeln("Not a git repository")
       end
-    end, { desc = "Change base to master", silent = true })
+    end, { desc = "Change base to main", silent = true })
     map('n', '<leader>hB', function() gs.reset_base(true) end, { desc = "Reset [B]ase to index", silent = true })
     map('n', '<leader>hD', function() gs.diffthis('~') end, { desc = "Diff to previous commit", silent = true })
     map('n', '<leader>td', gs.toggle_deleted, { desc = "[t]oggle [d]eleted", silent = true })

@@ -163,8 +163,7 @@ local plugins = {
     event = 'VeryLazy',
     dependencies = {'tpope/vim-rhubarb', 'shumphrey/fugitive-gitlab.vim'},
     config = function()
-      -- to open Roboception remote url:
-      vim.g.fugitive_gitlab_domains = {'https://gitlab.com', 'https://gitlab.roboception.de'}
+      vim.g.fugitive_gitlab_domains = {'https://gitlab.com'}
       vim.keymap.set("n", "<leader>hM", function()
           local main_branch_name = common.getGitMainBranch()
           if main_branch_name ~= nil then
@@ -176,6 +175,17 @@ local plugins = {
           end
         end,
         { desc = "Current file main version" })
+      vim.keymap.set("n", "<leader>hC", function()
+          local main_branch_name = common.getGitMainBranch()
+          if main_branch_name ~= nil then
+            local file_path = vim.fn.expand('%')
+            vim.cmd("NewCleanBufferInSplit")
+            vim.cmd("Gedit " .. vim.fn.getreg("*") .. ":" .. file_path)
+          else
+            vim.api.nvim_err_writeln("Not a git repository")
+          end
+        end,
+        { desc = "Clipboard hash for current file" })
     end,
     cond = not_vscode
   },
@@ -756,7 +766,8 @@ local plugins = {
     cond = not_vscode
   },
   {
-    "okuuva/auto-save.nvim",
+    -- original author moved to another fork. consider https://github.com/zoriya/flake/blob/320bedb075a06a0d83b1f75d55933c63695f0ce5/modules/misc/nvim/lua/plugins/misc.lua#L3
+    "Jendker/auto-save.nvim",
     event = { "InsertLeave", "TextChanged" },
     keys = {
       {"<leader>ta", function()
@@ -773,7 +784,7 @@ local plugins = {
       vim.g.autosave_on = common.is_dev_dir
     end,
     opts = {
-      execution_message = { enabled = false },
+      print_enabled = false,
       write_all_buffers = true,
       condition = function(buf)
         local ft = vim.fn.getbufvar(buf, "&filetype")
@@ -782,35 +793,27 @@ local plugins = {
         -- return true means will auto-save
         return modifiable and utils.not_in(ft, {'oil'})
       end,
-      },
-    config = function(_, opts)
-      require("auto-save").setup(opts)
-      if not vim.g.autosave_on then
-        -- disable autosave
-        vim.cmd("ASToggle")
-      end
-      -- set callbacks
-      local group = vim.api.nvim_create_augroup('autosave', {})
-      vim.api.nvim_create_autocmd('User', {
-        pattern = 'AutoSaveWritePre',
-        group = group,
-        callback = function(_)
+      callbacks = {
+        before_saving = function()
           common.disableAutoformat()
           vim.b.paste_start_mark = vim.fn.getpos("'[")
           vim.b.paste_end_mark = vim.fn.getpos("']")
         end,
-      })
-      vim.api.nvim_create_autocmd('User', {
-        pattern = 'AutoSaveWritePost',
-        group = group,
-        callback = function(_)
+        after_saving = function()
           if not vim.b.orbik_disable_autoformat then
             common.enableAutoformat()
           end
           vim.fn.setpos("'[", vim.b.paste_start_mark)
           vim.fn.setpos("']", vim.b.paste_end_mark)
         end,
-      })
+      },
+    },
+    config = function(_, opts)
+      require("auto-save").setup(opts)
+      if not vim.g.autosave_on then
+        -- enable autosave
+        vim.cmd('ASToggle')
+      end
     end,
     cond = not_vscode
   },
