@@ -73,9 +73,12 @@ local plugins = {
   'nvim-treesitter/nvim-treesitter-textobjects',
   { -- better % on matching delimeters
     'andymass/vim-matchup',
+    event = "BufReadPost",
     init = function()
       vim.g.matchup_motion_enabled = not vscode
       vim.g.matchup_matchparen_enabled = not vscode
+      vim.g.matchup_matchparen_offscreen = { method = "status_manual" }
+      vim.g.matchup_matchparen_deferred = 1
     end
   },
   {
@@ -1003,6 +1006,17 @@ local plugins = {
   {
     "kevinhwang91/nvim-bqf",
     event = "VeryLazy",
+    opts = {},
+    cond = not_vscode
+  },
+  {
+    "Exafunction/codeium.nvim",
+    event = "VeryLazy",
+    build = ":Codeium Auth",
+    dependencies = {
+        "nvim-lua/plenary.nvim",
+        "hrsh7th/nvim-cmp",
+    },
     opts = {},
     cond = not_vscode
   },
