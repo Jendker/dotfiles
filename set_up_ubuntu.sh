@@ -181,7 +181,7 @@ if [[ ! $# -eq 0 ]]; then
 fi
 
 sudo apt update
-sudo apt install tmux curl wget locales lsb-release zsh xclip unzip python3-venv fd-find ccache git -y
+sudo apt install tmux curl wget locales lsb-release zsh xclip unzip python3-venv fd-find ccache git imagemagick -y
 # for thefuck
 sudo apt install python3-dev python3-pip python3-setuptools -y
 # symlink fdfind as fd

@@ -73,7 +73,7 @@ gitsigns.setup {
     end, { desc = "Change base to main", silent = true })
     map('n', '<leader>hB', function() gs.reset_base(true) end, { desc = "Reset [B]ase to index", silent = true })
     map('n', '<leader>hD', function() gs.diffthis('~') end, { desc = "Diff to previous commit", silent = true })
-    map('n', '<leader>td', gs.toggle_deleted, { desc = "[t]oggle [d]eleted", silent = true })
+    -- map('n', '<leader>td', gs.toggle_deleted, { desc = "[t]oggle [d]eleted", silent = true })
 
     -- Text object
     map({'o', 'x'}, 'ih', ':<C-U>Gitsigns select_hunk<CR>', { desc = "select hunk", silent = true} )

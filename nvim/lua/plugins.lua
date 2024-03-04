@@ -154,6 +154,21 @@ local plugins = {
     'tzachar/highlight-undo.nvim',
     config = true
   },
+  {
+    event = {"BufReadPost", "BufNewFile"},
+    'haya14busa/vim-asterisk',
+    -- init = function() vim.g["asterisk#keeppos"] = 1 end,
+    config = function()
+      vim.keymap.set({"n", "v", "c"}, "*", "<Plug>(asterisk-*)", {noremap = false})
+      vim.keymap.set({"n", "v", "c"}, "#", "<Plug>(asterisk-#)", {noremap = false})
+      vim.keymap.set({"n", "v", "c"}, "g*", "<Plug>(asterisk-g*)", {noremap = false})
+      vim.keymap.set({"n", "v", "c"}, "g#", "<Plug>(asterisk-g#)", {noremap = false})
+      vim.keymap.set({"n", "v", "c"}, "z*", "<Plug>(asterisk-z*)", {noremap = false})
+      vim.keymap.set({"n", "v", "c"}, "gz*", "<Plug>(asterisk-gz*)", {noremap = false})
+      vim.keymap.set({"n", "v", "c"}, "z#", "<Plug>(asterisk-z#)", {noremap = false})
+      vim.keymap.set({"n", "v", "c"}, "gz#", "<Plug>(asterisk-gz#)", {noremap = false})
+    end
+  },
   -- without VSCode
   -- auto trail whitespace
   {
@@ -1436,6 +1451,15 @@ local plugins = {
     cmd = { "PinBuffer", "PinBuftype", "PinFiletype" },
     opts = {},
     cond = not_vscode
+  },
+  {
+    'b0o/incline.nvim',
+    event = { "BufReadPre", "BufNewFile" },
+    opts = {
+      hide = {
+        only_win = true,
+      },
+    },
   },
   require('debugging'),
 }

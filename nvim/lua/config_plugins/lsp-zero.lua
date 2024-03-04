@@ -355,6 +355,26 @@ vim.diagnostic.config({
   },
 })
 
+vim.api.nvim_create_user_command("DiagnosticToggle", function()
+	local config = vim.diagnostic.config
+	local signs = config().signs
+	config {
+		virtual_text = not signs,
+		underline = not signs,
+		signs = not signs,
+	}
+end, { desc = "[t]oggle [d]iagnostics" })
+vim.keymap.set("n", "<leader>td", "<cmd>DiagnosticToggle<CR>")
+
+vim.api.nvim_create_user_command("VirtualTextToggle", function()
+	local config = vim.diagnostic.config
+	local vt = config().virtual_text
+	config {
+          virtual_text = not vt,
+	}
+end, { desc = "[t]oggle [v]irtual text" })
+vim.keymap.set("n", "<leader>tv", "<cmd>VirtualTextToggle<CR>")
+
 local cmp = require('cmp')
 local cmp_action = require('lsp-zero').cmp_action()
 require('luasnip.loaders.from_vscode').lazy_load() -- for snippets

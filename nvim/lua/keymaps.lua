@@ -57,11 +57,6 @@ map("n", "<leader>tm", function()
     vim.notify("Vim mouse enabled", vim.log.levels.INFO)
   end
 end, { desc = "[T]oggle [m]ouse" })
--- center after buffer movements
--- vim.keymap.set("n", "n", "nzzzv")
--- vim.keymap.set("n", "N", "Nzzzv")
--- vim.keymap.set("n", "*", "*zzzv")
--- vim.keymap.set("n", "#", "#zzzv")
 
 -- don't enter command history
 map("n", "Q", "<nop>")
@@ -150,14 +145,6 @@ end, { desc = "Search for clipboard content"})
 
 -- Makes * and # work in visual mode - comes from https://github.com/stevearc/dotfiles/blob/66f2a389bb0647c0b88ee23d0f264d67b8e8cec3/.config/nvim/init.lua#L287-L295
 -- could be improved
-function VisualSetSearch(cmdtype)
-  local tmp = vim.fn.getreg("s")
-  vim.cmd.normal({ args = { 'gv"sy' }, bang = true })
-  vim.fn.setreg("/", "\\V" .. vim.fn.escape(vim.fn.getreg("s"), cmdtype .. "\\"):gsub("\n", "\\n"))
-  vim.fn.setreg("s", tmp)
-end
-map("x", "*", ':lua VisualSetSearch("/")<CR>/<C-R>=@/<CR><CR>')
-map("x", "#", ':lua VisualSetSearch("?")<CR>?<C-R>=@/<CR><CR>')
 
 map("n", "S", '"_cc')
 
