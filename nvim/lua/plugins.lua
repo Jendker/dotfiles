@@ -159,14 +159,14 @@ local plugins = {
     'haya14busa/vim-asterisk',
     -- init = function() vim.g["asterisk#keeppos"] = 1 end,
     config = function()
-      vim.keymap.set({"n", "v", "c"}, "*", "<Plug>(asterisk-*)", {noremap = false})
-      vim.keymap.set({"n", "v", "c"}, "#", "<Plug>(asterisk-#)", {noremap = false})
-      vim.keymap.set({"n", "v", "c"}, "g*", "<Plug>(asterisk-g*)", {noremap = false})
-      vim.keymap.set({"n", "v", "c"}, "g#", "<Plug>(asterisk-g#)", {noremap = false})
-      vim.keymap.set({"n", "v", "c"}, "z*", "<Plug>(asterisk-z*)", {noremap = false})
-      vim.keymap.set({"n", "v", "c"}, "gz*", "<Plug>(asterisk-gz*)", {noremap = false})
-      vim.keymap.set({"n", "v", "c"}, "z#", "<Plug>(asterisk-z#)", {noremap = false})
-      vim.keymap.set({"n", "v", "c"}, "gz#", "<Plug>(asterisk-gz#)", {noremap = false})
+      vim.keymap.set({"n", "v"}, "*", "<Plug>(asterisk-*)", {noremap = false})
+      vim.keymap.set({"n", "v"}, "#", "<Plug>(asterisk-#)", {noremap = false})
+      vim.keymap.set({"n", "v"}, "g*", "<Plug>(asterisk-g*)", {noremap = false})
+      vim.keymap.set({"n", "v"}, "g#", "<Plug>(asterisk-g#)", {noremap = false})
+      vim.keymap.set({"n", "v"}, "z*", "<Plug>(asterisk-z*)", {noremap = false})
+      vim.keymap.set({"n", "v"}, "gz*", "<Plug>(asterisk-gz*)", {noremap = false})
+      vim.keymap.set({"n", "v"}, "z#", "<Plug>(asterisk-z#)", {noremap = false})
+      vim.keymap.set({"n", "v"}, "gz#", "<Plug>(asterisk-gz#)", {noremap = false})
     end
   },
   -- without VSCode
