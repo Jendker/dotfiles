@@ -786,6 +786,7 @@ local plugins = {
   {
     -- original author moved to another fork. consider https://github.com/zoriya/flake/blob/320bedb075a06a0d83b1f75d55933c63695f0ce5/modules/misc/nvim/lua/plugins/misc.lua#L3
     "Jendker/auto-save.nvim",
+    cmd = { "ASToggle" },
     event = { "InsertLeave", "TextChanged" },
     keys = {
       {"<leader>ta", function()
