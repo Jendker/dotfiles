@@ -20,7 +20,6 @@ local auto_filetype_packages = {
   ['debugpy'] = true,
   ['ruff'] = true, -- auto fix errors with conform.nvim
   ['ruff_lsp'] = true,
-  ['isort'] = true,
   ['black'] = true,
   ['lua_ls'] = true,
   ['bashls'] = true,
@@ -210,7 +209,7 @@ require('mason-lspconfig').setup({
         init_options = {
           -- https://github.com/charliermarsh/ruff-lsp#settings
           settings = {
-            organizeImports = false,  -- let isort take care of organizeImports
+            organizeImports = false,  -- let conform take care of organizeImports
             -- Any extra CLI arguments for `ruff` go here.
             args = {
               "--ignore", table.concat({
