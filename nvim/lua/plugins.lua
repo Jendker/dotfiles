@@ -1449,8 +1449,32 @@ local plugins = {
   },
   {
     'stevearc/stickybuf.nvim',
-    cmd = { "PinBuffer", "PinBuftype", "PinFiletype" },
-    opts = {},
+    opts = {
+      get_auto_pin = function(bufnr)
+        -- from https://github.com/emmanueltouzery/nvim_config/blob/859c0377fabcf955cf77c353c1c95d4808d8f63c/init.lua#L755
+        local buf_ft = vim.api.nvim_get_option_value("ft", {buf = bufnr})
+        if buf_ft == "DiffviewFiles" then
+          -- this is a diffview tab, disable creating new windows
+          -- (which would be the default behavior of handle_foreign_buffer)
+          return {
+            handle_foreign_buffer = function(_) end
+          }
+        end
+        return require("stickybuf").should_auto_pin(bufnr)
+      end
+    },
+    config = function(_, opts)
+      local stickybuf = require("stickybuf")
+      stickybuf.setup(opts)
+      vim.api.nvim_create_autocmd("BufEnter", {
+        desc = "Pin the buffer to any window that is fixed width or height",
+        callback = function(args)
+          if not stickybuf.is_pinned() and (vim.wo.winfixwidth or vim.wo.winfixheight) then
+            stickybuf.pin()
+          end
+        end
+      })
+    end,
     cond = not_vscode
   },
   {
