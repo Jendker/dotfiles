@@ -285,4 +285,9 @@ fi
 # install git lfs
 curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash && sudo apt-get install git-lfs && git lfs install
 
+# auto setup remote for new branches
+git config --global --add --bool push.autoSetupRemote true
+# always rebase on pull
+git config --global pull.rebase true
+
 install_zoxide
