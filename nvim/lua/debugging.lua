@@ -2,7 +2,8 @@ return {
   {
     'mfussenegger/nvim-dap',
     dependencies = {
-      'rcarriga/nvim-dap-ui',
+      {'rcarriga/nvim-dap-ui', dependencies = 'nvim-neotest/nvim-nio'},
+      'theHamsta/nvim-dap-virtual-text',
 
       -- Installs the debug adapters
       'williamboman/mason.nvim',
@@ -13,7 +14,20 @@ return {
       'mfussenegger/nvim-dap-python',
 
       -- Miscellaneous
-      'Weissle/persistent-breakpoints.nvim',
+      {
+        'Weissle/persistent-breakpoints.nvim',
+        opts = {
+          load_breakpoints_event = { "BufReadPost" }
+        },
+        config = function(_, opts)
+          vim.api.nvim_set_hl(0, 'DapBreakpoint', { fg = '#993939' })
+          vim.fn.sign_define('DapBreakpoint', { text = '•', texthl='DapBreakpoint'})
+          vim.fn.sign_define('DapBreakpointCondition', { text = '', texthl='DapBreakpoint'})
+
+          require("persistent-breakpoints").setup(opts)
+          require("persistent-breakpoints.api").load_breakpoints()
+        end
+      },
       {
         "theHamsta/nvim-dap-virtual-text",
         opts = {
@@ -43,10 +57,6 @@ return {
       local dapui = require 'dapui'
 
       require('mason-nvim-dap').setup()
-
-      -- TODO set colors to red
-      vim.fn.sign_define('DapBreakpoint', { text = '•'})
-      vim.fn.sign_define('DapBreakpointCondition', { text = ''})
 
       -- Dap UI setup
       -- For more information, see |:help nvim-dap-ui|
@@ -196,15 +206,6 @@ return {
         require("dap.ext.vscode").load_launchjs(nil, { node = { "typescript", "javascript" } })
         require("overseer").patch_dap(true)
       end)
-    end,
-    cond = not_vscode
-  },
-  {
-    'Weissle/persistent-breakpoints.nvim',
-    config = function()
-      require('persistent-breakpoints').setup {
-        load_breakpoints_event = { "BufReadPost" }
-      }
     end,
     cond = not_vscode
   },
