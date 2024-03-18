@@ -1486,6 +1486,11 @@ local plugins = {
       },
     },
   },
+  {
+    "LunarVim/bigfile.nvim",
+    opts = {},
+    cond = not_vscode
+  },
   require('debugging'),
 }
 
