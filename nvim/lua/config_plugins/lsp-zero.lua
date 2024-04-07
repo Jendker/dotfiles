@@ -16,7 +16,7 @@ local auto_filetype_packages = {
   -- list of LSP servers -- https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md
   -- list of formatters -- https://github.com/jay-babu/mason-null-ls.nvim/blob/main/lua/mason-null-ls/mappings/filetype.lua
   -- list of DAP mappings -- https://github.com/jay-babu/mason-nvim-dap.nvim/blob/main/lua/mason-nvim-dap/mappings/filetypes.lua
-  ['pyright'] = true,
+  ['basedpyright'] = true,
   ['debugpy'] = true,
   ['ruff'] = true, -- auto fix errors with conform.nvim
   ['ruff_lsp'] = true,
@@ -118,7 +118,7 @@ require('mason-lspconfig').setup({
         },
       })
     end,
-    pyright = function()
+    basedpyright = function()
       local function get_python_path(workspace)
         local util = require('lspconfig/util')
         local path = util.path
@@ -187,19 +187,28 @@ require('mason-lspconfig').setup({
         vim.lsp.diagnostic.on_publish_diagnostics(a, params, client_id, c, config)
       end
 
-      require('lspconfig').pyright.setup({
+      require('lspconfig').basedpyright.setup({
         before_init = function(_, config)
           local python_path = get_python_path(config.root_dir)
-          config.settings.python.pythonPath = python_path
+          config.settings.basedpyright.pythonPath = python_path
           vim.g.python_host_prog = python_path
           vim.g.python3_host_prog = python_path
         end,
         on_attach = function(_, _)
           vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
             custom_on_publish_diagnostics, {})
+          vim.cmd('TSBufEnable highlight')
         end,
+        settings = {
+          basedpyright = {
+            analysis = {
+              typeCheckingMode = "standard",
+            },
+          },
+        },
       })
     end,
+    pyright = lsp_zero.noop,
     ruff_lsp = function()
       require('lspconfig').ruff_lsp.setup {
         on_attach = function(client, _)
