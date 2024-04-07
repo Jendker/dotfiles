@@ -154,21 +154,6 @@ local plugins = {
     'tzachar/highlight-undo.nvim',
     config = true
   },
-  {
-    event = {"BufReadPost", "BufNewFile"},
-    'haya14busa/vim-asterisk',
-    -- init = function() vim.g["asterisk#keeppos"] = 1 end,
-    config = function()
-      vim.keymap.set({"n", "v"}, "*", "<Plug>(asterisk-*)", {noremap = false})
-      vim.keymap.set({"n", "v"}, "#", "<Plug>(asterisk-#)", {noremap = false})
-      vim.keymap.set({"n", "v"}, "g*", "<Plug>(asterisk-g*)", {noremap = false})
-      vim.keymap.set({"n", "v"}, "g#", "<Plug>(asterisk-g#)", {noremap = false})
-      vim.keymap.set({"n", "v"}, "z*", "<Plug>(asterisk-z*)", {noremap = false})
-      vim.keymap.set({"n", "v"}, "gz*", "<Plug>(asterisk-gz*)", {noremap = false})
-      vim.keymap.set({"n", "v"}, "z#", "<Plug>(asterisk-z#)", {noremap = false})
-      vim.keymap.set({"n", "v"}, "gz#", "<Plug>(asterisk-gz#)", {noremap = false})
-    end
-  },
   -- without VSCode
   -- auto trail whitespace
   {
@@ -322,7 +307,7 @@ local plugins = {
   },
   {
     'nvim-lualine/lualine.nvim',
-    dependencies = { 'nvim-tree/nvim-web-devicons', lazy = true},
+    dependencies = { 'nvim-tree/nvim-web-devicons', lazy = true },
     config = function()
       vim.opt.showmode = false -- don't display mode, e.g. '-- INSERT --', lualine takes care of it
       local lualine_x = {}
@@ -347,22 +332,24 @@ local plugins = {
             end
           end
         })
-      table.insert(lualine_x, {'filetype'})
+      table.insert(lualine_x, { 'filetype' })
       -- lualine_x definition done
       require("lualine").setup(
-      {
-        sections = {
-          lualine_c = {
-            {
-              'filename',
-              file_status = true, -- displays file status (readonly status, modified status)
-              path = 1 -- 0 = just filename, 1 = relative path, 2 = absolute path
-            }
+        {
+          sections = {
+            lualine_c = {
+              {
+                'filename',
+                file_status = true, -- displays file status (readonly status, modified status)
+                path = 1          -- 0 = just filename, 1 = relative path, 2 = absolute path
+              }
+            },
+            lualine_x = lualine_x,
           },
-          lualine_x = lualine_x,
-        },
-        options = {theme = 'onedark', section_separators = '', component_separators = ''},
-      })
+          options = { theme = 'onedark', section_separators = '', component_separators = '' },
+          extensions = { "lazy", "oil", "overseer", "symbols-outline",
+            "trouble", "mason", "aerial", "fugitive", "nvim-dap-ui", "quickfix" }
+        })
     end,
     cond = not_vscode
   },
