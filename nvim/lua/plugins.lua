@@ -154,6 +154,58 @@ local plugins = {
     'tzachar/highlight-undo.nvim',
     config = true
   },
+  {
+    "RRethy/vim-illuminate",
+    event = { "BufReadPost", "BufNewFile" },
+    opts = {
+      delay = 200,
+      large_file_cutoff = 2000,
+      large_file_overrides = {
+        providers = { "lsp" },
+      },
+      filetypes_denylist = {
+        "dirvish",
+        "fugitive",
+        "lazy",
+        "Trouble",
+        "Outline",
+        "spectre_panel",
+        "toggleterm",
+        "TelescopePrompt",
+        "oil",
+      },
+    },
+    config = function(_, opts)
+      require("illuminate").configure(opts)
+
+      local function map(key, dir, buffer)
+        vim.keymap.set("n", key, function()
+          require("illuminate")["goto_" .. dir .. "_reference"](false)
+        end, { desc = dir:sub(1, 1):upper() .. dir:sub(2) .. " Reference", buffer = buffer })
+      end
+
+      map("]]", "next")
+      map("[[", "prev")
+
+      -- also set it after loading ftplugins, since a lot overwrite [[ and ]]
+      vim.api.nvim_create_autocmd("FileType", {
+        callback = function()
+          local buffer = vim.api.nvim_get_current_buf()
+          map("]]", "next", buffer)
+          map("[[", "prev", buffer)
+        end,
+      })
+      if vscode then
+        vim.api.nvim_set_hl(0, "IlluminatedWordText", { fg = "none", bg = "none" })
+        vim.api.nvim_set_hl(0, "IlluminatedWordRead", { fg = "none", bg = "none" })
+        vim.api.nvim_set_hl(0, "IlluminatedWordWrite", { fg = "none", bg = "none" })
+      end
+    end,
+    keys = {
+      { "]]", desc = "Next Reference" },
+      { "[[", desc = "Prev Reference" },
+    },
+  },
   -- without VSCode
   -- auto trail whitespace
   {
@@ -1058,54 +1110,6 @@ local plugins = {
     cmd = { "Outline", "OutlineOpen" },
     keys = { {'<leader>bo', '<cmd>Outline<CR>', 'n', desc = "[b]uffer symbols [o]outline"} },
     opts = { outline_window = { auto_close = true, auto_goto = true, }, },
-    cond = not_vscode,
-  },
-  {
-    "RRethy/vim-illuminate",
-    event = { "BufReadPost", "BufNewFile" },
-    opts = {
-      delay = 200,
-      large_file_cutoff = 2000,
-      large_file_overrides = {
-        providers = { "lsp" },
-      },
-      filetypes_denylist = {
-        "dirvish",
-        "fugitive",
-        "lazy",
-        "Trouble",
-        "Outline",
-        "spectre_panel",
-        "toggleterm",
-        "TelescopePrompt",
-        "oil",
-      },
-    },
-    config = function(_, opts)
-      require("illuminate").configure(opts)
-
-      local function map(key, dir, buffer)
-        vim.keymap.set("n", key, function()
-          require("illuminate")["goto_" .. dir .. "_reference"](false)
-        end, { desc = dir:sub(1, 1):upper() .. dir:sub(2) .. " Reference", buffer = buffer })
-      end
-
-      map("]]", "next")
-      map("[[", "prev")
-
-      -- also set it after loading ftplugins, since a lot overwrite [[ and ]]
-      vim.api.nvim_create_autocmd("FileType", {
-        callback = function()
-          local buffer = vim.api.nvim_get_current_buf()
-          map("]]", "next", buffer)
-          map("[[", "prev", buffer)
-        end,
-      })
-    end,
-    keys = {
-      { "]]", desc = "Next Reference" },
-      { "[[", desc = "Prev Reference" },
-    },
     cond = not_vscode,
   },
   {
