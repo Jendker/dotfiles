@@ -181,7 +181,7 @@ if [[ ! $# -eq 0 ]]; then
 fi
 
 sudo apt update
-sudo apt install tmux curl wget locales lsb-release zsh xclip unzip python3-venv fd-find ccache git imagemagick -y
+sudo apt install tmux curl wget locales lsb-release zsh xclip unzip python3-venv fd-find ccache git imagemagick pipx -y
 # for thefuck
 sudo apt install python3-dev python3-pip python3-setuptools -y
 # symlink fdfind as fd
@@ -189,7 +189,6 @@ mkdir -p $HOME/.local/bin
 ln -s $(which fdfind) $HOME/.local/bin/fd || true
 
 sudo apt install ripgrep -y || true
-sudo apt install clang-format-10 -y || true
 if [ -d ~/.oh-my-zsh ]; then
 	echo "oh-my-zsh is installed"
  else
@@ -198,7 +197,7 @@ if [ -d ~/.oh-my-zsh ]; then
   sudo chsh -s $(which zsh) $(whoami) || true
   git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
   git clone https://github.com/MenkeTechnologies/zsh-expand.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-expand
-  pip3 install thefuck --user
+  pipx install thefuck
   sudo tee -a $HOME/.zshrc > /dev/null <<'EOT'
 alias vim=nvim
 export EDITOR=nvim
@@ -264,7 +263,7 @@ fi
 # set up miniconda
 if ! [ -x "$(command -v conda)" ]; then
   mkdir -p ~/miniconda3
-  wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda3/miniconda.sh
+  wget "https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-$(uname --machine).sh" -O ~/miniconda3/miniconda.sh
   bash ~/miniconda3/miniconda.sh -b -u -p ~/miniconda3
   rm -rf ~/miniconda3/miniconda.sh
   ~/miniconda3/bin/conda init zsh
