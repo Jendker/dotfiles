@@ -1067,7 +1067,6 @@ local plugins = {
   {
     "Exafunction/codeium.nvim",
     event = "VeryLazy",
-    build = ":Codeium Auth",
     dependencies = {
         "nvim-lua/plenary.nvim",
         "hrsh7th/nvim-cmp",
