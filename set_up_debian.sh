@@ -105,6 +105,8 @@ function install_nvim_binary() {
   fi
   install_nvim_source $branch
   install_node
+  install_rust
+  /home/orbik/.cargo/bin/cargo install tree-sitter-cli
   update_git
 }
 
