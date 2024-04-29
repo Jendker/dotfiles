@@ -876,18 +876,14 @@ local plugins = {
     cond = not_vscode
   },
   {
-    'lewis6991/satellite.nvim',
+    'dstein64/nvim-scrollview',
+    event = { "BufReadPre", "BufNewFile" },
     opts = {
+      excluded_filetypes = {},
       current_only = true,
       winblend = 0,
-      handlers = {
-        cursor = {
-          enable = false,
-        },
-        diagnostic = {
-          min_severity = vim.diagnostic.severity.ERROR,
-        },
-      },
+      signs_on_startup = {'diagnostics', 'search', 'conflicts'},
+      diagnostics_severities = { vim.diagnostic.severity.ERROR },
     },
     cond = not_vscode
   },
