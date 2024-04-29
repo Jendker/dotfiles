@@ -1,7 +1,13 @@
+local parsers_to_install = { "bash", "cmake", "cpp", "css", "dockerfile", "go",
+    "html", "json", "lua", "markdown", "markdown_inline", "python",
+    "regex", "rust", "typescript", "vim", "vimdoc", "yaml"
+}
+-- latex parser requires tree-sitter cli to be installed for compilation
+if vim.fn.executable('tree-sitter') == 1 then
+  parsers_to_install[#parsers_to_install+1] = "latex"
+end
 require('nvim-treesitter.configs').setup({
-  ensure_installed = { "bash", "cmake", "cpp", "css", "dockerfile", "go",
-    "html", "json", "latex", "lua", "markdown", "markdown_inline", "python",
-    "regex", "rust", "typescript", "vim", "vimdoc", "yaml" },
+  ensure_installed = parsers_to_install,
   textobjects = {
     select = {
       enable = true,

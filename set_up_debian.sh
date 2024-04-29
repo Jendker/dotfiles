@@ -98,6 +98,11 @@ function install_rust() {
   fi
 }
 
+function install_rust_tree_sitter() {
+  install_rust
+  $HOME/.cargo/bin/cargo install tree-sitter-cli
+}
+
 function install_nvim_binary() {
   branch="stable"
   if [ -n "$1" ]; then
@@ -105,8 +110,6 @@ function install_nvim_binary() {
   fi
   install_nvim_source $branch
   install_node
-  install_rust
-  /home/orbik/.cargo/bin/cargo install tree-sitter-cli
   update_git
 }
 
