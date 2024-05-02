@@ -4,7 +4,8 @@ function not_vscode()
 end
 
 vscode = vim.fn.exists('g:vscode') ~= 0
-tmux = vim.fn.exists('$TMUX') ~= 0
+TMUX = vim.fn.exists('$TMUX') ~= 0
+SSH = vim.fn.exists('$SSH_CONNECTION') ~= 0
 
 function TableToString(o)
    if type(o) == 'table' then

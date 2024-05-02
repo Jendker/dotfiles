@@ -283,7 +283,7 @@ local plugins = {
     event = 'VeryLazy',
     opts = {
       undercurl = false,
-      transparent = true,
+      transparent = not SSH and not TMUX,
       colors = {
         theme = {
           all = {
@@ -313,9 +313,6 @@ local plugins = {
         }
       end,
     },
-    config = function(_, opts)
-      require('kanagawa').setup(opts)
-    end,
     cond = not_vscode
   },
   {
@@ -324,7 +321,7 @@ local plugins = {
     config = function()
       local onedark = require('onedark')
       onedark.setup{
-        transparent = not tmux,
+        transparent = not TMUX and not SSH,
         toggle_style_list = { 'light', 'dark' }, -- List of styles to toggle between
         diagnostics = {
           undercurl = false,
@@ -350,7 +347,7 @@ local plugins = {
       }
       onedark.load()
       vim.keymap.set('n', '<leader>tt', function()
-        onedark.setup({transparent = not vim.g.onedark_config.transparent and not tmux})
+        onedark.setup({transparent = not vim.g.onedark_config.transparent and not TMUX and not SSH})
         onedark.toggle()
         require('highlight-undo').setup()
       end, {desc = "Toggle dark and light mode"})
