@@ -316,7 +316,8 @@ local plugins = {
     cond = not_vscode
   },
   {
-    'navarasu/onedark.nvim',
+    'Jendker/onedark.nvim',
+    commit = 'efe6b2f',
     priority = 100,
     config = function()
       local onedark = require('onedark')
