@@ -1,6 +1,6 @@
 local parsers_to_install = { "bash", "cmake", "cpp", "css", "dockerfile", "go",
     "html", "json", "lua", "markdown", "markdown_inline", "python",
-    "regex", "rust", "typescript", "vim", "vimdoc", "yaml"
+    "regex", "rust", "typescript", "vim", "vimdoc", "yaml", "xml",
 }
 -- latex parser requires tree-sitter cli to be installed for compilation
 if vim.fn.executable('tree-sitter') == 1 then

@@ -932,6 +932,7 @@ local plugins = {
         callback = function()
           local cwd = vim.fn.getcwd()
           if vim.fn.argc() == 0 and not vim.g.started_with_stdin and not disabled_dirs[cwd] then
+            print("Loading session...")
             require("persistence").load()
           else
             require("persistence").stop()
