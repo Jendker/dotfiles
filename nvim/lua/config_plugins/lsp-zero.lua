@@ -128,7 +128,11 @@ require('mason-lspconfig').setup({
           if virtualenv_env_var then
             local parts = common.split_string(virtualenv_env_var, '/')
             vim.g.virtualenv_name = parts[#parts]
-            return path.join(virtualenv_env_var, 'bin', 'python')
+            if #parts > 1 then
+              return path.join(virtualenv_env_var, 'bin', 'python')
+            else
+              return vim.fn.exepath('python3') or vim.fn.exepath('python') or 'python'
+            end
           end
         end
         -- trick to check the current directory if workspace is unset
