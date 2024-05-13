@@ -200,6 +200,20 @@ if not vscode then
   })
   vim.keymap.set("v", "<leader>vc", "<esc><cmd>CompareClipboardSelection<cr>", { desc = "Compare clipboard", silent = true })
   map("i", "<S-Tab>", "<C-d>")
+  vim.keymap.set('n', '<leader>tt', function()
+    if vim.o.background == "light" then
+      vim.o.background = "dark"
+    else
+      vim.o.background = "light"
+    end
+    local should_be_transparent = vim.o.background == 'dark' and not TMUX and not SSH
+    local theme = vim.g.colors_name
+    local theme_extension = common.matching_string(theme, common.theme_extensions)
+    if theme_extension ~= nil then
+      require(theme_extension).setup({transparent = should_be_transparent})
+    end
+    vim.cmd(('colorscheme %s'):format(theme))
+  end, {desc = "Toggle dark and light mode"})
 else
   map('n', '<leader>?', "<Cmd>call VSCodeNotify('workbench.action.findInFiles', { 'query': expand('<cword>')})<CR>")
   map('v', '<leader>?', "\"fy<Cmd>call VSCodeNotify('workbench.action.findInFiles', { 'query': eval('@f')})<CR>")

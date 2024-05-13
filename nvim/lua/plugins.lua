@@ -283,7 +283,6 @@ local plugins = {
     event = 'VeryLazy',
     opts = {
       undercurl = false,
-      transparent = not SSH and not TMUX,
       colors = {
         theme = {
           all = {
@@ -317,13 +316,10 @@ local plugins = {
   },
   {
     'Jendker/onedark.nvim',
-    commit = 'efe6b2f',
-    priority = 100,
+    event = 'VeryLazy',
     config = function()
       local onedark = require('onedark')
       onedark.setup{
-        transparent = not TMUX and not SSH,
-        toggle_style_list = { 'light', 'dark' }, -- List of styles to toggle between
         diagnostics = {
           undercurl = false,
         },
@@ -346,12 +342,38 @@ local plugins = {
           MasonNormal = { fg = '$fg', bg = '$bg1' },
         }
       }
-      onedark.load()
-      vim.keymap.set('n', '<leader>tt', function()
-        onedark.setup({transparent = not vim.g.onedark_config.transparent and not TMUX and not SSH})
-        onedark.toggle()
-        require('highlight-undo').setup()
-      end, {desc = "Toggle dark and light mode"})
+    end,
+    cond = not_vscode
+  },
+  {
+    "Jendker/last-color.nvim",
+    config = function()
+      vim.api.nvim_create_autocmd('ColorScheme', {
+        group = vim.api.nvim_create_augroup('colorscheme-change', { clear = true }),
+        pattern = '*',
+        desc = 'Update theme settings on colorscheme change',
+        callback = function(info)
+          local theme = info["match"]
+          local should_be_transparent = vim.o.background == 'dark' and not TMUX and not SSH
+          local theme_extension = common.matching_string(theme, common.theme_extensions)
+          local lualine_theme = theme_extension or common.default_theme
+          require("lualine").setup({
+            options = {
+              theme = lualine_theme,
+            },
+          })
+          if theme_extension ~= nil then
+            require(theme_extension).setup({transparent = should_be_transparent})
+          end
+        end,
+      })
+      local theme, background = require('last-color').recall()
+      theme = theme or common.default_theme
+      background = background or 'dark'
+
+      vim.o.background = background
+      vim.cmd(('colorscheme %s'):format(theme))
+      require('highlight-undo').setup()
     end,
     cond = not_vscode
   },

@@ -186,4 +186,16 @@ M.split_string = function(input, delimiter)
   return result
 end
 
+M.matching_string = function(string, table)
+  for _, v in ipairs(table) do
+    if string.find(string, v) then
+      return v
+    end
+  end
+return nil
+end
+
+M.theme_extensions = {"onedark", "kanagawa"}
+M.default_theme = "onedark"
+
 return M
