@@ -25,6 +25,7 @@ vim.opt.wrap = true
 vim.opt.ignorecase = true
 vim.opt.smartcase = true
 vim.opt.scrolloff = 4
+vim.opt.termguicolors = true
 vim.opt.laststatus = 3 -- global statusline
 vim.o.updatetime = 200 -- CursorHold time default is 4s. Way too long
 vim.opt.showcmd = false -- prevent flickering if j/k is being held
