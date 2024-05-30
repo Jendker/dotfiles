@@ -1,15 +1,14 @@
 local common = require('common')
 local telescope = require('telescope')
 local actions = require('telescope.actions')
-local trouble = require("trouble.providers.telescope")
 
 local grep_string_default_additional_args = {'-w', '--case-sensitive'}
-
+local open_with_trouble = require("trouble.sources.telescope").open
 telescope.setup({
   defaults = {
     mappings = {
       i = {
-        ["<C-t>"] = trouble.open_with_trouble,
+        ["<C-t>"] = open_with_trouble,
         ["<C-f>"] = function(...)
           return actions.preview_scrolling_down(...)
         end,
@@ -18,7 +17,7 @@ telescope.setup({
         end,
       },
       n = {
-        ["<c-t>"] = trouble.open_with_trouble,
+        ["<c-t>"] = open_with_trouble,
         ["q"] = function(...)
           return actions.close(...)
         end,
