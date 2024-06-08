@@ -1216,8 +1216,7 @@ local plugins = {
   --   cond = not_vscode,
   -- },
   {
-    'Jendker/nvim-lint',
-    commit = 'ddd8c70',
+    'mfussenegger/nvim-lint',
     event = 'VeryLazy',
     opts = {
       linters_by_ft = {
