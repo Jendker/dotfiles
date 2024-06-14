@@ -620,7 +620,11 @@ local plugins = {
       {'rafamadriz/friendly-snippets'},
 
       -- Added by me
-      {'ray-x/lsp_signature.nvim', opts = { toggle_key = '<C-h>', select_signature_key = '<A-n>' } },
+      {'ray-x/lsp_signature.nvim', opts = {
+        toggle_key = '<C-h>',
+        select_signature_key = '<A-n>',
+        toggle_key_flip_floatwin_setting = true,
+      } },
       {'jay-babu/mason-null-ls.nvim'},
     },
     cond = not_vscode
