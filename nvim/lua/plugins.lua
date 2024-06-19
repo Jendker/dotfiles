@@ -766,7 +766,7 @@ local plugins = {
     config = function()
       require 'config_plugins.gitsigns'
     end,
-    tag = 'release',
+    tag = 'v0.8.1',
     cond = not_vscode
   },
   {
