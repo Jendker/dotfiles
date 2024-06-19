@@ -35,6 +35,7 @@ local auto_filetype_packages = {
   ['lemminx'] = true,  -- xml
   ['gopls'] = true,
   ['prettierd'] = true,
+  ['shellcheck'] = true,
 }
 
 local always_installed = {

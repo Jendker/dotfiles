@@ -1225,6 +1225,7 @@ local plugins = {
     opts = {
       linters_by_ft = {
         json = {'jsonlint'},
+        bash = {'shellcheck'},
       },
     },
     config = function(_, opts)
