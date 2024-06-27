@@ -2,8 +2,8 @@ require "common"
 
 -- Add luarocks to rtp
 local home = vim.uv.os_homedir()
-package.path = package.path .. ";" .. home .. "/.luarocks/share/lua/5.1/?/init.lua;"
-package.path = package.path .. ";" .. home .. "/.luarocks/share/lua/5.1/?.lua;"
+package.path = package.path .. ";" .. home .. "/.local/share/nvim/lazy-rocks/hererocks/share/lua/5.1/luarocks/?/init.lua"
+package.path = package.path .. ";" .. home .. "/.local/share/nvim/lazy-rocks/hererocks/share/lua/5.1/luarocks/?.lua"
 
 -- Line Numbers
 vim.opt.number = true
