@@ -296,3 +296,7 @@ git config --global --add --bool push.autoSetupRemote true
 git config --global pull.rebase true
 
 install_zoxide
+
+# set up gh
+wget -O /tmp/gh.deb 'https://github.com/cli/cli/releases/download/v2.52.0/gh_2.52.0_linux_amd64.deb' && sudo dpkg -i /tmp/gh.deb && rm /tmp/gh.deb
+# optionally run gh auth login
