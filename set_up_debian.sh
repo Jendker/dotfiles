@@ -16,6 +16,7 @@ function install_nvim_source() {
     branch_str="--branch $1"
   fi
   sudo apt-get install ninja-build gettext cmake unzip curl -y
+  sudo apt install libreadline-dev # for hererocks
   cd /tmp && rm -rf neovim && git clone https://github.com/neovim/neovim.git $branch_str --single-branch
   cd neovim
   if [ "$1" == "master" ]; then
@@ -244,7 +245,7 @@ grep -qxF 'set-option -g default-shell /bin/zsh' $HOME/.tmux.conf || printf "set
 # set up nvim
 if ! [ -x "$(command -v nvim)" ]; then
   echo 'nvim is not installed. installing'
-  install_nvim_binary master
+  install_nvim_binary stable
   update_dotfiles
 fi
 
