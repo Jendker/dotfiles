@@ -1,0 +1,3 @@
+[submodule "dotfiles_private"]
+	path = dotfiles_private
+	url = https://github.com/Jendker/dotfiles_private.git

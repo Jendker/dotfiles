@@ -20,6 +20,7 @@ function setup_nerdfont() {
   git clone https://github.com/epk/SF-Mono-Nerd-Font.git /tmp/SF-Mono-Nerd-Font
   cp /tmp/SF-Mono-Nerd-Font/*.otf ~/.local/share/fonts/
   rm -rf /tmp/SF-Mono-Nerd-Font
+  cp "$SCRIPT_DIR"/dotfiles_private/fonts/* ~/.local/share/fonts/
   fc-cache -f
 }
 
