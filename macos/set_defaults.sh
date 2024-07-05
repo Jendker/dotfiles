@@ -1,7 +1,11 @@
+#!/usr/bin/env zsh
+set -e
+
 # Close any open System Preferences panes, to prevent them from overriding
 # settings we’re about to change
-osascript -e 'tell application "System Preferences" to quit'# Disable press-and-hold for keys in favor of key repeat.
+osascript -e 'tell application "System Preferences" to quit'
 
+# Disable press-and-hold for keys in favor of key repeat.
 defaults write -g ApplePressAndHoldEnabled -bool false
 
 # Set a really fast key repeat. -- original = 2, another option 1
@@ -43,3 +47,8 @@ sudo nvram StartupMute=%01
 # Disable crash report windows
 # https://stackoverflow.com/questions/6084497/silencing-osx-crash-report-window
 defaults write com.apple.CrashReporter DialogType server
+
+# Dock autohide
+defaults write com.apple.dock autohide -bool true
+defaults write com.apple.dock autohide-time-modifier -float 0.15
+killall Dock

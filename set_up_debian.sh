@@ -16,7 +16,7 @@ function install_nvim_source() {
     branch_str="--branch $1"
   fi
   sudo apt-get install ninja-build gettext cmake unzip curl -y
-  sudo apt install libreadline-dev # for hererocks
+  sudo apt install libreadline-dev -y # for hererocks
   cd /tmp && rm -rf neovim && git clone https://github.com/neovim/neovim.git $branch_str --single-branch
   cd neovim
   if [ "$1" == "master" ]; then
@@ -151,6 +151,21 @@ EOT
   install_zoxide
 }
 
+function install_conda() {
+  # set up miniconda
+  if ! [ -x "$(command -v conda)" ]; then
+    mkdir -p ~/miniconda3
+    wget "https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-$(uname --machine).sh" -O ~/miniconda3/miniconda.sh
+    bash ~/miniconda3/miniconda.sh -b -u -p ~/miniconda3
+    rm -rf ~/miniconda3/miniconda.sh
+  fi
+
+  git clone https://github.com/esc/conda-zsh-completion ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/conda-zsh-completion
+  conda init zsh
+  conda config --set auto_activate_base false
+  sed -i 's/git-auto-fetch)/conda-zsh-completion git-auto-fetch)/g' $HOME/.zshrc
+}
+
 if [[ ! $# -eq 0 ]]; then
   if [[ $1 == "--update" ]]; then
     echo "Updating dotfiles..."
@@ -180,6 +195,10 @@ if [[ ! $# -eq 0 ]]; then
     echo "Installing yazi..."
     install_yazi_source
     exit 0
+  elif [[ $1 == "--install-conda" ]]; then
+    echo "Installing conda..."
+    install_conda
+    exit 0
   else
     echo "Option \"$1\" not recognized."
     exit 1
@@ -195,15 +214,13 @@ mkdir -p $HOME/.local/bin
 ln -s $(which fdfind) $HOME/.local/bin/fd || true
 
 sudo apt install ripgrep -y || true
-if [ -d ~/.oh-my-zsh ]; then
-	echo "oh-my-zsh is installed"
- else
- 	echo "installing oh-my-zsh"
-  sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
-  sudo chsh -s $(which zsh) $(whoami) || true
-  git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
-  git clone https://github.com/MenkeTechnologies/zsh-expand.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-expand
-  pipx install thefuck
+
+
+# run set_up_common.sh
+./set_up_common.sh
+
+pipx install thefuck
+if ! grep -q "alias vim=nvim" $HOME/.zshrc; then
   sudo tee -a $HOME/.zshrc > /dev/null <<'EOT'
 alias vim=nvim
 export EDITOR=nvim
@@ -232,7 +249,7 @@ export ZPWR_EXPAND_TO_HISTORY=true # expand to history also on enter
 .
 wq
 IN
-  sed -i 's/plugins=(git)/plugins=(git ubuntu zsh-syntax-highlighting zsh-expand conda-zsh-completion git-auto-fetch)/g' $HOME/.zshrc
+  sed -i 's/plugins=(git)/plugins=(git ubuntu zsh-syntax-highlighting zsh-expand git-auto-fetch)/g' $HOME/.zshrc
   sed -i '/mode auto/s/^# //g' $HOME/.zshrc
 fi
 
@@ -265,22 +282,6 @@ if [[ $(lsb_release -cs) == "bionic" ]]; then
   pyenv global 3.8.15 || pyenv install 3.8.15 && pyenv global 3.8.15
 fi
 
-
-# set up miniconda
-if ! [ -x "$(command -v conda)" ]; then
-  mkdir -p ~/miniconda3
-  wget "https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-$(uname --machine).sh" -O ~/miniconda3/miniconda.sh
-  bash ~/miniconda3/miniconda.sh -b -u -p ~/miniconda3
-  rm -rf ~/miniconda3/miniconda.sh
-  ~/miniconda3/bin/conda init zsh
-  ~/miniconda3/bin/conda config --set auto_activate_base false
-  # zsh autocomplete
-  git clone https://github.com/esc/conda-zsh-completion ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/conda-zsh-completion
-fi
-
-git config --global user.name "Jedrzej Orbik"
-git config --global user.email Jendker@users.noreply.github.com
-
 # set up fzf for zsh
 if [ ! -d "$HOME/.fzf" ]; then
   git clone --depth 1 https://github.com/junegunn/fzf.git $HOME/.fzf
@@ -290,13 +291,10 @@ fi
 # install git lfs
 curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash && sudo apt-get install git-lfs && git lfs install
 
-# auto setup remote for new branches
-git config --global --add --bool push.autoSetupRemote true
-# always rebase on pull
-git config --global pull.rebase true
-
 install_zoxide
 
 # set up gh
-wget -O /tmp/gh.deb 'https://github.com/cli/cli/releases/download/v2.52.0/gh_2.52.0_linux_amd64.deb' && sudo dpkg -i /tmp/gh.deb && rm /tmp/gh.deb
-# optionally run gh auth login
+LATEST_VERSION=$(curl -s "https://api.github.com/repos/cli/cli/releases/latest" | grep -Po '"tag_name": "v\K[0-9.]+')
+wget -O /tmp/gh.deb "https://github.com/cli/cli/releases/download/v${LATEST_VERSION}/gh_${LATEST_VERSION}_linux_$(dpkg --print-architecture).deb" && sudo dpkg -i /tmp/gh.deb && rm /tmp/gh.deb
+echo "Optionally 'run gh auth login'"
+echo "Done"
