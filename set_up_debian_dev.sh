@@ -4,6 +4,17 @@ set -e
 
 SCRIPT_DIR=$(dirname "$0")
 
+# Initialize a flag
+optional_provided=false
+
+# Loop through the arguments
+for arg in "$@"; do
+    if [ "$arg" == "--optional" ]; then
+        optional_provided=true
+        break
+    fi
+done
+
 function setup_nerdfont() {
   mkdir -p ~/.local/share/fonts
   git clone https://github.com/epk/SF-Mono-Nerd-Font.git /tmp/SF-Mono-Nerd-Font
@@ -18,5 +29,64 @@ function setup_powerlevel10k() {
   cp "$SCRIPT_DIR/.p10k.zsh" "$HOME/"
 }
 
+function setup_sublimetext() {
+  if ! [ -x "$(command -v subl)" ]; then
+    wget -qO - https://download.sublimetext.com/sublimehq-pub.gpg | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/sublimehq-archive.gpg > /dev/null
+    echo "deb https://download.sublimetext.com/ apt/stable/" | sudo tee /etc/apt/sources.list.d/sublime-text.list
+    sudo apt update
+    sudo apt install sublime-text
+  fi
+}
+
+function setup_spotify() {
+  if ! [ -x "$(command -v spotify)" ]; then
+    curl -sS https://download.spotify.com/debian/pubkey_6224F9941A8AA6D1.gpg | sudo gpg --dearmor --yes -o /etc/apt/trusted.gpg.d/spotify.gpg
+    echo "deb http://repository.spotify.com stable non-free" | sudo tee /etc/apt/sources.list.d/spotify.list
+    sudo apt-get update && sudo apt-get install spotify-client
+   fi
+}
+
+function setup_flatpak() {
+  if ! [ -x "$(command -v flatpak)" ]; then
+    sudo apt install flatpak
+    flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+  fi
+}
+
+function setup_open_any_terminal() {
+  # to open from nautilus with wezterm
+  # if /home/jorbik/.local/share/nautilus-python/extensions/nautilus_open_any_terminal.py does not exist
+  if [ ! -f ~/.local/share/nautilus-python/extensions/nautilus_open_any_terminal.py ]; then
+    cwd=$(pwd)
+    cd /tmp
+    git clone https://github.com/Stunkymonkey/nautilus-open-any-terminal.git
+    cd nautilus-open-any-terminal
+    make
+
+    make install schema      # User install
+    gsettings set com.github.stunkymonkey.nautilus-open-any-terminal terminal wezterm
+    sudo apt install python3-nautilus
+    echo "To make the 'Open with Wezterm' work restart nautilus: 'nautilus -q'"
+    cd "$cwd"
+  fi
+}
+
+function setup_wezterm() {
+  curl -fsSL https://apt.fury.io/wez/gpg.key | sudo gpg --yes --dearmor -o /usr/share/keyrings/wezterm-fury.gpg
+  echo 'deb [signed-by=/usr/share/keyrings/wezterm-fury.gpg] https://apt.fury.io/wez/ * *' | sudo tee /etc/apt/sources.list.d/wezterm.list
+  sudo apt update
+  sudo apt install wezterm
+}
+
 setup_nerdfont
 setup_powerlevel10k
+setup_sublimetext
+setup_wezterm
+setup_open_any_terminal
+sudo apt install copyq
+
+if [ "$optional_provided" == true ]; then
+    echo "--optional was provided, installing optional tools."
+    setup_spotify
+    setup_flatpak
+fi
