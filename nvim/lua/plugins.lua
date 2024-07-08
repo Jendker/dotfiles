@@ -949,28 +949,6 @@ local plugins = {
     "folke/persistence.nvim",
     opts = {
       dir = vim.fn.expand(vim.fn.stdpath "state" .. "/sessions/"), -- directory where session files are saved
-      options = vim.opt.sessionoptions:get(),    -- sessionoptions used for saving
-      pre_save = function()
-        local tabpages = vim.api.nvim_list_tabpages()
-        for _, tabpage in ipairs(tabpages) do
-          local windows = vim.api.nvim_tabpage_list_wins(tabpage)
-          for _, window in ipairs(windows) do
-            local buffer = vim.api.nvim_win_get_buf(window)
-            local file_name = vim.api.nvim_buf_get_name(buffer)
-            if string.find(file_name, "diffview:") then
-              -- close all windows in this tab
-              for _, this_window in ipairs(windows) do
-                vim.api.nvim_win_close(this_window, false)
-              end
-              break
-            end
-            if string.find(file_name, "fugitive:") then
-              -- close buffer
-              vim.api.nvim_win_close(window, false)
-            end
-          end
-        end
-      end,
     },
     config = function(_, opts)
       require('persistence').setup(opts)
@@ -1004,6 +982,33 @@ local plugins = {
         callback = function()
           vim.g.started_with_stdin = true
         end,
+      })
+
+      -- make sure that empty windows are not stored
+      vim.api.nvim_create_autocmd({ 'User' }, {
+        group = persistence_group,
+        pattern = 'PersistenceSavePre',
+        callback = vim.schedule_wrap(function()
+          local tabpages = vim.api.nvim_list_tabpages()
+          for _, tabpage in ipairs(tabpages) do
+            local windows = vim.api.nvim_tabpage_list_wins(tabpage)
+            for _, window in ipairs(windows) do
+              local buffer = vim.api.nvim_win_get_buf(window)
+              local file_name = vim.api.nvim_buf_get_name(buffer)
+              if string.find(file_name, "diffview:") then
+                -- close all windows in this tab
+                for _, this_window in ipairs(windows) do
+                  vim.api.nvim_win_close(this_window, false)
+                end
+                break
+              end
+              if string.find(file_name, "fugitive:") then
+                -- close buffer
+                vim.api.nvim_win_close(window, false)
+              end
+            end
+          end
+        end),
       })
     end,
     cond = not_vscode
