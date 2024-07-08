@@ -21,6 +21,7 @@ function setup_nerdfont() {
   cp /tmp/SF-Mono-Nerd-Font/*.otf ~/.local/share/fonts/
   rm -rf /tmp/SF-Mono-Nerd-Font
   cp "$SCRIPT_DIR"/dotfiles_private/fonts/* ~/.local/share/fonts/
+  rm ~/.local/share/fonts/MonacoNerdFont-Regular.ttf
   fc-cache -f
 }
 
