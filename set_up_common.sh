@@ -18,3 +18,7 @@ git config --global pull.rebase true
 git config --global user.name "Jedrzej Orbik"
 git config --global user.email Jendker@users.noreply.github.com
 
+# copy the aliases
+SCRIPT_DIR=$(dirname "$0")
+cp "$SCRIPT_DIR/.aliases" ~/.aliases
+
