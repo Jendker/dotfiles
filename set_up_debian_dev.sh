@@ -78,6 +78,17 @@ function setup_wezterm() {
   echo 'deb [signed-by=/usr/share/keyrings/wezterm-fury.gpg] https://apt.fury.io/wez/ * *' | sudo tee /etc/apt/sources.list.d/wezterm.list
   sudo apt update
   sudo apt install wezterm
+
+  # ubuntu specific - set up tdrop for wezterm activation with hotkey
+  cwd=$(pwd)
+  mkdir -p ~/.local/bin/
+  cd ~/.local/bin/
+  git clone https://github.com/noctuid/tdrop.git
+  echo "Add custom hotkey in Ubuntu to activate wezterm with tdrop"
+  echo "Command is: '$HOME/.local/bin/tdrop/tdrop -mta -h 100% wezterm'"
+  # installing tdrop dependencies
+  sudo apt install xdotool gawk
+  cd "$cwd"
 }
 
 setup_nerdfont

@@ -10,6 +10,13 @@ function is_installed() {
      dpkg --verify "$1" 2>/dev/null
 }
 
+function uncomment_line() {
+  # Uses sed to uncomment a line containing a string
+  file_path=$1
+  string=$2
+  sed -i "s/^#*\($string\)/\1/" $file_path
+}
+
 function install_nvim_source() {
   branch_str="--branch stable"
   if [ -n "$1" ]; then
@@ -43,7 +50,8 @@ function install_node() {
   installed=false
   if ! [ -x "$(command -v nvm)" ]; then
     echo "Installing nvm."
-    nvm_install_command="wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash"
+    LATEST_NVM_VERSION=$(curl -s "https://api.github.com/repos/nvm-sh/nvm/releases/latest" | grep -Po '"tag_name": "v\K[0-9.]+')
+    nvm_install_command="wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v${LATEST_NVM_VERSION}/install.sh | bash"
     zsh -c "$nvm_install_command" || eval "$nvm_install_command"
     set +x
     # load nvm
@@ -94,7 +102,7 @@ function update_git() {
 function install_rust() {
   if ! [ -x "$(command -v cargo)" ]; then
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-    grep -qxF 'source "$HOME/.cargo/env"' $HOME/.zshrc || printf 'source "$HOME/.cargo/env"' >> $HOME/.zshrc
+    grep -qxF 'source "$HOME/.cargo/env"' $HOME/.zshrc || echo 'source "$HOME/.cargo/env"' >> $HOME/.zshrc
     echo "Please source ~/.zshrc or ~/.bashrc"
   fi
 }
@@ -118,7 +126,7 @@ function install_zoxide() {
   if ! command -v zoxide > /dev/null 2>&1; then
     curl -sS https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | bash
   fi
-  grep -qxF 'eval "$(zoxide init zsh)"' $HOME/.zshrc || printf 'eval "$(zoxide init zsh)"' >> $HOME/.zshrc
+  grep -qxF 'eval "$(zoxide init zsh)"' $HOME/.zshrc || echo 'eval "$(zoxide init zsh)"' >> $HOME/.zshrc
 }
 
 function install_yazi_source() {
@@ -132,7 +140,7 @@ function install_yazi_source() {
   highest_tag=$(get_highest_tag_version)
   git checkout $highest_tag
 
-  cargo build --release
+  $HOME/.cargo/bin/cargo build --release
   sudo cp ./target/release/yazi /usr/local/bin/
   cd .. && rm -rf yazi
 
@@ -148,7 +156,6 @@ function ya() {
 }
 EOT
   fi
-  install_zoxide
 }
 
 function install_conda() {
@@ -164,6 +171,10 @@ function install_conda() {
   conda init zsh
   conda config --set auto_activate_base false
   sed -i 's/git-auto-fetch)/conda-zsh-completion git-auto-fetch)/g' $HOME/.zshrc
+}
+
+function install_direnv() {
+  curl -sfL https://direnv.net/install.sh | bash
 }
 
 if [[ ! $# -eq 0 ]]; then
@@ -233,6 +244,8 @@ export LC_ALL=en_US.UTF-8
 export PATH=$PATH:$HOME/.local/bin
 export PATH="/usr/lib/ccache:$PATH"
 eval $(thefuck --alias doit)
+alias zshconfig="vim ~/.zshrc"
+alias zshsource="source ~/.zshrc"
 EOT
   # set plugin variables before sourcing oh-my-zsh
   ex -s $HOME/.zshrc <<\IN
@@ -257,7 +270,7 @@ sudo locale-gen en_US
 sudo locale-gen en_US.UTF-8
 
 # .tmux.conf
-grep -qxF 'set-option -g default-shell /bin/zsh' $HOME/.tmux.conf || printf "set-option -g history-limit 125000\nset-option -g default-shell /bin/zsh" >> $HOME/.tmux.conf
+grep -qxF 'set-option -g default-shell /bin/zsh' $HOME/.tmux.conf || echo "set-option -g history-limit 125000\nset-option -g default-shell /bin/zsh" >> $HOME/.tmux.conf
 
 # set up nvim
 if ! [ -x "$(command -v nvim)" ]; then
@@ -293,8 +306,10 @@ curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.s
 
 install_zoxide
 
+install_direnv
+
 # set up gh
-LATEST_VERSION=$(curl -s "https://api.github.com/repos/cli/cli/releases/latest" | grep -Po '"tag_name": "v\K[0-9.]+')
-wget -O /tmp/gh.deb "https://github.com/cli/cli/releases/download/v${LATEST_VERSION}/gh_${LATEST_VERSION}_linux_$(dpkg --print-architecture).deb" && sudo dpkg -i /tmp/gh.deb && rm /tmp/gh.deb
+LATEST_GH_VERSION=$(curl -s "https://api.github.com/repos/cli/cli/releases/latest" | grep -Po '"tag_name": "v\K[0-9.]+')
+wget -O /tmp/gh.deb "https://github.com/cli/cli/releases/download/v${LATEST_GH_VERSION}/gh_${LATEST_GH_VERSION}_linux_$(dpkg --print-architecture).deb" && sudo dpkg -i /tmp/gh.deb && rm /tmp/gh.deb
 echo "Optionally 'run gh auth login'"
 echo "Done"

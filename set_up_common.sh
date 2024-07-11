@@ -21,4 +21,10 @@ git config --global user.email Jendker@users.noreply.github.com
 # copy the aliases
 SCRIPT_DIR=$(dirname "$0")
 cp "$SCRIPT_DIR/.aliases" ~/.aliases
+grep -qxF 'source ~/.aliases' "$HOME/.zshrc" || echo 'source ~/.aliases' >> "$HOME/.zshrc"
+grep -qxF 'eval "$(direnv hook zsh)"' $HOME/.zshrc || echo 'eval "$(direnv hook zsh)"' >> "$HOME/.zshrc"
+mkdir -p ~/.config/direnv
+echo '[global]
+load_dotenv = true
+strict_env = true' > ~/.config/direnv/direnv.toml
 
