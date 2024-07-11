@@ -1122,13 +1122,21 @@ local plugins = {
     cond = not_vscode
   },
   {
-    "Exafunction/codeium.nvim",
-    event = "VeryLazy",
+    "CopilotC-Nvim/CopilotChat.nvim",
+    cmd = "Copilot",
+    event = "InsertEnter",
+    branch = "canary",
     dependencies = {
-        "nvim-lua/plenary.nvim",
-        "hrsh7th/nvim-cmp",
+      { "zbirenbaum/copilot.lua", opts = {suggestion = {keymap = {accept_word = "<M-k>"}}}}, -- or github/copilot.vim
+      { "nvim-lua/plenary.nvim" }, -- for curl, log wrapper
     },
-    opts = {},
+    opts = {
+      mappings = {
+        close = {
+          normal = 'q',
+        },
+      },
+    },
     cond = not_vscode
   },
   {
