@@ -124,11 +124,13 @@ vim.api.nvim_create_autocmd({"BufReadPre", "BufNewFile"}, {
 vim.api.nvim_create_autocmd({ "FocusGained", "TermClose", "TermLeave" }, {
 -- vim.api.nvim_create_autocmd("FocusGained", {
   desc = "Reload files from disk when we focus vim",
+  pattern = "*",
   group = augroup("checktime_focus"),
   command = "if getcmdwintype() == '' | checktime | endif",
 })
 vim.api.nvim_create_autocmd("BufEnter", {
   desc = "Every time we enter an unmodified buffer, check if it changed on disk",
+  pattern = "*",
   group = augroup("checktime_enter"),
   command = "if &buftype == '' && !&modified && expand('%') != '' | exec 'checktime ' . expand('<abuf>') | endif",
 })

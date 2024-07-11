@@ -834,7 +834,8 @@ local plugins = {
     cond = not_vscode
   },
   {
-    "folke/which-key.nvim",
+    "Jendker/which-key.nvim",
+    branch = "fix_interrupt_error",
     config = function()
       vim.o.timeout = true
       vim.o.timeoutlen = 500
