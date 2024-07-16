@@ -834,30 +834,33 @@ local plugins = {
     cond = not_vscode
   },
   {
-    "Jendker/which-key.nvim",
-    branch = "fix_interrupt_error",
+    "folke/which-key.nvim",
     config = function()
       vim.o.timeout = true
       vim.o.timeoutlen = 500
       local wk = require("which-key")
       wk.setup {
         plugins = { spelling = true },
+        icons = {
+          rules = false,
+        },
       }
-      wk.register({
-        mode = { "n", "v" },
-        ["<leader>w"] = { name = "+workspace"},
-        ["<leader>e"] = { name = "+debug"},
-        ["<leader>t"] = { name = "+toogle/tab"},
-        ["<leader>o"] = { name = "+overseer/noice"},
-        -- ["<leader>os"] = { name = "+noice"},
-        ["<leader>s"] = { name = "+search" },
-        ["<leader>sf"] = { name = "+go to file" },
-        ["<leader>sb"] = { name = "+bookmarks" },
-        ["<leader>g"] = { name = "+diffview"},
-        ["<leader>h"] = { name = "+hunks"},
-        ["<leader>b"] = { name = "+buffer/bookmarks"},
-        ["<leader>x"] = { name = "+trouble"},
-        ["<leader>v"] = { name = "+compare"},
+      wk.add({
+        {
+          mode = { "n", "v" },
+          { "<leader>b",  group = "buffer/bookmarks" },
+          { "<leader>e",  group = "debug" },
+          { "<leader>g",  group = "diffview" },
+          { "<leader>h",  group = "hunks" },
+          { "<leader>o",  group = "overseer/noice" },
+          { "<leader>s",  group = "search" },
+          { "<leader>sb", group = "bookmarks" },
+          { "<leader>sf", group = "go to file" },
+          { "<leader>t",  group = "toogle/tab" },
+          { "<leader>v",  group = "compare" },
+          { "<leader>w",  group = "workspace" },
+          { "<leader>x",  group = "trouble" },
+        },
       })
     end,
     cond = not_vscode
