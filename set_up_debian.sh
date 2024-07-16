@@ -35,6 +35,16 @@ function install_nvim_source() {
   cd .. && rm -rf neovim
 }
 
+function install_nvim_tarball() {
+  curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim-linux64.tar.gz
+  sudo rm -rf /opt/nvim
+  sudo tar -C /opt -xzf nvim-linux64.tar.gz
+  if ! grep -Fxq 'export PATH="$PATH:/opt/nvim-linux64/bin"' $HOME/.zshrc; then
+    echo 'export PATH="$PATH:/opt/nvim-linux64/bin"' >> $HOME/.zshrc
+  fi
+  export PATH="$PATH:/opt/nvim-linux64/bin"
+}
+
 function update_dotfiles() {
   cd /tmp/ && rm -rf dotfiles && git clone https://github.com/Jendker/dotfiles.git
   mkdir -p $HOME/.config
@@ -66,6 +76,9 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 EOT
     fi
+    export NVM_DIR="$HOME/.nvm"
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+    [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
     set -x
     installed=true
   fi
@@ -117,7 +130,11 @@ function install_nvim_binary() {
   if [ -n "$1" ]; then
     branch="$1"
   fi
-  install_nvim_source $branch
+  if [ "$branch" == "stable" ]; then
+    install_nvim_tarball
+  else
+    install_nvim_source $branch
+  fi
   install_node
   update_git
 }
