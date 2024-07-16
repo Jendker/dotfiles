@@ -36,7 +36,7 @@ function setup_sublimetext() {
     wget -qO - https://download.sublimetext.com/sublimehq-pub.gpg | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/sublimehq-archive.gpg > /dev/null
     echo "deb https://download.sublimetext.com/ apt/stable/" | sudo tee /etc/apt/sources.list.d/sublime-text.list
     sudo apt update
-    sudo apt install sublime-text
+    sudo apt install sublime-text -y
   fi
 }
 
@@ -50,7 +50,7 @@ function setup_spotify() {
 
 function setup_flatpak() {
   if ! [ -x "$(command -v flatpak)" ]; then
-    sudo apt install flatpak
+    sudo apt install flatpak -y
     flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
   fi
 }
@@ -61,14 +61,14 @@ function setup_open_any_terminal() {
   if [ ! -f ~/.local/share/nautilus-python/extensions/nautilus_open_any_terminal.py ]; then
     cwd=$(pwd)
     cd /tmp
-    sudo apt install gettext
+    sudo apt install gettext -y
     git clone https://github.com/Stunkymonkey/nautilus-open-any-terminal.git
     cd nautilus-open-any-terminal
     make
 
     make install schema      # User install
     gsettings set com.github.stunkymonkey.nautilus-open-any-terminal terminal wezterm
-    sudo apt install python3-nautilus
+    sudo apt install python3-nautilus -y
     echo "To make the 'Open with Wezterm' work restart nautilus: 'nautilus -q'"
     cd "$cwd"
   fi
@@ -78,7 +78,7 @@ function setup_wezterm() {
   curl -fsSL https://apt.fury.io/wez/gpg.key | sudo gpg --yes --dearmor -o /usr/share/keyrings/wezterm-fury.gpg
   echo 'deb [signed-by=/usr/share/keyrings/wezterm-fury.gpg] https://apt.fury.io/wez/ * *' | sudo tee /etc/apt/sources.list.d/wezterm.list
   sudo apt update
-  sudo apt install wezterm
+  sudo apt install wezterm -y
 
   # ubuntu specific - set up tdrop for wezterm activation with hotkey
   cwd=$(pwd)
@@ -88,7 +88,7 @@ function setup_wezterm() {
   echo "Add custom hotkey in Ubuntu to activate wezterm with tdrop"
   echo "Command is: '$HOME/.local/bin/tdrop/tdrop -mta -h 100% wezterm'"
   # installing tdrop dependencies
-  sudo apt install xdotool gawk
+  sudo apt install xdotool gawk -y
   cd "$cwd"
 }
 
@@ -97,7 +97,7 @@ setup_powerlevel10k
 setup_sublimetext
 setup_wezterm
 setup_open_any_terminal
-sudo apt install copyq
+sudo apt install copyq -y
 
 if [ "$optional_provided" == true ]; then
     echo "--optional was provided, installing optional tools."
