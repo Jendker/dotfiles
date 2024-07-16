@@ -61,6 +61,7 @@ function setup_open_any_terminal() {
   if [ ! -f ~/.local/share/nautilus-python/extensions/nautilus_open_any_terminal.py ]; then
     cwd=$(pwd)
     cd /tmp
+    sudo apt install gettext
     git clone https://github.com/Stunkymonkey/nautilus-open-any-terminal.git
     cd nautilus-open-any-terminal
     make
