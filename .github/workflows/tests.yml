@@ -24,3 +24,4 @@ jobs:
         run: |
           ./install.sh
           ./set_up_debian.sh
+          ./set_up_debian_dev.sh --optional
