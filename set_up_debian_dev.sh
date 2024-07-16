@@ -103,3 +103,9 @@ if [ "$optional_provided" == true ]; then
     setup_spotify
     setup_flatpak
 fi
+
+if [ "$DESKTOP_SESSION" == "ubuntu" ]; then
+  # disable meta+number key bindings - it interferes with wezterm
+  gsettings set org.gnome.shell.extensions.dash-to-dock hot-keys false
+  for i in $(seq 1 9); do gsettings set org.gnome.shell.keybindings "switch-to-application-${i}" '[]'; done
+fi
