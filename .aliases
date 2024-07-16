@@ -22,3 +22,7 @@ alias cdr='conda env remove --name '
 
 # MuJoCo
 alias mjv='python -m mujoco.viewer --mjcf'
+
+# zsh config
+alias zshconfig="vim ~/.zshrc"
+alias zshsource="source ~/.zshrc"

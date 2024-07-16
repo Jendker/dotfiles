@@ -235,7 +235,6 @@ if ! grep -q "alias vim=nvim" $HOME/.zshrc; then
   sudo tee -a $HOME/.zshrc > /dev/null <<'EOT'
 alias vim=nvim
 export EDITOR=nvim
-alias venv="if [ -e ./venv/bin/activate ]; then source ./venv/bin/activate; else python3 -m venv venv && source ./venv/bin/activate; fi"
 unsetopt BEEP
 PROMPT="%(?:%{$fg_bold[green]%}➜ :%{$fg_bold[red]%}➜ )"
 PROMPT+=' %{$fg[cyan]%}%~%{$reset_color%} $(git_prompt_info)'
@@ -244,8 +243,9 @@ export LC_ALL=en_US.UTF-8
 export PATH=$PATH:$HOME/.local/bin
 export PATH="/usr/lib/ccache:$PATH"
 eval $(thefuck --alias doit)
-alias zshconfig="vim ~/.zshrc"
-alias zshsource="source ~/.zshrc"
+
+# don't show the warning which happens if direnv loads the .envrc file
+typeset -g POWERLEVEL9K_INSTANT_PROMPT=quiet
 EOT
   # set plugin variables before sourcing oh-my-zsh
   ex -s $HOME/.zshrc <<\IN
