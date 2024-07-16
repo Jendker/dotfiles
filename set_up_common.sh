@@ -27,4 +27,3 @@ mkdir -p ~/.config/direnv
 echo '[global]
 load_dotenv = true
 strict_env = true' > ~/.config/direnv/direnv.toml
-
