@@ -51,7 +51,7 @@ function setup_spotify() {
 function setup_flatpak() {
   if ! [ -x "$(command -v flatpak)" ]; then
     sudo apt install flatpak -y
-    flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+    sudo flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
   fi
 }
 
