@@ -5,7 +5,7 @@ on: [push, workflow_dispatch]
 jobs:
   pipeline:
 
-    name: pipeline (${{ matrix.python-version }}, ${{ matrix.os }})
+    name: pipeline ${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     defaults:
       run:
@@ -14,7 +14,6 @@ jobs:
       fail-fast: false
       matrix:
         os: ["ubuntu-latest"]
-        python-version: ["3.10"]
 
     steps:
       - name: Checkout repository
