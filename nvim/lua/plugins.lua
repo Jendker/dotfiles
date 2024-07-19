@@ -258,7 +258,6 @@ local plugins = {
     'stevearc/oil.nvim',
     dependencies = { "nvim-tree/nvim-web-devicons" },
     opts = {
-      default_file_explorer = false,
       delete_to_trash = true,
       keymaps = {
         ["<leader>o"] = function()
@@ -274,7 +273,8 @@ local plugins = {
     config = function(_, opts)
       local oil = require("oil")
       oil.setup(opts)
-      vim.keymap.set("n", "<leader>pv", oil.open, { desc = "Open directory view" })
+      vim.keymap.set("n", "<leader>pv", oil.open, { desc = "Open parent directory" })
+      vim.keymap.set("n", "-", oil.open, { desc = "Open parent directory" })
     end,
     cond = not_vscode
   },

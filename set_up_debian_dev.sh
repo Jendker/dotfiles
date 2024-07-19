@@ -87,6 +87,7 @@ function setup_wezterm() {
   git clone https://github.com/noctuid/tdrop.git
   echo "Add custom hotkey in Ubuntu to activate wezterm with tdrop"
   echo "Command is: '$HOME/.local/bin/tdrop/tdrop -mta -h 100% wezterm'"
+  echo "This will work work with nvidia drivers on the latest Ubuntu"
   # installing tdrop dependencies
   sudo apt install xdotool gawk -y
   cd "$cwd"
