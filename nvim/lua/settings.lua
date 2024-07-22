@@ -36,7 +36,7 @@ vim.opt.clipboard = "unnamedplus"
 
 if vim.env.SSH_CONNECTION then
   local function copy(register)
-    if vim.env.TMUX == nil then
+    if not TMUX then
       return require('vim.ui.clipboard.osc52').copy(register)
     else
       return function(lines)
@@ -48,7 +48,7 @@ if vim.env.SSH_CONNECTION then
     end
   end
   local function paste(register)
-    if vim.env.TMUX == nil then
+    if not TMUX then
       return require('vim.ui.clipboard.osc52').paste(register)
     else
       return {'tmux', 'save-buffer', '-'}
