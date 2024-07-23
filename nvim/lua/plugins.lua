@@ -1127,7 +1127,7 @@ local plugins = {
   },
   {
     "CopilotC-Nvim/CopilotChat.nvim",
-    cmd = "Copilot",
+    cmd = {"Copilot", "CopilotChat"},
     event = "InsertEnter",
     branch = "canary",
     dependencies = {
@@ -1137,7 +1137,7 @@ local plugins = {
     opts = {
       mappings = {
         close = {
-          normal = 'q',
+          insert = false,
         },
       },
     },

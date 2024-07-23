@@ -25,11 +25,22 @@ local M = {}
 local function is_dev_dir()
   local cwd_parts = vim.split(vim.fn.getcwd(), "/")
   vim.g.debug = cwd_parts
-  local directory = cwd_parts[#cwd_parts]
-  vim.g.directory_name = directory
-  if directory:match('^myo_(.*)') then
-    return true
+
+  local patterns = {'^Projects$', '^code$'}
+  local num_parts_to_check = 2  -- Change this to check more parts
+
+  for i = 0, num_parts_to_check - 1 do
+    local directory = cwd_parts[#cwd_parts - i]
+    if directory then
+      vim.g.directory_name = directory
+      for _, pattern in ipairs(patterns) do
+        if directory:match(pattern) then
+          return true
+        end
+      end
+    end
   end
+
   return false
 end
 M.is_dev_dir = is_dev_dir()
