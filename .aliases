@@ -17,7 +17,7 @@ alias ght='gh workflow run tests --ref $(git rev-parse --abbrev-ref HEAD)'
 alias cda='conda activate'
 alias cdd='conda deactivate'
 alias cdl='conda env list'
-alias cdc='conda create --name'
+alias cdc='conda -y create --name'
 alias cdr='conda env remove --name '
 
 # MuJoCo
