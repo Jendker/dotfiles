@@ -52,3 +52,10 @@ defaults write com.apple.CrashReporter DialogType server
 defaults write com.apple.dock autohide -bool true
 defaults write com.apple.dock autohide-time-modifier -float 0.15
 killall Dock
+
+# Reduce the padding between the elements
+# To disable:
+# defaults -currentHost delete -globalDomain NSStatusItemSpacing
+# defaults -currentHost delete -globalDomain NSStatusItemSelectionPadding
+defaults -currentHost write -globalDomain NSStatusItemSpacing -int 14
+defaults -currentHost write -globalDomain NSStatusItemSelectionPadding -int 8
