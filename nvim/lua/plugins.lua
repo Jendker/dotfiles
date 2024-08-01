@@ -1039,6 +1039,26 @@ local plugins = {
     cond = not_vscode
   },
   {
+    "MeanderingProgrammer/markdown.nvim",
+    opts = {
+      file_types = { "markdown", "norg", "rmd", "org" },
+      code = {
+        sign = false,
+        width = "block",
+        right_pad = 1,
+      },
+      heading = {
+        sign = false,
+        icons = {},
+      },
+    },
+    ft = { "markdown", "norg", "rmd", "org" },
+    config = function(_, opts)
+      require("render-markdown").setup(opts)
+      vim.keymap.set("n", "<leader>tk", require("render-markdown").toggle, { desc = "[t]oggle mar[k]down" })
+    end,
+  },
+  {
     "iamcco/markdown-preview.nvim",
     build = function() vim.fn["mkdp#util#install"]() end,
     cond = not_vscode
