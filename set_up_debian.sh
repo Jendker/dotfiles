@@ -36,9 +36,16 @@ function install_nvim_source() {
 }
 
 function install_nvim_tarball() {
-  curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim-linux64.tar.gz
+  nvim_download_path=/tmp/nvim-linux64.tar.gz
+  curl -Lo "$nvim_download_path" https://github.com/neovim/neovim/releases/latest/download/nvim-linux64.tar.gz
   sudo rm -rf /opt/nvim
-  sudo tar -C /opt -xzf nvim-linux64.tar.gz
+  sudo tar -C /opt -xzf "$nvim_download_path"
+  rm -rf "$nvim_download_path"
+  if ! /opt/nvim-linux64/bin/nvim --version; then
+    echo "nvim binary in /opt/nvim-linux64/bin cannot be opened. Exiting..."
+    sudo rm -rf /opt/nvim
+    exit 1
+  fi
   if ! grep -Fxq 'export PATH="$PATH:/opt/nvim-linux64/bin"' $HOME/.zshrc; then
     echo 'export PATH="$PATH:/opt/nvim-linux64/bin"' >> $HOME/.zshrc
   fi
@@ -131,7 +138,7 @@ function install_nvim_binary() {
     branch="$1"
   fi
   if [ "$branch" == "stable" ]; then
-    install_nvim_tarball
+    install_nvim_tarball || install_nvim_source $branch
   else
     install_nvim_source $branch
   fi
@@ -201,11 +208,11 @@ if [[ ! $# -eq 0 ]]; then
     exit 0
   elif [[ $1 == "--update-nvim" ]]; then
     echo "Updating nvim binary..."
-    install_nvim_source stable
+    install_nvim_binary stable
     exit 0
   elif [[ $1 == "--update-nvim-dev" ]]; then
     echo "Updating nvim binary from git dev branch..."
-    install_nvim_source master
+    install_nvim_binary master
     exit 0
   elif [[ $1 == "--install-node" ]]; then
     echo "Installing node js over nvm..."

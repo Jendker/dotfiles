@@ -1057,6 +1057,7 @@ local plugins = {
       require("render-markdown").setup(opts)
       vim.keymap.set("n", "<leader>tk", require("render-markdown").toggle, { desc = "[t]oggle mar[k]down" })
     end,
+    cond = not_vscode
   },
   {
     "iamcco/markdown-preview.nvim",
@@ -1160,7 +1161,12 @@ local plugins = {
           insert = false,
         },
       },
+      context = 'buffer',
     },
+    config = function(_, opts)
+      require("CopilotChat").setup(opts)
+      require("CopilotChat.integrations.cmp").setup()
+    end,
     cond = not_vscode
   },
   {
@@ -1336,16 +1342,15 @@ local plugins = {
       "OverseerToggle",
     },
     keys = {
-      { "<leader>oo", "<cmd>OverseerToggle<CR>", mode = "n", desc = "OverseerToggle" },
-      { "<leader>or", "<cmd>OverseerRun<CR>", mode = "n", desc = "OverseerRun" },
-      { "<leader>oc", "<cmd>OverseerRunCmd<CR>", mode = "n", desc = "OverseerRunCmd" },
-      { "<leader>ol", "<cmd>OverseerLoadBundle<CR>", mode = "n", desc = "OverseerLoadBundle" },
-      { "<leader>ob", "<cmd>OverseerToggle! bottom<CR>", mode = "n", desc = "OverseerToggle" },
-      { "<leader>od", "<cmd>OverseerQuickAction<CR>", mode = "n", desc = "OverseerQuickAction" },
-      { "<leader>os", "<cmd>OverseerTaskAction<CR>", mode = "n", desc = "OverseerTaskAction" },
+      { "<leader>oo", "<cmd>OverseerToggle!<CR>", mode = "n", desc = "[O]verseer [O]pen" },
+      { "<leader>or", "<cmd>OverseerRun<CR>", mode = "n", desc = "[O]verseer [R]un" },
+      { "<leader>oc", "<cmd>OverseerRunCmd<CR>", mode = "n", desc = "[O]verseer run [C]ommand" },
+      { "<leader>ol", "<cmd>OverseerLoadBundle<CR>", mode = "n", desc = "[O]verseer [L]oad" },
+      { "<leader>od", "<cmd>OverseerQuickAction<CR>", mode = "n", desc = "[O]verseer [D]o quick action" },
+      { "<leader>os", "<cmd>OverseerTaskAction<CR>", mode = "n", desc = "[O]verseer [S]elect task action" },
     },
     opts = {
-      templates = { builtin = true },
+      templates = { "builtin", "user.run_script", "user.run_script_with_args", "user.populate_scripts" },
       strategy = { "jobstart" },
       dap = false,
       log = {
@@ -1357,6 +1362,11 @@ local plugins = {
           type = "file",
           filename = "overseer.log",
           level = vim.log.levels.DEBUG,
+        },
+      },
+      task_list = {
+        bindings = {
+          dd = "Dispose",
         },
       },
       task_launcher = {
@@ -1372,7 +1382,7 @@ local plugins = {
           "on_output_summarize",
           "on_exit_set_status",
           { "on_complete_notify", system = "unfocused" },
-          "on_complete_dispose",
+          { "on_complete_dispose", require_view = { "SUCCESS", "FAILURE" } },
         },
         default_neotest = {
           "unique",
@@ -1383,13 +1393,37 @@ local plugins = {
       post_setup = {},
     },
     config = function(_, opts)
-      opts.templates = vim.tbl_keys(opts.templates)
+      -- opts.templates = vim.tbl_keys(opts.templates)
       local overseer = require("overseer")
       overseer.setup(opts)
       for _, cb in pairs(opts.post_setup) do
         cb()
       end
       vim.api.nvim_create_user_command("OverseerDebugParser", 'lua require("overseer").debug_parser()', {})
+      vim.api.nvim_create_user_command("OverseerTestOutput", function(params)
+        vim.cmd.tabnew()
+        vim.bo.bufhidden = "wipe"
+        local TaskView = require("overseer.task_view")
+        TaskView.new(0, {
+          select = function(self, tasks)
+            for _, task in ipairs(tasks) do
+              if task.metadata.neotest_group_id then
+                return task
+              end
+            end
+            self:dispose()
+          end,
+        })
+      end, {})
+      vim.api.nvim_create_user_command("OverseerRestartLast", function()
+        local overseer = require("overseer")
+        local tasks = overseer.list_tasks({ recent_first = true })
+        if vim.tbl_isempty(tasks) then
+          vim.notify("No tasks found", vim.log.levels.WARN)
+        else
+          overseer.run_action(tasks[1], "restart")
+        end
+      end, {})
       vim.api.nvim_create_user_command("Grep", function(params)
         local args = vim.fn.expandcmd(params.args)
         -- Insert args at the '$*' in the grepprg
@@ -1415,7 +1449,7 @@ local plugins = {
               items_only = true,
             },
             -- We don't care to keep this around as long as most tasks
-            { "on_complete_dispose", timeout = 30 },
+            { "on_complete_dispose", timeout = 30, require_view = {} },
             "default",
           },
         })

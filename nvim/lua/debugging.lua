@@ -34,6 +34,7 @@ return {
           virt_text_pos = 'eol',
         },
       },
+      "stevearc/overseer.nvim",
     },
     keys = {
       { '<F5>',       function() require('dap').continue() end,          desc = 'Debug: Start/Continue' },

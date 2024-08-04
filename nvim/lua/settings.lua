@@ -30,6 +30,7 @@ vim.opt.laststatus = 3 -- global statusline
 vim.o.updatetime = 200 -- CursorHold time default is 4s. Way too long
 vim.opt.showcmd = false -- prevent flickering if j/k is being held
 vim.opt.title = true -- turn on for tmux and terminal apps tab title
+vim.o.splitright = true
 
 -- Clipboard
 vim.opt.clipboard = "unnamedplus"
