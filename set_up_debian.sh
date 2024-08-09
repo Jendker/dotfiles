@@ -101,6 +101,22 @@ EOT
   fi
 }
 
+function install_delta() {
+  installed=false
+  if ! [ -x "$(command -v delta)" ]; then
+    echo "Installing delta."
+    LATEST_DELTA_VERSION=$(curl -s "https://api.github.com/repos/dandavison/delta/releases/latest" | grep -Po '"tag_name": "\K[0-9.]+')
+    wget -O /tmp/delta.deb "https://github.com/dandavison/delta/releases/download/${LATEST_DELTA_VERSION}/git-delta_${LATEST_DELTA_VERSION}_$(dpkg --print-architecture).deb" && sudo dpkg -i /tmp/delta.deb && rm /tmp/delta.deb
+    installed=true
+  fi
+}
+
+function install_gh() {
+  LATEST_GH_VERSION=$(curl -s "https://api.github.com/repos/cli/cli/releases/latest" | grep -Po '"tag_name": "v\K[0-9.]+')
+  wget -O /tmp/gh.deb "https://github.com/cli/cli/releases/download/v${LATEST_GH_VERSION}/gh_${LATEST_GH_VERSION}_linux_$(dpkg --print-architecture).deb" && sudo dpkg -i /tmp/gh.deb && rm /tmp/gh.deb
+  echo "Optionally 'run gh auth login'"
+}
+
 function update_git() {
   # need at least git 2.31
   version=$(git --version | tr -d -c 0-9.)
@@ -332,8 +348,8 @@ install_zoxide
 
 install_direnv
 
-# set up gh
-LATEST_GH_VERSION=$(curl -s "https://api.github.com/repos/cli/cli/releases/latest" | grep -Po '"tag_name": "v\K[0-9.]+')
-wget -O /tmp/gh.deb "https://github.com/cli/cli/releases/download/v${LATEST_GH_VERSION}/gh_${LATEST_GH_VERSION}_linux_$(dpkg --print-architecture).deb" && sudo dpkg -i /tmp/gh.deb && rm /tmp/gh.deb
-echo "Optionally 'run gh auth login'"
+install_delta
+
+install_gh
+
 echo "Done"
