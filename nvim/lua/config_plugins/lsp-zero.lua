@@ -359,16 +359,12 @@ vim.diagnostic.config({
   },
 })
 
-vim.api.nvim_create_user_command("DiagnosticToggle", function()
-	local config = vim.diagnostic.config
-	local signs = config().signs
-	config {
-		virtual_text = not signs,
-		underline = not signs,
-		signs = not signs,
-	}
-end, { desc = "[t]oggle [d]iagnostics" })
-vim.keymap.set("n", "<leader>td", "<cmd>DiagnosticToggle<CR>")
+vim.keymap.set(
+  "n",
+  "<leader>td",
+  function() vim.diagnostic.enable(not vim.diagnostic.is_enabled()) end,
+  { desc = "[t]oggle [d]iagnostics" }
+)
 
 vim.api.nvim_create_user_command("VirtualTextToggle", function()
 	local config = vim.diagnostic.config
@@ -377,7 +373,7 @@ vim.api.nvim_create_user_command("VirtualTextToggle", function()
           virtual_text = not vt,
 	}
 end, { desc = "[t]oggle [v]irtual text" })
-vim.keymap.set("n", "<leader>tv", "<cmd>VirtualTextToggle<CR>")
+vim.keymap.set("n", "<leader>tv", "<cmd>VirtualTextToggle<CR>", { desc = "[t]oggle [v]irtual text" })
 
 local cmp = require('cmp')
 local cmp_action = require('lsp-zero').cmp_action()

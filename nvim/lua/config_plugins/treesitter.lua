@@ -92,4 +92,4 @@ require('nvim-treesitter.configs').setup({
 local ts_repeat_move = require "nvim-treesitter.textobjects.repeatable_move"
 vim.keymap.set({ "n", "x", "o" }, ";", ts_repeat_move.repeat_last_move, {silent = true})
 vim.keymap.set({ "n", "x", "o" }, ",", ts_repeat_move.repeat_last_move_opposite, {silent = true})
-vim.keymap.set("n", "<leader>th", "<cmd>TSToggle highlight<cr>", {desc="[T]oggle treesitter [h]ighlight"})
+vim.keymap.set("n", "<leader>th", "<cmd>TSToggle highlight<cr>", {desc="[t]oggle treesitter [h]ighlight"})

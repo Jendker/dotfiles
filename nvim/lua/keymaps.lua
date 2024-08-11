@@ -34,9 +34,9 @@ map({"n", "v"}, "<leader>d", [["_d]])
 map({"n", "v"}, "<leader>D", [["_D]])
 map({"n", "v"}, "<leader>c", [["_c]])
 map({"n", "v"}, "<leader>C", [["_C]])
-map("n", "<leader>tq", "<cmd>tabclose<cr>", { desc = "[T]ab [q] close" })
-map("n", "<leader>tc", "<cmd>tabnew<CR>", { desc = "[T]ab [n]ew"})
-map("n", "<leader>tn", "<cmd>tabnew<CR>", { desc = "[T]ab [c]reate"})
+map("n", "<leader>tq", "<cmd>tabclose<cr>", { desc = "[t]ab [q] close" })
+map("n", "<leader>tc", "<cmd>tabnew<CR>", { desc = "[t]ab [n]ew"})
+map("n", "<leader>tn", "<cmd>tabnew<CR>", { desc = "[t]ab [c]reate"})
 map("n", "<leader>tf", function()
   if vim.b.orbik_disable_autoformat then
     common.enableAutoformat()
@@ -47,7 +47,7 @@ map("n", "<leader>tf", function()
     vim.b.orbik_disable_autoformat = true
     vim.notify("Autoformat disabled for the buffer", vim.log.levels.INFO)
   end
-end, { desc = "[T]oggle auto[f]ormat" })
+end, { desc = "[t]oggle auto[f]ormat" })
 map("n", "<leader>tm", function()
   if vim.o.mouse == "nvi" then
     vim.opt.mouse = ""
@@ -56,7 +56,7 @@ map("n", "<leader>tm", function()
     vim.opt.mouse = "nvi"
     vim.notify("Vim mouse enabled", vim.log.levels.INFO)
   end
-end, { desc = "[T]oggle [m]ouse" })
+end, { desc = "[t]oggle [m]ouse" })
 
 -- don't enter command history
 map("n", "Q", "<nop>")
@@ -78,8 +78,8 @@ map("v", "<", "<gv")
 map("v", ">", ">gv")
 
 -- toggle settings
-map("n", "<leader>tw", function() toggle("wrap") end, { desc = "[T]oggle word [w]rap" })
-map("n", "<leader>to", function() vim.cmd("ASToggle"); require('gitsigns').toggle_current_line_blame() end, { desc = "[T]oggle development [o]ptions" })
+map("n", "<leader>tw", function() toggle("wrap") end, { desc = "[t]oggle word [w]rap" })
+map("n", "<leader>to", function() vim.cmd("ASToggle"); require('gitsigns').toggle_current_line_blame() end, { desc = "[t]oggle development [o]ptions" })
 if vim.fn.has("nvim-0.9.0") == 1 then
   map("n", "<leader>ti", vim.show_pos, { desc = "Inspect Pos" }) -- highlights under cursor
 end

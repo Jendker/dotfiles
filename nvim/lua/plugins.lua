@@ -406,7 +406,7 @@ local plugins = {
           vim.o.background = "light"
         end
         setup_theme(theme)
-      end, {desc = "Toggle dark and light mode"})
+      end, {desc = "[t]oggle dark/light [t]heme"})
     end,
     cond = not_vscode
   },
@@ -896,7 +896,7 @@ local plugins = {
         else
           vim.notify("auto-save off")
         end
-      end, desc = "[T]oggle [a]utosave"},
+      end, desc = "[t]oggle [a]utosave"},
     },
     init = function ()
       vim.g.autosave_on = common.is_dev_dir
@@ -1068,18 +1068,26 @@ local plugins = {
   {
     -- config from https://www.lazyvim.org/plugins/editor#troublenvim
     "folke/trouble.nvim",
-    cmd = { "TroubleToggle", "Trouble" },
-    opts = { use_diagnostic_signs = true, action_keys = {toggle_fold = {"zA", "za", "h", "l"} } },
+    cmd = { "Trouble" },
+    opts = {
+      modes = {
+        lsp = {
+          win = { position = "right" },
+        },
+      },
+    },
     keys = {
-      { "<leader>xx", "<cmd>TroubleToggle document_diagnostics<cr>", desc = "Document Diagnostics (Trouble)" },
-      { "<leader>xX", "<cmd>TroubleToggle workspace_diagnostics<cr>", desc = "Workspace Diagnostics (Trouble)" },
-      { "<leader>xl", "<cmd>TroubleToggle loclist<cr>", desc = "Location List (Trouble)" },
-      { "<leader>xq", "<cmd>TroubleToggle quickfix<cr>", desc = "Quickfix List (Trouble)" },
+      { "<leader>xx", "<cmd>Trouble diagnostics toggle<cr>",              desc = "Diagnostics (Trouble)" },
+      { "<leader>xX", "<cmd>Trouble diagnostics toggle filter.buf=0<cr>", desc = "Buffer Diagnostics (Trouble)" },
+      { "<leader>xs", "<cmd>Trouble symbols toggle<cr>",                  desc = "Symbols (Trouble)" },
+      { "<leader>xS", "<cmd>Trouble lsp toggle<cr>",                      desc = "LSP references/definitions/... (Trouble)" },
+      { "<leader>xl", "<cmd>Trouble loclist toggle<cr>",                  desc = "Location List (Trouble)" },
+      { "<leader>xq", "<cmd>Trouble qflist toggle<cr>",                   desc = "Quickfix List (Trouble)" },
       {
         "[q",
         function()
           if require("trouble").is_open() then
-            require("trouble").previous({ skip_groups = true, jump = true })
+            require("trouble").prev({ skip_groups = true, jump = true })
           else
             local ok, err = pcall(vim.cmd.cprev)
             if not ok then
@@ -1087,7 +1095,7 @@ local plugins = {
             end
           end
         end,
-        desc = "Previous trouble/quickfix item",
+        desc = "Previous Trouble/Quickfix Item",
       },
       {
         "]q",
@@ -1101,7 +1109,7 @@ local plugins = {
             end
           end
         end,
-        desc = "Next trouble/quickfix item",
+        desc = "Next Trouble/Quickfix Item",
       },
     },
     cond = not_vscode
@@ -1315,7 +1323,7 @@ local plugins = {
           vim.notify("Disabled codespell", vim.log.levels.INFO)
           vim.diagnostic.reset(nil, 0)
         end
-      end, {desc = "[T]oggle code[s]pell"})
+      end, {desc = "[t]oggle code[s]pell"})
     end,
     cond = not_vscode
   },
