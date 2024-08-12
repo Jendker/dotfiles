@@ -19,8 +19,6 @@ function add() {
   fi
 }
 
-mkdir -p "$HOME/.config"
-
 # nvim
 add "$SCRIPT_DIR/nvim" "$HOME/.config/nvim"
 
@@ -28,7 +26,7 @@ add "$SCRIPT_DIR/nvim" "$HOME/.config/nvim"
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
   add "$SCRIPT_DIR/clangd" "$HOME/.config/clangd"
 elif [[ "$OSTYPE" == "darwin"* ]]; then
-  macos_clangd_path="$HOME/Library/Preferences/clangd/"
+  macos_clangd_path="$HOME/Library/Preferences/clangd"
   mkdir -p "$macos_clangd_path"
   add "$SCRIPT_DIR/clangd" "$macos_clangd_path"
 else
