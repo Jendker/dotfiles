@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ["ubuntu-latest"]
+        os: ["ubuntu-latest", "macos-latest"]
 
     steps:
       - name: Checkout repository
@@ -25,5 +25,10 @@ jobs:
       - name: Run setup
         run: |
           ./install.sh
-          ./set_up_debian.sh
-          ./set_up_debian_dev.sh --optional
+          if [[ "$RUNNER_OS" == "Linux" ]]; then
+            ./set_up_debian.sh
+            ./set_up_debian_dev.sh --optional
+          elif [[ "$RUNNER_OS" == "macOS" ]]; then
+            ./macos/install.sh
+            ./macos/set_defaults.sh --optional
+          fi
