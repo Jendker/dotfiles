@@ -626,6 +626,7 @@ local plugins = {
         toggle_key_flip_floatwin_setting = true,
       } },
       {'jay-babu/mason-null-ls.nvim'},
+      {'folke/neoconf.nvim', opts = {}},  -- autoload settings.json
     },
     cond = not_vscode
   },
@@ -848,6 +849,7 @@ local plugins = {
       wk.add({
         {
           mode = { "n", "v" },
+          { "<leader>a",  group = "tab" },
           { "<leader>b",  group = "buffer/bookmarks" },
           { "<leader>e",  group = "debug" },
           { "<leader>g",  group = "diffview" },
@@ -856,7 +858,7 @@ local plugins = {
           { "<leader>s",  group = "search" },
           { "<leader>sb", group = "bookmarks" },
           { "<leader>sf", group = "go to file" },
-          { "<leader>t",  group = "toogle/tab" },
+          { "<leader>t",  group = "toogle" },
           { "<leader>v",  group = "compare" },
           { "<leader>w",  group = "workspace" },
           { "<leader>x",  group = "trouble" },
@@ -1110,6 +1112,48 @@ local plugins = {
           end
         end,
         desc = "Next Trouble/Quickfix Item",
+      },
+    },
+    cond = not_vscode
+  },
+  {
+    'stevearc/quicker.nvim',
+    ft = {"qf"},
+    keys = {
+      { "<leader>tq", function() require("quicker").toggle() end, desc = "[t]oggle [q]uickfix" },
+      { "<leader>tl", function() require("quicker").toggle({ loclist = true }) end, desc = "[t]oggle [l]oclist" },
+    },
+    opts = {
+      keys = {
+        {
+          ">",
+          function()
+            require("quicker").expand({ before = 2, after = 2, add_to_existing = true })
+          end,
+          desc = "Expand quickfix context",
+        },
+        {
+          "<",
+          function()
+            require("quicker").collapse()
+          end,
+          desc = "Collapse quickfix context",
+        },
+      },
+      {
+        "<leader>Q",
+        function()
+          vim.fn.setqflist({}, "a", {
+            items = {
+              {
+                bufnr = vim.api.nvim_get_current_buf(),
+                lnum = vim.api.nvim_win_get_cursor(0)[1],
+                text = vim.api.nvim_get_current_line(),
+              },
+            },
+          })
+        end,
+        desc = "Add to [Q]uickfix",
       },
     },
     cond = not_vscode
