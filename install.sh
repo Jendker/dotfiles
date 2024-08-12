@@ -19,6 +19,8 @@ function add() {
   fi
 }
 
+mkdir -p "$HOME/.config"
+
 # nvim
 add "$SCRIPT_DIR/nvim" "$HOME/.config/nvim"
 
