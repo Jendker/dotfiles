@@ -89,6 +89,23 @@ vim.opt.spelllang = 'en_us'
 local function augroup(name)
   return vim.api.nvim_create_augroup("jorbik_" .. name, { clear = true })
 end
+
+local function auto_change_cwd()
+  local starting_args = vim.fn.argv()
+
+  -- Check if there is exactly one argument and it is a directory
+  if #starting_args == 1 then
+    local dir = starting_args[1]
+    if vim.fn.isdirectory(dir) == 1 then
+      local ok, err = pcall(vim.api.nvim_set_current_dir, dir)
+      if not ok then
+        vim.api.nvim_err_writeln("Failed to change directory to: " .. dir .. "\nError: " .. err)
+      end
+    end
+  end
+end
+auto_change_cwd()
+
 -- Highlight on yank
 vim.api.nvim_create_autocmd("TextYankPost", {
   group = augroup("highlight_yank"),
