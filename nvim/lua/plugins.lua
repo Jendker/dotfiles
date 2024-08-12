@@ -349,7 +349,7 @@ local plugins = {
     "Jendker/last-color.nvim",
     config = function()
       local function setup_theme(theme)
-        local should_be_transparent = vim.o.background == 'dark'
+        local should_be_transparent = vim.o.background == 'dark' and not SSH
         local theme_extension = common.matching_string(theme, common.theme_extensions)
         if theme_extension == "kanagawa" then
           require("kanagawa").setup({

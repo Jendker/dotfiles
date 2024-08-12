@@ -33,37 +33,41 @@ vim.opt.title = true -- turn on for tmux and terminal apps tab title
 vim.o.splitright = true
 
 -- Clipboard
-local function copy(register)
-  if not TMUX then
-    return require('vim.ui.clipboard.osc52').copy(register)
-  else
-    return function(lines)
-      -- Set both OSC 52 to copy to host and to tmux to use on remote
-      require('vim.ui.clipboard.osc52').copy(register)(lines)
-      local cmd = {"tmux", "load-buffer", "-"}
-      vim.fn.system(cmd, lines)
+vim.opt.clipboard = "unnamedplus"
+
+if vim.env.SSH_CONNECTION then
+  local function copy(register)
+    if not TMUX then
+      return require('vim.ui.clipboard.osc52').copy(register)
+    else
+      return function(lines)
+        -- Set both OSC 52 to copy to host and to tmux to use on remote
+        require('vim.ui.clipboard.osc52').copy(register)(lines)
+        local cmd = {"tmux", "load-buffer", "-"}
+        vim.fn.system(cmd, lines)
+      end
     end
   end
-end
-local function paste(register)
-  if not TMUX then
-    return require('vim.ui.clipboard.osc52').paste(register)
-  else
-    return {'tmux', 'save-buffer', '-'}
+  local function paste(register)
+    if not TMUX then
+      return require('vim.ui.clipboard.osc52').paste(register)
+    else
+      return {'tmux', 'save-buffer', '-'}
+    end
   end
-end
 
-vim.g.clipboard = {
-  name = 'OSC 52 with tmux',
-  copy = {
-    ['+'] = copy('+'),
-    ['*'] = copy('*'),
-  },
-  paste = {
-    ['+'] = paste('+'),
-    ['*'] = paste('*'),
+  vim.g.clipboard = {
+    name = 'OSC 52 with tmux',
+    copy = {
+      ['+'] = copy('+'),
+      ['*'] = copy('*'),
+    },
+    paste = {
+      ['+'] = paste('+'),
+      ['*'] = paste('*'),
+    }
   }
-}
+end
 
 -- don't continue comment on newline
 vim.cmd("autocmd BufEnter * setlocal formatoptions-=cro")
