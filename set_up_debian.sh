@@ -24,6 +24,7 @@ function install_nvim_source() {
   fi
   sudo apt-get install ninja-build gettext cmake unzip curl -y
   sudo apt install libreadline-dev -y # for hererocks
+  sudo apt install libmagickwand-dev -y # for image.nvim
   cd /tmp && rm -rf neovim && git clone https://github.com/neovim/neovim.git $branch_str --single-branch
   cd neovim
   if [ "$1" == "master" ]; then

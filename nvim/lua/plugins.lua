@@ -1612,10 +1612,21 @@ local plugins = {
     opts = {},
     cond = not_vscode
   },
+  {
+    '3rd/image.nvim',
+    ft = { "markdown", "norg", "oil" },
+    -- Disable on Windows system
+    dependencies = {
+      'leafo/magick',
+    },
+    opts = {
+      editor_only_render_when_focused = true,
+      tmux_show_only_in_active_window = true,
+    },
+    cond = not_vscode
+  },
   require('debugging'),
 }
 
--- use the lazy_opts until this is fixed: https://github.com/rmagatti/auto-session/issues/223
 local lazy_opts = {}
-
 require("lazy").setup(plugins, lazy_opts)
