@@ -42,7 +42,7 @@ local always_installed = {
 }
 
 --  This function gets run when an LSP connects to a particular buffer.
-lsp_zero.on_attach(function(client, bufnr)
+local lsp_attach = function(client, bufnr)
   lsp_zero.default_keymaps({
     buffer = bufnr,
     exclude = {'gr', '<F3>'},
@@ -83,7 +83,14 @@ lsp_zero.on_attach(function(client, bufnr)
       vim.cmd('TSBufDisable highlight')
     end
   end
-end)
+end
+
+lsp_zero.extend_lspconfig({
+  capabilities = require('cmp_nvim_lsp').default_capabilities(),
+  lsp_attach = lsp_attach,
+  float_border = 'rounded',
+  sign_text = true,
+})
 
 lsp_zero.set_sign_icons({
   error = '',
@@ -450,6 +457,11 @@ cmp.setup({
     {name = 'codeium'},
     {name = 'buffer', keyword_length = 3},
     {name = 'luasnip', keyword_length = 2},
+  },
+  snippet = {
+    expand = function(args)
+      require('luasnip').lsp_expand(args.body)
+    end,
   },
   sorting = cmp_sorting,
 })
