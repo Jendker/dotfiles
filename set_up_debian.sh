@@ -272,10 +272,12 @@ sudo apt install ripgrep -y || true
 ./set_up_common.sh
 
 pipx install thefuck
-if ! grep -q "alias vim=nvim" $HOME/.zshrc; then
+if ! grep -q "unsetopt BEEP" $HOME/.zshrc; then
   sudo tee -a $HOME/.zshrc > /dev/null <<'EOT'
-alias vim=nvim
-export EDITOR=nvim
+if command -v nvim &> /dev/null; then
+  alias vim=nvim
+  export EDITOR=nvim
+fi
 unsetopt BEEP
 PROMPT="%(?:%{$fg_bold[green]%}➜ :%{$fg_bold[red]%}➜ )"
 PROMPT+=' %{$fg[cyan]%}%~%{$reset_color%} $(git_prompt_info)'
