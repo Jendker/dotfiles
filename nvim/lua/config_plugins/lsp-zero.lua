@@ -18,8 +18,7 @@ local auto_filetype_packages = {
   -- list of DAP mappings -- https://github.com/jay-babu/mason-nvim-dap.nvim/blob/main/lua/mason-nvim-dap/mappings/filetypes.lua
   ['pyright'] = true,
   ['debugpy'] = true,
-  ['ruff'] = true, -- auto fix errors with conform.nvim
-  ['ruff_lsp'] = true,
+  ['ruff'] = true,
   ['black'] = true,
   ['lua_ls'] = true,
   ['bashls'] = true,
@@ -205,8 +204,8 @@ require('mason-lspconfig').setup({
         end,
       })
     end,
-    ruff_lsp = function()
-      require('lspconfig').ruff_lsp.setup {
+    ruff = function()
+      require('lspconfig').ruff.setup({
         on_attach = function(client, _)
           -- Disable hover in favor of Pyright
           client.server_capabilities.hoverProvider = false
@@ -225,7 +224,7 @@ require('mason-lspconfig').setup({
             },
           }
         }
-      }
+      })
     end,
     gopls = function()
       require'lspconfig'.gopls.setup{
