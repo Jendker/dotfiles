@@ -1041,7 +1041,7 @@ local plugins = {
     cond = not_vscode
   },
   {
-    "MeanderingProgrammer/markdown.nvim",
+    "MeanderingProgrammer/render-markdown.nvim",
     opts = {
       file_types = { "markdown", "norg", "rmd", "org" },
       code = {
@@ -1052,6 +1052,13 @@ local plugins = {
       heading = {
         sign = false,
         icons = {},
+      },
+      overrides = {
+        buftype = {
+          nofile = {
+            code = { width = "full", left_pad = 0, right_pad = 0 },
+          },
+        },
       },
     },
     ft = { "markdown", "norg", "rmd", "org" },
