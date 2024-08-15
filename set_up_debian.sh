@@ -1,13 +1,16 @@
 #!/bin/bash
-set -x
 set -e
 
 function get_highest_tag_version() {
   git tag | sort -V | tail -n 1
 }
 
-function is_installed() {
-     dpkg --verify "$1" 2>/dev/null
+function command_exists() {
+  command -v "$1" &> /dev/null
+}
+
+function package_installed() {
+  dpkg --verify "$1" 2>/dev/null
 }
 
 function uncomment_line() {
@@ -71,7 +74,6 @@ function install_node() {
     LATEST_NVM_VERSION=$(curl -s "https://api.github.com/repos/nvm-sh/nvm/releases/latest" | grep -Po '"tag_name": "v\K[0-9.]+')
     nvm_install_command="wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v${LATEST_NVM_VERSION}/install.sh | bash"
     zsh -c "$nvm_install_command" || eval "$nvm_install_command"
-    set +x
     # load nvm
     export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
     [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
@@ -87,34 +89,29 @@ EOT
     export NVM_DIR="$HOME/.nvm"
     [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
     [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-    set -x
     installed=true
   fi
-  set +x
   if [[ $(lsb_release -cs) == "bionic" ]]; then
     nvm install 16
   else
     nvm install --lts
   fi
-  set -x
   if [ $installed = true ]; then
     echo "Please source ~/.zshrc or ~/.bashrc"
   fi
 }
 
 function install_delta() {
-  installed=false
   if ! [ -x "$(command -v delta)" ]; then
     echo "Installing delta."
     LATEST_DELTA_VERSION=$(curl -s "https://api.github.com/repos/dandavison/delta/releases/latest" | grep -Po '"tag_name": "\K[0-9.]+')
-    wget -O /tmp/delta.deb "https://github.com/dandavison/delta/releases/download/${LATEST_DELTA_VERSION}/git-delta_${LATEST_DELTA_VERSION}_$(dpkg --print-architecture).deb" && sudo dpkg -i /tmp/delta.deb && rm /tmp/delta.deb
-    installed=true
+    wget -O /tmp/delta.deb "https://github.com/dandavison/delta/releases/download/${LATEST_DELTA_VERSION}/git-delta_${LATEST_DELTA_VERSION}_$(dpkg --print-architecture).deb" && sudo apt install -y /tmp/delta.deb && rm /tmp/delta.deb
   fi
 }
 
 function install_gh() {
   LATEST_GH_VERSION=$(curl -s "https://api.github.com/repos/cli/cli/releases/latest" | grep -Po '"tag_name": "v\K[0-9.]+')
-  wget -O /tmp/gh.deb "https://github.com/cli/cli/releases/download/v${LATEST_GH_VERSION}/gh_${LATEST_GH_VERSION}_linux_$(dpkg --print-architecture).deb" && sudo dpkg -i /tmp/gh.deb && rm /tmp/gh.deb
+  wget -O /tmp/gh.deb "https://github.com/cli/cli/releases/download/v${LATEST_GH_VERSION}/gh_${LATEST_GH_VERSION}_linux_$(dpkg --print-architecture).deb" && sudo dpkg -i /tmp/gh.deb && sudo apt install -y /tmp/gh.deb
   echo "Optionally 'run gh auth login'"
 }
 
@@ -271,7 +268,9 @@ sudo apt install ripgrep -y || true
 # run set_up_common.sh
 ./set_up_common.sh
 
-pipx install thefuck
+if command -v doit &> /dev/null; then
+  pipx install thefuck
+fi
 if ! grep -q "unsetopt BEEP" $HOME/.zshrc; then
   sudo tee -a $HOME/.zshrc > /dev/null <<'EOT'
 if command -v nvim &> /dev/null; then
@@ -322,22 +321,6 @@ if ! [ -x "$(command -v nvim)" ]; then
   update_dotfiles
 fi
 
-# set up pyenv only on bionic
-if [[ $(lsb_release -cs) == "bionic" ]]; then
-  if [ ! -d "$HOME/.pyenv" ]; then
-    sudo apt install libreadline-dev libbz2-dev -y
-    curl https://pyenv.run | bash
-  echo '# Load pyenv
-  export PYENV_ROOT="$HOME/.pyenv"
-  command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"
-  eval "$(pyenv init -)"
-
-  # Load pyenv-virtualenv automatically
-  eval "$(pyenv virtualenv-init -)"' >> $HOME/.zshrc
-  fi
-  pyenv global 3.8.15 || pyenv install 3.8.15 && pyenv global 3.8.15
-fi
-
 # set up fzf for zsh
 if [ ! -d "$HOME/.fzf" ]; then
   git clone --depth 1 https://github.com/junegunn/fzf.git $HOME/.fzf
@@ -345,7 +328,9 @@ if [ ! -d "$HOME/.fzf" ]; then
 fi
 
 # install git lfs
-curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash && sudo apt-get install git-lfs && git lfs install
+if ! command_exists git-lfs; then
+  curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash && sudo apt-get install git-lfs && git lfs install
+fi
 
 install_zoxide
 
