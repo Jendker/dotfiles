@@ -639,7 +639,7 @@ local plugins = {
         javascript = { "prettierd" },
         json = { "prettierd" },
         markdown = { "prettierd" },
-        python = { "ruff_fix", "black" },
+        python = { "ruff_fix", "ruff_organize_imports", "black" },
         typescript = { "prettierd" },
         yaml = { "prettierd" },
       },
