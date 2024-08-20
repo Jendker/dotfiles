@@ -35,6 +35,7 @@ local auto_filetype_packages = {
   ['gopls'] = true,
   ['prettierd'] = true,
   ['shellcheck'] = true,
+  ['shfmt'] = true,
 }
 
 local always_installed = {

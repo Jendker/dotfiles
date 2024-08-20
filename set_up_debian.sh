@@ -6,7 +6,7 @@ function get_highest_tag_version() {
 }
 
 function command_exists() {
-  command -v "$1" &> /dev/null
+  command -v "$1" &>/dev/null
 }
 
 function package_installed() {
@@ -26,7 +26,7 @@ function install_nvim_source() {
     branch_str="--branch $1"
   fi
   sudo apt-get install ninja-build gettext cmake unzip curl -y
-  sudo apt install libreadline-dev -y # for hererocks
+  sudo apt install libreadline-dev -y   # for hererocks
   sudo apt install libmagickwand-dev -y # for image.nvim
   cd /tmp && rm -rf neovim && git clone https://github.com/neovim/neovim.git $branch_str --single-branch
   cd neovim
@@ -51,7 +51,7 @@ function install_nvim_tarball() {
     exit 1
   fi
   if ! grep -Fxq 'export PATH="$PATH:/opt/nvim-linux64/bin"' $HOME/.zshrc; then
-    echo 'export PATH="$PATH:/opt/nvim-linux64/bin"' >> $HOME/.zshrc
+    echo 'export PATH="$PATH:/opt/nvim-linux64/bin"' >>$HOME/.zshrc
   fi
   export PATH="$PATH:/opt/nvim-linux64/bin"
 }
@@ -79,7 +79,7 @@ function install_node() {
     [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
     # add nvm to .zshrc with string does not exists after the installation
     if ! grep -Fxq 'export NVM_DIR="$HOME/.nvm"' $HOME/.zshrc; then
-      sudo tee -a $HOME/.zshrc > /dev/null <<'EOT'
+      sudo tee -a $HOME/.zshrc >/dev/null <<'EOT'
 # Load nvm
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
@@ -87,8 +87,8 @@ export NVM_DIR="$HOME/.nvm"
 EOT
     fi
     export NVM_DIR="$HOME/.nvm"
-    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-    [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"                   # This loads nvm
+    [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" # This loads nvm bash_completion
     installed=true
   fi
   if [[ $(lsb_release -cs) == "bionic" ]]; then
@@ -118,12 +118,12 @@ function install_gh() {
 function update_git() {
   # need at least git 2.31
   version=$(git --version | tr -d -c 0-9.)
-  major=`echo $version | cut -d. -f1`
-  minor=`echo $version | cut -d. -f2`
-  revision=`echo $version | cut -d. -f3`
-  revision=`expr $revision + 1`
+  major=$(echo $version | cut -d. -f1)
+  minor=$(echo $version | cut -d. -f2)
+  revision=$(echo $version | cut -d. -f3)
+  revision=$(expr $revision + 1)
 
-  if (( 2 > $major )) || (( 31 > $minor )); then
+  if ((2 > $major)) || ((31 > $minor)); then
     echo "Updating git to the latest version..."
     sudo add-apt-repository ppa:git-core/ppa -y
     sudo apt-get update
@@ -136,7 +136,7 @@ function update_git() {
 function install_rust() {
   if ! [ -x "$(command -v cargo)" ]; then
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-    grep -qxF 'source "$HOME/.cargo/env"' $HOME/.zshrc || echo 'source "$HOME/.cargo/env"' >> $HOME/.zshrc
+    grep -qxF 'source "$HOME/.cargo/env"' $HOME/.zshrc || echo 'source "$HOME/.cargo/env"' >>$HOME/.zshrc
     echo "Please source ~/.zshrc or ~/.bashrc"
   fi
 }
@@ -161,16 +161,16 @@ function install_nvim_binary() {
 }
 
 function install_zoxide() {
-  if ! command -v zoxide > /dev/null 2>&1; then
+  if ! command -v zoxide >/dev/null 2>&1; then
     curl -sS https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | bash
   fi
-  grep -qxF 'eval "$(zoxide init zsh)"' $HOME/.zshrc || echo 'eval "$(zoxide init zsh)"' >> $HOME/.zshrc
+  grep -qxF 'eval "$(zoxide init zsh)"' $HOME/.zshrc || echo 'eval "$(zoxide init zsh)"' >>$HOME/.zshrc
 }
 
 function install_yazi_source() {
   sudo test || true
   install_rust
-  if ! command -v rustc > /dev/null 2>&1; then
+  if ! command -v rustc >/dev/null 2>&1; then
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
   fi
   cd /tmp && rm -rf yazi && git clone https://github.com/sxyazi/yazi.git
@@ -183,7 +183,7 @@ function install_yazi_source() {
   cd .. && rm -rf yazi
 
   if ! grep -Fxq 'function ya() {' $HOME/.zshrc; then
-    sudo tee -a $HOME/.zshrc > /dev/null <<'EOT'
+    sudo tee -a $HOME/.zshrc >/dev/null <<'EOT'
 function ya() {
   tmp="$(mktemp -t "yazi-cwd.XXXXX")"
   yazi "$@" --cwd-file="$tmp"
@@ -264,15 +264,14 @@ ln -s $(which fdfind) $HOME/.local/bin/fd || true
 
 sudo apt install ripgrep -y || true
 
-
 # run set_up_common.sh
 ./set_up_common.sh
 
-if command -v doit &> /dev/null; then
+if command -v doit &>/dev/null; then
   pipx install thefuck
 fi
 if ! grep -q "unsetopt BEEP" $HOME/.zshrc; then
-  sudo tee -a $HOME/.zshrc > /dev/null <<'EOT'
+  sudo tee -a $HOME/.zshrc >/dev/null <<'EOT'
 if command -v nvim &> /dev/null; then
   alias vim=nvim
   export EDITOR=nvim
@@ -312,7 +311,7 @@ sudo locale-gen en_US
 sudo locale-gen en_US.UTF-8
 
 # .tmux.conf
-grep -qxF 'set-option -g default-shell /bin/zsh' $HOME/.tmux.conf || echo "set-option -g history-limit 125000\nset-option -g default-shell /bin/zsh" >> $HOME/.tmux.conf
+grep -qxF 'set-option -g default-shell /bin/zsh' $HOME/.tmux.conf || echo "set-option -g history-limit 125000\nset-option -g default-shell /bin/zsh" >>$HOME/.tmux.conf
 
 # set up nvim
 if ! [ -x "$(command -v nvim)" ]; then

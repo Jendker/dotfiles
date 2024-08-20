@@ -8,10 +8,10 @@ optional_provided=false
 
 # Loop through the arguments
 for arg in "$@"; do
-    if [ "$arg" == "--optional" ]; then
-        optional_provided=true
-        break
-    fi
+  if [ "$arg" == "--optional" ]; then
+    optional_provided=true
+    break
+  fi
 done
 
 function setup_nerdfont() {
@@ -32,7 +32,7 @@ function setup_powerlevel10k() {
 
 function setup_sublimetext() {
   if ! [ -x "$(command -v subl)" ]; then
-    wget -qO - https://download.sublimetext.com/sublimehq-pub.gpg | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/sublimehq-archive.gpg > /dev/null
+    wget -qO - https://download.sublimetext.com/sublimehq-pub.gpg | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/sublimehq-archive.gpg >/dev/null
     echo "deb https://download.sublimetext.com/ apt/stable/" | sudo tee /etc/apt/sources.list.d/sublime-text.list
     sudo apt update
     sudo apt install sublime-text -y
@@ -44,7 +44,7 @@ function setup_spotify() {
     curl -sS https://download.spotify.com/debian/pubkey_6224F9941A8AA6D1.gpg | sudo gpg --dearmor --yes -o /etc/apt/trusted.gpg.d/spotify.gpg
     echo "deb http://repository.spotify.com stable non-free" | sudo tee /etc/apt/sources.list.d/spotify.list
     sudo apt-get update && sudo apt-get install spotify-client
-   fi
+  fi
 }
 
 function setup_flatpak() {
@@ -65,7 +65,7 @@ function setup_open_any_terminal() {
     cd nautilus-open-any-terminal
     make
 
-    make install schema      # User install
+    make install schema # User install
     gsettings set com.github.stunkymonkey.nautilus-open-any-terminal terminal wezterm
     sudo apt install python3-nautilus -y
     echo "To make the 'Open with Wezterm' work restart nautilus: 'nautilus -q'"
@@ -100,9 +100,9 @@ setup_open_any_terminal
 sudo apt install copyq -y
 
 if [ "$optional_provided" == true ]; then
-    echo "--optional was provided, installing optional tools."
-    setup_spotify
-    setup_flatpak
+  echo "--optional was provided, installing optional tools."
+  setup_spotify
+  setup_flatpak
 fi
 
 if [ "$DESKTOP_SESSION" == "ubuntu" ]; then

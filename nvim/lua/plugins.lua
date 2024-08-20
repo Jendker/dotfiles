@@ -642,6 +642,8 @@ local plugins = {
         python = { "ruff_fix", "ruff_organize_imports", "black" },
         typescript = { "prettierd" },
         yaml = { "prettierd" },
+        bash = { "shellcheck", "shfmt" },
+        sh = { "shellcheck", "shfmt" },
       },
     },
     config = function(_, opts)

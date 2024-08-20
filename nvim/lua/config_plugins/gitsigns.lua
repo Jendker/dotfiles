@@ -57,6 +57,7 @@ gitsigns.setup {
     map({'n', 'v'}, '<leader>hr', ':Gitsigns reset_hunk<CR>', { desc = "[r]eset hunk", silent = true })
     map('n', '<leader>hS', gs.stage_buffer, { desc = "[S]tage buffer", silent = true })
     map('n', '<leader>hu', gs.undo_stage_hunk, { desc = "[u]ndo stage hunk", silent = true })
+    map('n', '<leader>hU', gs.reset_buffer_index, { desc = "[u]ndo stage buffe", silent = true })
     map('n', '<leader>hR', gs.reset_buffer, { desc = "[r]eset buffer", silent = true })
     map('n', '<leader>hp', gs.preview_hunk, { desc = "[p]review hunk", silent = true })
     map('n', '<leader>hb', function() gs.blame_line{full=true} end, { desc = "show full line [b]lame", silent = true })
