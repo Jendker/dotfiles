@@ -92,9 +92,6 @@ map("n", "<leader>qq", "<cmd>qa<cr>", { desc = "Quit all" })
 map("n", "j", [[(v:count > 5 ? "m'" . v:count . 'j' : 'gj')]], { expr = true })
 map("n", "k", [[(v:count > 5 ? "m'" . v:count . 'k' : 'gk')]], { expr = true })
 
-map('n', '<leader>o',  function() common.openWithDefault(vim.fn.expand('<cWORD>')) end, { desc = "Open with default application" })
-map('v', '<leader>o', function() common.openWithDefault(common.getVisualSelection()) end, { desc = "Open with default application" })
-
 local function type_no_escape(text)
   vim.api.nvim_feedkeys(text, "n", false)
 end

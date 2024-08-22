@@ -150,23 +150,32 @@ M.getGitRoot = function()
   return git_root
 end
 
-M.getSystemCommand = function()
-  local system_name = vim.uv.os_uname().sysname
-  if system_name == "Darwin" then
-    return "open"
-  elseif system_name == "Linux" then
-    return "xdg-open"
+local function get_open_cmd(path)
+  if vim.fn.has("mac") == 1 then
+    return { "open", path }
+  elseif vim.fn.executable("xdg-open") == 1 then
+    return { "xdg-open", path }
+  elseif vim.fn.has("win32") == 1 then
+    if vim.fn.executable("rundll32") == 1 then
+      return { "rundll32", "url.dll,FileProtocolHandler", path }
+    else
+      return nil, "rundll32 not found"
+    end
+  elseif vim.fn.executable("explorer.exe") == 1 then
+    return { "explorer.exe", path }
+  else
+    return nil, "no handler found"
   end
-  vim.api.nvim_err_writeln("System not known: " .. system_name)
-  return nil
 end
 
-M.openWithDefault = function(text)
-  local command = M.getSystemCommand()
-  if command == nil then
+M.openWithDefault = function(path)
+  local cmd, err = get_open_cmd(path)
+  if not cmd then
+    vim.notify(string.format("Could not open %s: %s", path, err), vim.log.levels.ERROR)
     return
   end
-  vim.fn.jobstart(command .. " " .. text)
+  local jid = vim.fn.jobstart(cmd, { detach = true })
+  assert(jid > 0, "Failed to start job")
 end
 
 M.getTableIndex = function(tab, val)
