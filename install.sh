@@ -33,3 +33,9 @@ else
   echo "OS type unknown. Exiting."
   exit 1
 fi
+
+# tmux
+add "$SCRIPT_DIR/.tmux.conf" "$HOME/.tmux.conf"
+
+# .wezterm
+add "$SCRIPT_DIR/.wezterm.lua" "$HOME/.wezterm.lua"

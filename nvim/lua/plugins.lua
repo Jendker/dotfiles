@@ -1691,6 +1691,21 @@ local plugins = {
     },
     cond = not_vscode
   },
+  {
+    'numToStr/Navigator.nvim',
+    keys = {
+      {'<C-w>h', '<CMD>NavigatorLeft<CR>'},
+      {'<C-w><C-h>', '<CMD>NavigatorLeft<CR>'},
+      {'<C-w>l', '<CMD>NavigatorRight<CR>'},
+      {'<C-w><C-l>', '<CMD>NavigatorRight<CR>'},
+      {'<C-w>k', '<CMD>NavigatorUp<CR>'},
+      {'<C-w><C-k>', '<CMD>NavigatorUp<CR>'},
+      {'<C-w>j', '<CMD>NavigatorDown<CR>'},
+      {'<C-w><C-j>', '<CMD>NavigatorDown<CR>'},
+    },
+    opts = {},
+    cond = not_vscode
+  },
   require('debugging'),
 }
 
