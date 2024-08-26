@@ -37,6 +37,7 @@ if wezterm.target_triple == 'aarch64-apple-darwin' then
     harfbuzz_features = { 'ss07', 'calt', 'liga=0' },
   }
   config.font_size = 12
+  config.native_macos_fullscreen_mode = true
 else
   -- disable the window title bar
   config.window_decorations = "NONE"
@@ -68,6 +69,11 @@ config.keys = {
   { key = "LeftArrow", mods = "OPT", action = wezterm.action { SendString = "\x1bb" } },
   -- Make Option-Right equivalent to Alt-f; forward-word
   { key = "RightArrow", mods = "OPT", action = wezterm.action { SendString = "\x1bf" } },
+  {
+    key = 'f',
+    mods = 'CMD|CTRL',
+    action = wezterm.action.ToggleFullScreen,
+  },
 }
 config.mouse_bindings = {
   -- Change the default click behavior so that it only selects
@@ -89,8 +95,6 @@ config.mouse_bindings = {
     mods = 'CMD',
     action = act.OpenLinkAtMouseCursor,
   },
-  -- NOTE that binding only the 'Up' event can give unexpected behaviors.
-  -- Read more below on the gotcha of binding an 'Up' event only.
 }
 
 -- and finally, return the configuration to wezterm
