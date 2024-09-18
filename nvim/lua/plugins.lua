@@ -215,11 +215,12 @@ local plugins = {
   },
   {
     'tpope/vim-fugitive',
-    event = 'VeryLazy',
     dependencies = {'tpope/vim-rhubarb', 'shumphrey/fugitive-gitlab.vim'},
-    config = function()
-      vim.g.fugitive_gitlab_domains = {'https://gitlab.com'}
-      vim.keymap.set("n", "<leader>hM", function()
+    cmd = { "Git", "G", "GBrowse", "Gwrite", "GitEditDiff", "GitEditChanged", "Gedit", "GitHistory" },
+    keys = {
+      {
+        "<leader>hM",
+        function()
           local main_branch_name = common.getGitMainBranch()
           if main_branch_name ~= nil then
             local file_path = vim.fn.expand('%')
@@ -229,8 +230,11 @@ local plugins = {
             vim.api.nvim_err_writeln("Not a git repository")
           end
         end,
-        { desc = "Current file main version" })
-      vim.keymap.set("n", "<leader>hC", function()
+        desc = "Current file main version"
+      },
+      {
+        "<leader>hC",
+        function()
           local main_branch_name = common.getGitMainBranch()
           if main_branch_name ~= nil then
             local file_path = vim.fn.expand('%')
@@ -240,7 +244,13 @@ local plugins = {
             vim.api.nvim_err_writeln("Not a git repository")
           end
         end,
-        { desc = "Clipboard hash for current file" })
+        desc = "Current file clipboard hash"
+      },
+      { "<leader>hc", "<cmd>GBrowse!<CR>", desc = "Copy link" },
+      { "<leader>hc", ":GBrowse!<CR>", mode = "v", desc = "Copy link" },
+    },
+    config = function()
+      vim.g.fugitive_gitlab_domains = {'https://gitlab.com'}
     end,
     cond = not_vscode
   },
@@ -259,16 +269,6 @@ local plugins = {
     dependencies = { "nvim-tree/nvim-web-devicons" },
     opts = {
       delete_to_trash = true,
-      keymaps = {
-        ["<leader>o"] = function()
-          local oil = require("oil")
-          local cwd = oil.get_current_dir()
-          local entry = oil.get_cursor_entry()
-          if cwd and entry then
-            common.openWithDefault(string.format("%s/%s", cwd, entry.name))
-          end
-        end,
-      },
     },
     config = function(_, opts)
       local oil = require("oil")
@@ -644,6 +644,7 @@ local plugins = {
         yaml = { "prettierd" },
         bash = { "shellcheck", "shfmt" },
         sh = { "shellcheck", "shfmt" },
+        xml = { "xmlformatter" },
       },
     },
     config = function(_, opts)
@@ -1311,7 +1312,7 @@ local plugins = {
       },
       merge_keywords = false, -- to make sure that the keywords above override the default
       highlight = {
-        multiline = false, -- rarely useful
+        -- multiline = false, -- rarely useful
         pattern = [[.*<(KEYWORDS)>:?\s\s*]],
         keyword = "fg", -- make it less flashy
       },
@@ -1672,25 +1673,26 @@ local plugins = {
         only_win = true,
       },
     },
+    cond = not_vscode
   },
   {
     "LunarVim/bigfile.nvim",
     opts = {},
     cond = not_vscode
   },
-  {
-    '3rd/image.nvim',
-    ft = { "markdown", "norg", "oil" },
-    -- Disable on Windows system
-    dependencies = {
-      'leafo/magick',
-    },
-    opts = {
-      editor_only_render_when_focused = true,
-      tmux_show_only_in_active_window = true,
-    },
-    cond = not_vscode
-  },
+  -- {
+  --   '3rd/image.nvim',
+  --   ft = { "markdown", "norg", "oil" },
+  --   -- Disable on Windows system
+  --   dependencies = {
+  --     'leafo/magick',
+  --   },
+  --   opts = {
+  --     editor_only_render_when_focused = true,
+  --     tmux_show_only_in_active_window = true,
+  --   },
+  --   cond = not_vscode
+  -- },
   {
     'numToStr/Navigator.nvim',
     keys = {

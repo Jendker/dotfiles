@@ -66,9 +66,9 @@ config.keys = {
   -- { key = 'Insert', mods = 'CTRL',       action = act.CopyTo 'PrimarySelection' },
   -- { key = 'L',      mods = 'CTRL',       action = act.ShowDebugOverlay }, -- CTRL-SHIFT-l activates the debug overlay
   -- On mac make Option-Left equivalent to Alt-b which many line editors interpret as backward-word
-  { key = "LeftArrow", mods = "OPT", action = wezterm.action { SendString = "\x1bb" } },
+  { key = "LeftArrow", mods = "OPT", action = act { SendString = "\x1bb" } },
   -- Make Option-Right equivalent to Alt-f; forward-word
-  { key = "RightArrow", mods = "OPT", action = wezterm.action { SendString = "\x1bf" } },
+  { key = "RightArrow", mods = "OPT", action = act { SendString = "\x1bf" } },
   {
     key = 'f',
     mods = 'CMD|CTRL',
