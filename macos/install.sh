@@ -19,3 +19,8 @@ if ! grep -Fxq "PasswordAuthentication no" "$SSH_CONFIG_PATH"; then
   echo "PasswordAuthentication no" | sudo tee -a "$SSH_CONFIG_PATH"
   echo "ChallengeResponseAuthentication no" | sudo tee -a "$SSH_CONFIG_PATH"
 fi
+
+# karabiner config
+rm "$HOME/.config/karabiner.edn"
+ln -s "$ROOT_DIR/dotfiles_private/karabiner.edn" "$HOME/.config/karabiner.edn"
+goku || echo "goku not installed. Install with brew and run 'goku' when possible."
