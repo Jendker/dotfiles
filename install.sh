@@ -39,3 +39,15 @@ add "$SCRIPT_DIR/.tmux.conf" "$HOME/.tmux.conf"
 
 # .wezterm
 add "$SCRIPT_DIR/.wezterm.lua" "$HOME/.wezterm.lua"
+
+# snippets
+if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+  vscode_snippets_path="$HOME/.config/Code/User/snippets"
+elif [[ "$OSTYPE" == "darwin"* ]]; then
+  vscode_snippets_path="$HOME/Library/Application Support/Code/User/snippets"
+else
+  echo "OS type unknown. Exiting."
+  exit 1
+fi
+mkdir -p "$(dirname "${vscode_snippets_path}")"
+add "$SCRIPT_DIR/nvim/snippets" "${vscode_snippets_path}"

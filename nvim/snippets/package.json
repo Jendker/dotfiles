@@ -1,0 +1,22 @@
+{
+  "contributes": {
+    "snippets": [
+      {
+        "language": "all",
+        "path": "global.code-snippets"
+      },
+      {
+        "language": "sh",
+        "path": "shellscript.json"
+      },
+      {
+        "language": "markdown",
+        "path": "markdown.json"
+      },
+      {
+        "language": "python",
+        "path": "python.json"
+      }
+    ]
+  }
+}

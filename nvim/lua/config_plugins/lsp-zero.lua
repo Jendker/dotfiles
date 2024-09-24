@@ -386,6 +386,7 @@ vim.keymap.set("n", "<leader>tv", "<cmd>VirtualTextToggle<CR>", { desc = "[t]ogg
 local cmp = require('cmp')
 local cmp_action = require('lsp-zero').cmp_action()
 require('luasnip.loaders.from_vscode').lazy_load() -- for snippets
+require('luasnip.loaders.from_vscode').lazy_load({ paths = { vim.uv.os_homedir() .. "/.config/nvim/snippets" } }) -- for snippets
 local has_words_before = function()
   unpack = unpack or table.unpack
   local line, col = unpack(vim.api.nvim_win_get_cursor(0))
