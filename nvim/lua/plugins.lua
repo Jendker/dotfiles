@@ -659,10 +659,10 @@ local plugins = {
             ["end"] = { args.line2, end_line:len() },
           }
         end
-        require("conform").format({ async = true, lsp_fallback = true, range = range })
+        require("conform").format({ async = true, lsp_format = "fallback", range = range })
       end, { range = true })
       vim.keymap.set('v', '=', function()
-          require("conform").format({async = true, lsp_fallback = true })
+          require("conform").format({async = true, lsp_format = "fallback" })
           vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<ESC>", true, true, true), "n", false)
           return '<Ignore>'
       end, {expr = true})
@@ -1589,49 +1589,6 @@ local plugins = {
           end)
         )
       end)
-    end,
-    init = function()
-      -- Shim for vim.ui.open
-      if vim.ui.open then
-        return
-      end
-
-      ---Copied from vim.ui.open in Neovim 0.10+
-      ---@param path string
-      ---@return nil|string[] cmd
-      ---@return nil|string error
-      local function get_open_cmd(path)
-        if vim.fn.has("mac") == 1 then
-          return { "open", path }
-        elseif vim.fn.has("win32") == 1 then
-          if vim.fn.executable("rundll32") == 1 then
-            return { "rundll32", "url.dll,FileProtocolHandler", path }
-          else
-            return nil, "rundll32 not found"
-          end
-        elseif vim.fn.executable("wslview") == 1 then
-          return { "wslview", path }
-        elseif vim.fn.executable("xdg-open") == 1 then
-          return { "xdg-open", path }
-        else
-          return nil, "no handler found"
-        end
-      end
-
-      vim.ui.open = function(path)
-        local is_uri = path:match("%w+:")
-        if not is_uri then
-          path = vim.fn.expand(path)
-        end
-        local cmd, err = get_open_cmd(path)
-        if not cmd or err then
-          return nil, err
-        end
-        local jid = vim.fn.jobstart(cmd, { detach = true })
-        if jid <= 0 then
-          return nil, "Failed to start job"
-        end
-      end
     end,
     cond = not_vscode
   },
