@@ -53,10 +53,10 @@ function install_nvim_tarball() {
     sudo rm -rf "${nvim_target}"
     return 1
   fi
-  if ! grep -Fxq 'export PATH="$PATH:/opt/nvim-linux64/bin"' $HOME/.zshrc; then
-    echo 'export PATH="$PATH:/opt/nvim-linux64/bin"' >>$HOME/.zshrc
+  if ! grep -Fxq "export PATH=\"\$PATH:${nvim_target}/bin\"" "$HOME/.zshrc"; then
+    echo "export PATH=\"\$PATH:${nvim_target}/bin\"" >>$HOME/.zshrc
   fi
-  export PATH="$PATH:/opt/nvim-linux64/bin"
+  export PATH="$PATH:${nvim_target}/bin"
 }
 
 function install_node() {
