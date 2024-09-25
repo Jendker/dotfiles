@@ -70,6 +70,7 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
   prefix="debian"
 elif [[ "$OSTYPE" == "darwin"* ]]; then
   prefix="macos"
+  echo '\.DS_Store' >"$HOME/.stow-global-ignore"
 else
   echo "Unsupported OS"
 fi
