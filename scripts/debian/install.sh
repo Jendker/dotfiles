@@ -1,5 +1,6 @@
 #!/bin/bash
 set -e
+set -x
 
 SCRIPT_DIR=$(dirname "$0")
 ROOT_DIR=$(realpath "${SCRIPT_DIR}/../..")
@@ -20,8 +21,6 @@ function setup_nerdfont() {
   git clone https://github.com/epk/SF-Mono-Nerd-Font.git /tmp/SF-Mono-Nerd-Font
   cp /tmp/SF-Mono-Nerd-Font/*.otf ~/.local/share/fonts/
   rm -rf /tmp/SF-Mono-Nerd-Font
-  cp "$ROOT_DIR"/dotfiles_private/fonts/* ~/.local/share/fonts/
-  rm ~/.local/share/fonts/MonacoNerdFont-Regular.ttf
   fc-cache -f
 }
 
@@ -43,7 +42,7 @@ function setup_spotify() {
   if ! [ -x "$(command -v spotify)" ]; then
     curl -sS https://download.spotify.com/debian/pubkey_6224F9941A8AA6D1.gpg | sudo gpg --dearmor --yes -o /etc/apt/trusted.gpg.d/spotify.gpg
     echo "deb http://repository.spotify.com stable non-free" | sudo tee /etc/apt/sources.list.d/spotify.list
-    sudo apt-get update && sudo apt-get install spotify-client
+    sudo apt-get update && sudo apt-get install spotify-client -y || echo "Spotify installation failed. Consider installing outside of apt."
   fi
 }
 
@@ -55,6 +54,10 @@ function setup_flatpak() {
 }
 
 function setup_open_any_terminal() {
+  # ubuntu specific
+  if [ "$DESKTOP_SESSION" != "ubuntu" ]; then
+    return
+  fi
   # to open from nautilus with wezterm
   # if /home/jorbik/.local/share/nautilus-python/extensions/nautilus_open_any_terminal.py does not exist
   if [ ! -f ~/.local/share/nautilus-python/extensions/nautilus_open_any_terminal.py ]; then
@@ -79,17 +82,19 @@ function setup_wezterm() {
   sudo apt update
   sudo apt install wezterm -y
 
-  # ubuntu specific - set up tdrop for wezterm activation with hotkey
-  cwd=$(pwd)
-  mkdir -p ~/.local/bin/
-  cd ~/.local/bin/
-  git clone https://github.com/noctuid/tdrop.git
-  echo "Add custom hotkey in Ubuntu to activate wezterm with tdrop"
-  echo "Command is: '$HOME/.local/bin/tdrop/tdrop -mta -h 100% wezterm'"
-  echo "This will work work with nvidia drivers on the latest Ubuntu"
-  # installing tdrop dependencies
-  sudo apt install xdotool gawk -y
-  cd "$cwd"
+  if [ "$DESKTOP_SESSION" == "ubuntu" ] && [[ ! -e "$HOME/.local/bin/tdrop/tdrop" ]]; then
+    # ubuntu specific - set up tdrop for wezterm activation with hotkey
+    cwd=$(pwd)
+    mkdir -p ~/.local/bin/
+    cd ~/.local/bin/
+    git clone https://github.com/noctuid/tdrop.git
+    echo "Add custom hotkey in Ubuntu to activate wezterm with tdrop"
+    echo "Command is: '$HOME/.local/bin/tdrop/tdrop -mta -h 100% wezterm'"
+    echo "This will work work with nvidia drivers on the latest Ubuntu"
+    # installing tdrop dependencies
+    sudo apt install xdotool gawk -y
+    cd "$cwd"
+  fi
 }
 
 setup_nerdfont
@@ -99,14 +104,14 @@ setup_wezterm
 setup_open_any_terminal
 sudo apt install copyq -y
 
-if [ "$optional_provided" == true ]; then
-  echo "--optional was provided, installing optional tools."
-  setup_spotify
-  setup_flatpak
-fi
-
 if [ "$DESKTOP_SESSION" == "ubuntu" ]; then
   # disable meta+number key bindings - it interferes with wezterm
   gsettings set org.gnome.shell.extensions.dash-to-dock hot-keys false
   for i in $(seq 1 9); do gsettings set org.gnome.shell.keybindings "switch-to-application-${i}" '[]'; done
+fi
+
+if [ "$optional_provided" == true ]; then
+  echo "--optional was provided, installing optional tools."
+  setup_flatpak
+  setup_spotify
 fi

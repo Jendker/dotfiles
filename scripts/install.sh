@@ -6,6 +6,24 @@ set -e
 SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 ROOT_DIR=$(dirname "$SCRIPT_DIR")
 
+# Initialize flags
+dev=false
+copy=false
+install_only=false
+
+# Loop through the arguments
+for arg in "$@"; do
+  if [ "$arg" == "--copy" ]; then
+    copy=true
+  elif [ "$arg" == "--dev" ]; then
+    dev=true
+  elif [ "$arg" == "--optional" ]; then
+    dev=true
+  elif [ "$arg" == "--install-only" ]; then
+    install_only=true
+  fi
+done
+
 copy=false
 if [[ $1 == "--copy" ]]; then
   copy=true
@@ -43,30 +61,47 @@ if ! [ -x "$(command -v stow)" ]; then
     fi
     brew install stow
   else
-      echo "Unsupported OS"
+    echo "Unsupported OS"
   fi
 fi
 
-# Stow common config
-stow -t ~ common
-cd dotfiles_private/stow
-stow -t ~ common_private
-cd ../..
-
 # Stow platform-specific config
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-    stow -t ~ debian
-    cd dotfiles_private/stow
-    stow -t ~ debian_private
-    cd ../..
-    scripts/debian/install_min.sh
-    scripts/debian/install.sh --optional
+  prefix="debian"
 elif [[ "$OSTYPE" == "darwin"* ]]; then
-    stow -t ~ macos
-    cd dotfiles_private/stow
-    stow -t ~ macos_private
-    cd ../..
-    scripts/macos/install.sh
+  prefix="macos"
 else
-    echo "Unsupported OS"
+  echo "Unsupported OS"
+fi
+
+if [[ $install_only != true ]]; then
+  # Stow common config
+  stow -t ~ common
+  stow -t ~ "${prefix}"
+fi
+
+# Platform-specific config install
+if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+  "${SCRIPT_DIR}/debian/install_min.sh"
+  if [[ $dev == true ]]; then
+    "${SCRIPT_DIR}/debian/install.sh" --optional
+  fi
+elif [[ "$OSTYPE" == "darwin"* ]]; then
+  "${SCRIPT_DIR}/macos/install.sh"
+else
+  echo "Unsupported OS"
+fi
+
+# Private submodule install
+SUBMODULE_PATH="dotfiles_private"
+# Check if the submodule is not empty
+if [[ -n "$(ls -A ${SUBMODULE_PATH})" ]]; then
+  echo "Private submodule is available. Installing..."
+  install_only_arg=""
+  if [[ $install_only == true ]]; then
+    install_only_arg="--install-only"
+  fi
+  "${SUBMODULE_PATH}/scripts/install.sh" $install_only_arg
+else
+  echo "Private submodule is not cloned. Skipping installation."
 fi

@@ -1,5 +1,6 @@
 #!/bin/bash
 set -e
+set -x
 
 SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 
@@ -28,8 +29,6 @@ function install_nvim_source() {
     branch_str="--branch $1"
   fi
   sudo apt-get install ninja-build gettext cmake unzip curl -y
-  sudo apt install libreadline-dev -y   # for hererocks
-  sudo apt install libmagickwand-dev -y # for image.nvim
   cd /tmp && rm -rf neovim && git clone https://github.com/neovim/neovim.git $branch_str --single-branch
   cd neovim
   if [ "$1" == "master" ]; then
@@ -43,30 +42,21 @@ function install_nvim_source() {
 
 function install_nvim_tarball() {
   nvim_download_path=/tmp/nvim-linux64.tar.gz
+  nvim_target=/opt/nvim
   curl -Lo "$nvim_download_path" https://github.com/neovim/neovim/releases/latest/download/nvim-linux64.tar.gz
-  sudo rm -rf /opt/nvim
-  sudo tar -C /opt -xzf "$nvim_download_path"
+  sudo rm -rf "${nvim_target}"
+  sudo mkdir -p "${nvim_target}"
+  sudo tar -C "${nvim_target}" --strip-components=1 -xzf "$nvim_download_path"
   rm -rf "$nvim_download_path"
-  if ! /opt/nvim-linux64/bin/nvim --version; then
-    echo "nvim binary in /opt/nvim-linux64/bin cannot be opened. Exiting..."
-    sudo rm -rf /opt/nvim
-    exit 1
+  if ! "${nvim_target}/bin/nvim" --version; then
+    echo "nvim binary in ${nvim_target}/bin cannot be opened. Install from nvim tarball failed"
+    sudo rm -rf "${nvim_target}"
+    return 1
   fi
   if ! grep -Fxq 'export PATH="$PATH:/opt/nvim-linux64/bin"' $HOME/.zshrc; then
     echo 'export PATH="$PATH:/opt/nvim-linux64/bin"' >>$HOME/.zshrc
   fi
   export PATH="$PATH:/opt/nvim-linux64/bin"
-}
-
-function update_dotfiles() {
-  cd /tmp/ && rm -rf dotfiles && git clone https://github.com/Jendker/dotfiles.git
-  mkdir -p $HOME/.config
-  bash dotfiles/install.sh --copy
-  run_times=1
-  nvim --headless "+Lazy! install" +qa
-  # repeat again until successful
-  while [ $? -ne 0 ]; do !!; done
-  rm -rf dotfiles
 }
 
 function install_node() {
@@ -112,9 +102,11 @@ function install_delta() {
 }
 
 function install_gh() {
-  LATEST_GH_VERSION=$(curl -s "https://api.github.com/repos/cli/cli/releases/latest" | grep -Po '"tag_name": "v\K[0-9.]+')
-  wget -O /tmp/gh.deb "https://github.com/cli/cli/releases/download/v${LATEST_GH_VERSION}/gh_${LATEST_GH_VERSION}_linux_$(dpkg --print-architecture).deb" && sudo dpkg -i /tmp/gh.deb && sudo apt install -y /tmp/gh.deb
-  echo "Optionally 'run gh auth login'"
+  if ! [ -x "$(command -v gh)" ]; then
+    LATEST_GH_VERSION=$(curl -s "https://api.github.com/repos/cli/cli/releases/latest" | grep -Po '"tag_name": "v\K[0-9.]+')
+    wget -O /tmp/gh.deb "https://github.com/cli/cli/releases/download/v${LATEST_GH_VERSION}/gh_${LATEST_GH_VERSION}_linux_$(dpkg --print-architecture).deb" && sudo dpkg -i /tmp/gh.deb && sudo apt install -y /tmp/gh.deb
+    echo "Optionally run 'gh auth login'"
+  fi
 }
 
 function update_git() {
@@ -153,13 +145,15 @@ function install_nvim_binary() {
   if [ -n "$1" ]; then
     branch="$1"
   fi
-  if [ "$branch" == "stable" ]; then
+  if [ "$branch" == "stable" ] && [ "$(uname -m)" == "x86_64" ]; then
     install_nvim_tarball || install_nvim_source $branch
   else
     install_nvim_source $branch
   fi
   install_node
   update_git
+  sudo apt install libreadline-dev -y   # for hererocks
+  sudo apt install libmagickwand-dev -y # for image.nvim
 }
 
 function install_zoxide() {
@@ -214,20 +208,19 @@ function install_conda() {
 }
 
 function install_direnv() {
-  curl -sfL https://direnv.net/install.sh | bash
+  if ! [ -x "$(command -v direnv)" ]; then
+    curl -sfL https://direnv.net/install.sh | bash
+    grep -Fxq 'eval "$(direnv hook zsh)"' "$HOME/.zshrc" || echo 'eval "$(direnv hook zsh)"' >>"$HOME/.zshrc"
+  fi
 }
 
 if [[ ! $# -eq 0 ]]; then
-  if [[ $1 == "--update" ]]; then
-    echo "Updating dotfiles..."
-    update_dotfiles
-    exit 0
-  elif [[ $1 == "--update-nvim" ]]; then
-    echo "Updating nvim binary..."
+  if [[ $1 == "--install-nvim" ]]; then
+    echo "Installing nvim binary..."
     install_nvim_binary stable
     exit 0
-  elif [[ $1 == "--update-nvim-dev" ]]; then
-    echo "Updating nvim binary from git dev branch..."
+  elif [[ $1 == "--install-nvim-dev" ]]; then
+    echo "Installing nvim binary from git dev branch..."
     install_nvim_binary master
     exit 0
   elif [[ $1 == "--install-node" ]]; then
@@ -256,8 +249,9 @@ if [[ ! $# -eq 0 ]]; then
   fi
 fi
 
+# --- MAIN ---
 sudo apt update
-sudo apt install tmux curl wget locales lsb-release zsh xclip unzip python3-venv fd-find ccache git imagemagick pipx -y
+sudo apt install tmux curl wget locales lsb-release zsh xclip unzip python3-venv fd-find ccache git imagemagick pipx libglib2.0-bin vim zsh -y
 # for thefuck
 sudo apt install python3-dev python3-pip python3-setuptools -y
 # symlink fdfind as fd
@@ -269,9 +263,6 @@ sudo apt install ripgrep -y || true
 # run set_up_common.sh
 "$SCRIPT_DIR/../set_up_common.sh"
 
-if command -v doit &>/dev/null; then
-  pipx install thefuck
-fi
 if ! grep -q "unsetopt BEEP" $HOME/.zshrc; then
   sudo tee -a $HOME/.zshrc >/dev/null <<'EOT'
 if command -v nvim &> /dev/null; then
@@ -286,10 +277,8 @@ export LC_ALL=en_US.UTF-8
 export PATH=$PATH:$HOME/.local/bin
 export PATH="/usr/lib/ccache:$PATH"
 eval $(thefuck --alias doit)
-
-# don't show the warning which happens if direnv loads the .envrc file
-typeset -g POWERLEVEL9K_INSTANT_PROMPT=quiet
 EOT
+
   # set plugin variables before sourcing oh-my-zsh
   ex -s $HOME/.zshrc <<\IN
 /source \$ZSH\/oh-my-zsh.sh/i
@@ -315,11 +304,19 @@ sudo locale-gen en_US.UTF-8
 # .tmux.conf
 grep -qxF 'set-option -g default-shell /bin/zsh' $HOME/.tmux.conf || echo "set-option -g history-limit 125000\nset-option -g default-shell /bin/zsh" >>$HOME/.tmux.conf
 
+# set up thefuck
+if ! command -v thefuck &>/dev/null; then
+  pipx install thefuck
+fi
+
 # set up nvim
 if ! [ -x "$(command -v nvim)" ]; then
   echo 'nvim is not installed. installing'
   install_nvim_binary stable
-  update_dotfiles
+  # install plugins
+  nvim --headless "+Lazy! install" +qa
+  # repeat again until successful
+  while [ $? -ne 0 ]; do !!; done
 fi
 
 # set up fzf for zsh
@@ -332,6 +329,8 @@ fi
 if ! command_exists git-lfs; then
   curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash && sudo apt-get install git-lfs && git lfs install
 fi
+
+install_node
 
 install_zoxide
 
