@@ -3,9 +3,8 @@ name: Test install
 on: [push, workflow_dispatch]
 
 jobs:
-  pipeline:
-
-    name: pipeline ${{ matrix.os }})
+  minimal:
+    name: Test install minimal ${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     defaults:
       run:
@@ -25,4 +24,48 @@ jobs:
       - name: Test setup
         run: |
           ./scripts/install.sh
+          ./scripts/uninstall.sh
+  minimal_no_submodule:
+    name: Test install minimal without submodule ${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash -el {0}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ["ubuntu-latest", "macos-latest"]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.PAT }}
+          submodules: false
+
+      - name: Test setup
+        run: |
+          ./scripts/install.sh
+          ./scripts/uninstall.sh
+  dev_install:
+    name: Test install full ${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash -el {0}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ["ubuntu-latest"]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.PAT }}
+          submodules: true
+
+      - name: Test setup
+        run: |
+          ./scripts/install.sh --dev
           ./scripts/uninstall.sh
