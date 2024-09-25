@@ -41,8 +41,11 @@ defaults write com.apple.desktopservices DSDontWriteUSBStores -bool true
 # General UI/UX                                                               #
 ###############################################################################
 
+echo "Disabling startup sound effects, password will be required"
 # Disable the sound effects on boot
+set -x
 sudo nvram StartupMute=%01
+set +x
 
 # Disable crash report windows
 # https://stackoverflow.com/questions/6084497/silencing-osx-crash-report-window

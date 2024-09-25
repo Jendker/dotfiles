@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
+
 function get_highest_tag_version() {
   git tag | sort -V | tail -n 1
 }
@@ -265,7 +267,7 @@ ln -s $(which fdfind) $HOME/.local/bin/fd || true
 sudo apt install ripgrep -y || true
 
 # run set_up_common.sh
-./set_up_common.sh
+"$SCRIPT_DIR/../set_up_common.sh"
 
 if command -v doit &>/dev/null; then
   pipx install thefuck
@@ -338,5 +340,3 @@ install_direnv
 install_delta
 
 install_gh
-
-echo "Done"

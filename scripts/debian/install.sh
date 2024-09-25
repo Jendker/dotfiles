@@ -2,6 +2,7 @@
 set -e
 
 SCRIPT_DIR=$(dirname "$0")
+ROOT_DIR=$(realpath "${SCRIPT_DIR}/../..")
 
 # Initialize a flag
 optional_provided=false
@@ -19,7 +20,7 @@ function setup_nerdfont() {
   git clone https://github.com/epk/SF-Mono-Nerd-Font.git /tmp/SF-Mono-Nerd-Font
   cp /tmp/SF-Mono-Nerd-Font/*.otf ~/.local/share/fonts/
   rm -rf /tmp/SF-Mono-Nerd-Font
-  cp "$SCRIPT_DIR"/dotfiles_private/fonts/* ~/.local/share/fonts/
+  cp "$ROOT_DIR"/dotfiles_private/fonts/* ~/.local/share/fonts/
   rm ~/.local/share/fonts/MonacoNerdFont-Regular.ttf
   fc-cache -f
 }
@@ -27,7 +28,6 @@ function setup_nerdfont() {
 function setup_powerlevel10k() {
   git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k" || true
   sed -i 's/ZSH_THEME=\"robbyrussell\"/ZSH_THEME=\"powerlevel10k\/powerlevel10k\"/g' "$HOME/.zshrc"
-  cp "$SCRIPT_DIR/.p10k.zsh" "$HOME/"
 }
 
 function setup_sublimetext() {

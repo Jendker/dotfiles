@@ -1,0 +1,17 @@
+# roots define root directories for syncing between
+root = /Users/jedrzej/Library/Mobile Documents/iCloud~md~obsidian/Documents/
+root = /Users/jedrzej/Dropbox/ObsidianVaults/
+
+# dirs to sync
+path=Personal
+
+# don't ask for confirmation
+auto=true
+batch=true
+# sync ownership and group
+owner=true
+group=true
+# for safety
+confirmbigdel=true
+# prefer newer in case of conflicts
+prefer=newer

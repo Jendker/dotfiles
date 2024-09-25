@@ -2,9 +2,9 @@
 set -e
 
 SCRIPT_DIR=$(dirname $0)
-ROOT_DIR=$(dirname "$SCRIPT_DIR")
+ROOT_DIR=$(realpath "${SCRIPT_DIR}/../..")
 
-$ROOT_DIR/set_up_common.sh
+$SCRIPT_DIR/../set_up_common.sh
 
 KEYBOARD_SOURCE_PATH="$HOME/Library/Mobile Documents/com~apple~CloudDocs/Random/Keyboard Layouts/Polish-German.bundle"
 KEYBOARD_TARGET_PATH="$HOME/Library/Keyboard Layouts/Polish-German.bundle"
@@ -20,7 +20,7 @@ if ! grep -Fxq "PasswordAuthentication no" "$SSH_CONFIG_PATH"; then
   echo "ChallengeResponseAuthentication no" | sudo tee -a "$SSH_CONFIG_PATH"
 fi
 
-# karabiner config
-rm "$HOME/.config/karabiner.edn"
-ln -s "$ROOT_DIR/dotfiles_private/karabiner.edn" "$HOME/.config/karabiner.edn"
-goku || echo "goku not installed. Install with brew and run 'goku' when possible."
+# run goku to install karabiner config
+goku > /dev/null || echo "goku not installed. Install with brew and run 'goku' when possible."
+
+$SCRIPT_DIR/set_defaults.sh

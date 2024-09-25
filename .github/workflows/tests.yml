@@ -22,13 +22,7 @@ jobs:
           token: ${{ secrets.PAT }}
           submodules: true
 
-      - name: Run setup
+      - name: Test setup
         run: |
-          ./install.sh
-          if [[ "$RUNNER_OS" == "Linux" ]]; then
-            ./set_up_debian.sh
-            ./set_up_debian_dev.sh --optional
-          elif [[ "$RUNNER_OS" == "macOS" ]]; then
-            ./macos/install.sh
-            ./macos/set_defaults.sh --optional
-          fi
+          ./scripts/install.sh
+          ./scripts/uninstall.sh

@@ -32,11 +32,17 @@ config.font_size = 11
 if wezterm.target_triple == 'aarch64-apple-darwin' then
   config.window_close_confirmation = 'NeverPrompt'
   config.window_decorations = "RESIZE"
-  config.font = wezterm.font{
+  local weight = "Medium"
+  config.font_size = 12
+  if wezterm.hostname() == "Jedrzejs-Mac-mini.local" then
+    config.font_size = 13
+    weight = "Bold"
+  end
+  config.font = wezterm.font {
     family = 'Monaco Nerd Font',
     harfbuzz_features = { 'ss07', 'calt', 'liga=0' },
+    weight = weight,
   }
-  config.font_size = 12
   config.native_macos_fullscreen_mode = true
 else
   -- disable the window title bar
