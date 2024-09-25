@@ -4,7 +4,7 @@ on: [push, workflow_dispatch]
 
 jobs:
   minimal:
-    name: Test install minimal ${{ matrix.os }})
+    name: Test install minimal (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     defaults:
       run:
@@ -26,7 +26,7 @@ jobs:
           ./scripts/install.sh
           ./scripts/uninstall.sh
   minimal_no_submodule:
-    name: Test install minimal without submodule ${{ matrix.os }})
+    name: Test install minimal without submodule (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     defaults:
       run:
@@ -48,7 +48,7 @@ jobs:
           ./scripts/install.sh
           ./scripts/uninstall.sh
   dev_install:
-    name: Test install full ${{ matrix.os }})
+    name: Test install full (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     defaults:
       run:
