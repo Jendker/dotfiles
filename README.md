@@ -1,7 +1,5 @@
 # dotfiles
 
-To install:
-
 Clone:
 ```
 git clone https://github.com/Jendker/dotfiles.git ~/.dotfiles
