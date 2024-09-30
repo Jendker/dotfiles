@@ -23,3 +23,6 @@ fi
 goku > /dev/null || echo "goku not installed. Install with brew and run 'goku' when possible."
 
 $SCRIPT_DIR/set_defaults.sh
+
+echo 'Install all packages with: brew bundle install --file "/Users/jedrzej/Library/Mobile Documents/com~apple~CloudDocs/.Brewfile"'
+echo 'Dump all packages later with: brew bundle dump --casks --taps --brews --mas --force --file "/Users/jedrzej/Library/Mobile Documents/com~apple~CloudDocs/.Brewfile"'
