@@ -79,7 +79,6 @@ if ! [ -x "$(command -v stow)" ]; then
       echo "Installing from tarfile"
       install_stow_debian
     fi
-
   elif [[ "$OSTYPE" == "darwin"* ]]; then
     if ! [ -x "$(command -v brew)" ]; then
       /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
@@ -111,7 +110,7 @@ if [[ $install_only != true ]]; then
 fi
 
 if [[ $stow_only != true ]]; then
-    # Platform-specific config install
+  # Platform-specific config install
   if [[ "$OSTYPE" == "linux-gnu"* ]]; then
     "${SCRIPT_DIR}/debian/install_min.sh"
     if [[ $dev == true ]]; then
