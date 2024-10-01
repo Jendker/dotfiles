@@ -8,34 +8,50 @@ ROOT_DIR=$(dirname "$SCRIPT_DIR")
 
 # Initialize flags
 dev=false
-copy=false
 install_only=false
+stow_only=false
+
+function install_stow_debian {
+  if ! [ -x "$(command -v perl)" ]; then
+    sudo apt install perl -y
+  fi
+  current_dir=$(pwd)
+
+  cd /tmp
+  wget https://mirror.fcix.net/gnu/stow/stow-latest.tar.gz
+
+  tar -xzf stow-latest.tar.gz
+
+  # Find the extracted directory (it should match "stow-X.Y.Z")
+  dir_name=$(tar -tzf stow-latest.tar.gz | head -1 | cut -f1 -d"/")
+
+  # Change into the extracted directory
+  cd "$dir_name"
+
+  ./configure && sudo make install
+
+  # cleanup
+  cd /tmp
+  rm -rf "$dir_name" && rm "stow-latest.tar.gz"
+  cd "${current_dir}"
+}
 
 # Loop through the arguments
 for arg in "$@"; do
-  if [ "$arg" == "--copy" ]; then
-    copy=true
-  elif [ "$arg" == "--dev" ]; then
+  if [ "$arg" == "--dev" ]; then
     dev=true
   elif [ "$arg" == "--optional" ]; then
     dev=true
   elif [ "$arg" == "--install-only" ]; then
     install_only=true
+  elif [ "$arg" == "--stow-only" ]; then
+    stow_only=true
   fi
 done
 
-copy=false
-if [[ $1 == "--copy" ]]; then
-  copy=true
-fi
-
 function add() {
   rm -r "$2" || true
-  if [[ $copy == true ]]; then
-    cp -r "$1" "$2"
-  else
-    ln -s "$1" "$2"
-  fi
+  ln -s "$1" "$2"
 }
 
 # snippets
@@ -54,7 +70,16 @@ cd "$ROOT_DIR"
 
 if ! [ -x "$(command -v stow)" ]; then
   if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-    sudo apt install stow -y
+    stow_version=$(stow --version | awk 'NR==1{print $NF}')
+    min_stow_version="2.4.0"
+
+    # Compare versions
+    if [ "$(printf '%s\n' "$stow_version" "$min_stow_version" | sort -V | head -n1)" = "$stow_version" ] && [ "$stow_version" != "$min_stow_version" ]; then
+      echo "Your stow version ($stow_version) is lower than $min_stow_version."
+      echo "Installing from tarfile"
+      install_stow_debian
+    fi
+
   elif [[ "$OSTYPE" == "darwin"* ]]; then
     if ! [ -x "$(command -v brew)" ]; then
       /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
@@ -65,7 +90,7 @@ if ! [ -x "$(command -v stow)" ]; then
   fi
 fi
 
-# Stow platform-specific config
+# Stow platform-specific prefix to run stow
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
   prefix="debian"
 elif [[ "$OSTYPE" == "darwin"* ]]; then
@@ -76,21 +101,27 @@ else
 fi
 
 if [[ $install_only != true ]]; then
+  cd stow
   # Stow common config
-  stow -t ~ common
-  stow -t ~ "${prefix}"
+  stow --dotfiles -t ~ common
+  # Stow platform specific stuff
+  stow --dotfiles -t ~ "${prefix}"
+
+  cd ..
 fi
 
-# Platform-specific config install
-if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-  "${SCRIPT_DIR}/debian/install_min.sh"
-  if [[ $dev == true ]]; then
-    "${SCRIPT_DIR}/debian/install.sh" --optional
+if [[ $stow_only != true ]]; then
+    # Platform-specific config install
+  if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    "${SCRIPT_DIR}/debian/install_min.sh"
+    if [[ $dev == true ]]; then
+      "${SCRIPT_DIR}/debian/install.sh" --optional
+    fi
+  elif [[ "$OSTYPE" == "darwin"* ]]; then
+    "${SCRIPT_DIR}/macos/install.sh"
+  else
+    echo "Unsupported OS"
   fi
-elif [[ "$OSTYPE" == "darwin"* ]]; then
-  "${SCRIPT_DIR}/macos/install.sh"
-else
-  echo "Unsupported OS"
 fi
 
 # Private submodule install
@@ -98,11 +129,14 @@ SUBMODULE_PATH="dotfiles_private"
 # Check if the submodule is not empty
 if [[ -n "$(ls -A ${SUBMODULE_PATH})" ]]; then
   echo "Private submodule is available. Installing..."
-  install_only_arg=""
+  submodule_args=()
   if [[ $install_only == true ]]; then
-    install_only_arg="--install-only"
+    submodule_args+=("--install-only")
   fi
-  "${SUBMODULE_PATH}/scripts/install.sh" $install_only_arg
+  if [[ $stow_only == true ]]; then
+    submodule_args+=("--stow-only")
+  fi
+  "${SUBMODULE_PATH}/scripts/install.sh" "${submodule_args[@]}"
 else
   echo "Private submodule is not cloned. Skipping installation."
 fi
