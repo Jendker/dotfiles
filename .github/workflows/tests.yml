@@ -21,10 +21,14 @@ jobs:
           token: ${{ secrets.PAT }}
           submodules: true
 
-      - name: Test setup
+      - name: Test install
         run: |
           ./scripts/install.sh
+
+      - name: Test uninstall
+        run: |
           ./scripts/uninstall.sh
+
   minimal_no_submodule:
     name: Test install minimal without submodule (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
@@ -43,10 +47,14 @@ jobs:
           token: ${{ secrets.PAT }}
           submodules: false
 
-      - name: Test setup
+      - name: Test install
         run: |
           ./scripts/install.sh
+
+      - name: Test uninstall
+        run: |
           ./scripts/uninstall.sh
+
   dev_install:
     name: Test install full (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
@@ -65,7 +73,10 @@ jobs:
           token: ${{ secrets.PAT }}
           submodules: true
 
-      - name: Test setup
+      - name: Test install
         run: |
           ./scripts/install.sh --dev
+
+      - name: Test uninstall
+        run: |
           ./scripts/uninstall.sh
