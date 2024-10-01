@@ -26,6 +26,7 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
   stow --dotfiles -D -t ~ macos
 else
   echo "Unsupported OS"
+  exit 1
 fi
 
 # Unstow common

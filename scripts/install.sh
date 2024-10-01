@@ -86,6 +86,7 @@ if ! [ -x "$(command -v stow)" ]; then
     brew install stow
   else
     echo "Unsupported OS"
+    exit 1
   fi
 fi
 
@@ -97,6 +98,7 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
   echo '\.DS_Store' >"$HOME/.stow-global-ignore"
 else
   echo "Unsupported OS"
+  exit 1
 fi
 
 if [[ $install_only != true ]]; then
@@ -107,20 +109,6 @@ if [[ $install_only != true ]]; then
   stow --dotfiles -t ~ "${prefix}"
 
   cd ..
-fi
-
-if [[ $stow_only != true ]]; then
-  # Platform-specific config install
-  if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-    "${SCRIPT_DIR}/debian/install_min.sh"
-    if [[ $dev == true ]]; then
-      "${SCRIPT_DIR}/debian/install.sh" --optional
-    fi
-  elif [[ "$OSTYPE" == "darwin"* ]]; then
-    "${SCRIPT_DIR}/macos/install.sh"
-  else
-    echo "Unsupported OS"
-  fi
 fi
 
 # Private submodule install
@@ -138,4 +126,19 @@ if [[ -n "$(ls -A ${SUBMODULE_PATH})" ]]; then
   "${SUBMODULE_PATH}/scripts/install.sh" "${submodule_args[@]}"
 else
   echo "Private submodule is not cloned. Skipping installation."
+fi
+
+if [[ $stow_only != true ]]; then
+  # Platform-specific config install
+  if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    "${SCRIPT_DIR}/debian/install_min.sh"
+    if [[ $dev == true ]]; then
+      "${SCRIPT_DIR}/debian/install.sh" --optional
+    fi
+  elif [[ "$OSTYPE" == "darwin"* ]]; then
+    "${SCRIPT_DIR}/macos/install.sh"
+  else
+    echo "Unsupported OS"
+    exit 1
+  fi
 fi
