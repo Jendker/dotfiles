@@ -152,6 +152,7 @@ local plugins = {
   {"romainl/vim-cool", event = 'BufReadPost'}, -- auto hide highlight after search
   {
     'tzachar/highlight-undo.nvim',
+    commit = "1ea1c79372",
     config = true
   },
   {
