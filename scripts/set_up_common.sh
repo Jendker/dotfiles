@@ -2,6 +2,8 @@
 set -e
 set -x
 
+SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
+
 if [ -d ~/.oh-my-zsh ]; then
   echo "oh-my-zsh is installed"
 else
@@ -40,3 +42,16 @@ mkdir -p ~/.config/direnv
 echo '[global]
 load_dotenv = true
 strict_env = true' >"$HOME"/.config/direnv/direnv.toml
+
+alacritty_path="$HOME/.config/alacritty/alacritty.toml"
+if [ ! -e "$alacritty_path" ]; then
+  mkdir -p ~/.config/alacritty
+  if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    cp "${SCRIPT_DIR}/debian/alacritty.toml" "$alacritty_path"
+  elif [[ "$OSTYPE" == "darwin"* ]]; then
+    cp "${SCRIPT_DIR}/macos/alacritty.toml" "$alacritty_path"
+  else
+    echo "Unsupported OS"
+    exit 1
+  fi
+fi

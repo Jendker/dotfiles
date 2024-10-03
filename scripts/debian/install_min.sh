@@ -4,9 +4,7 @@ set -x
 
 SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 
-function get_highest_tag_version() {
-  git tag | sort -V | tail -n 1
-}
+source "$SCRIPT_DIR/common.sh"
 
 function command_exists() {
   command -v "$1" &>/dev/null
@@ -124,14 +122,6 @@ function update_git() {
     sudo apt-get install --upgrade git -y
   else
     echo "Git version $version is sufficient."
-  fi
-}
-
-function install_rust() {
-  if ! [ -x "$(command -v cargo)" ]; then
-    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-    grep -qxF 'source "$HOME/.cargo/env"' $HOME/.zshrc || echo 'source "$HOME/.cargo/env"' >>$HOME/.zshrc
-    echo "Please source ~/.zshrc or ~/.bashrc"
   fi
 }
 
