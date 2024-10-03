@@ -1,4 +1,4 @@
-require "common"
+local common = require "common"
 
 -- Add luarocks to rtp
 local home = vim.uv.os_homedir()
@@ -41,17 +41,15 @@ local function copy(register)
   else
     return {"tmux", "load-buffer", "-w", "-"}
   end
+  -- return function(lines) vim.fn.setreg("+", lines) end
 end
 local function paste(register)
-  if not vim.env.WEZTERM_EXECUTABLE then
-    if not TMUX then
-      return require('vim.ui.clipboard.osc52').paste(register)
-    else
-      return { 'bash', '-c', 'tmux refresh-client -l && sleep 0.05 && tmux save-buffer -' }
-    end
+  if not TMUX then
+    return require('vim.ui.clipboard.osc52').paste(register)
   else
-    return { vim.fn.split(vim.fn.getreg("+"), "\n"), vim.fn.getregtype("+") }
+    return { 'bash', '-c', 'tmux refresh-client -l && sleep 0.05 && tmux save-buffer -' }
   end
+  -- return { vim.fn.split(vim.fn.getreg("+"), "\n"), vim.fn.getregtype("+") }
 end
 
 vim.g.clipboard = {

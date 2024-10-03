@@ -5,8 +5,6 @@ end
 
 vscode = vim.fn.exists('g:vscode') ~= 0
 TMUX = vim.env.TMUX ~= nil
-SSH = vim.env.SSH_CONNECTION ~= nil
-
 function TableToString(o)
    if type(o) == 'table' then
       local s = '{ '
@@ -21,6 +19,23 @@ function TableToString(o)
 end
 
 local M = {}
+
+function M.is_SSH()
+  if TMUX then
+    local handle = io.popen("tmux show-env")
+    if handle then
+      local result = handle:read("*a")
+      handle:close()
+      if result:find("SSH_CONNECTION=") then
+        return true
+      end
+      if result:find("-SSH_CONNECTION") then
+        return false
+      end
+    end
+  end
+  return vim.env.SSH_CONNECTION ~= nil
+end
 
 local function is_dev_dir()
   local cwd_parts = vim.split(vim.fn.getcwd(), "/")
