@@ -8,7 +8,7 @@ telescope.setup({
   defaults = {
     mappings = {
       i = {
-        ["<C-t>"] = open_with_trouble,
+        ["<C-x>"] = open_with_trouble,
         ["<C-f>"] = function(...)
           return actions.preview_scrolling_down(...)
         end,
@@ -17,7 +17,7 @@ telescope.setup({
         end,
       },
       n = {
-        ["<c-t>"] = open_with_trouble,
+        ["<c-x>"] = open_with_trouble,
         ["q"] = function(...)
           return actions.close(...)
         end,

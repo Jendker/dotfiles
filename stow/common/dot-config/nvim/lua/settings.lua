@@ -35,34 +35,36 @@ vim.o.splitright = true
 -- Clipboard
 vim.opt.clipboard:append("unnamedplus")
 
-local function copy(register)
-  if not TMUX then
-    return require('vim.ui.clipboard.osc52').copy(register)
-  else
-    return {"tmux", "load-buffer", "-w", "-"}
+if not vscode then
+  local function copy(register)
+    if not TMUX then
+      return require('vim.ui.clipboard.osc52').copy(register)
+    else
+      return {"tmux", "load-buffer", "-w", "-"}
+    end
+    -- return function(lines) vim.fn.setreg("+", lines) end
   end
-  -- return function(lines) vim.fn.setreg("+", lines) end
-end
-local function paste(register)
-  if not TMUX then
-    return require('vim.ui.clipboard.osc52').paste(register)
-  else
-    return { 'bash', '-c', 'tmux refresh-client -l && sleep 0.05 && tmux save-buffer -' }
+  local function paste(register)
+    if not TMUX then
+      return require('vim.ui.clipboard.osc52').paste(register)
+    else
+      return { 'bash', '-c', 'tmux refresh-client -l && sleep 0.05 && tmux save-buffer -' }
+    end
+    -- return { vim.fn.split(vim.fn.getreg("+"), "\n"), vim.fn.getregtype("+") }
   end
-  -- return { vim.fn.split(vim.fn.getreg("+"), "\n"), vim.fn.getregtype("+") }
-end
 
-vim.g.clipboard = {
-  name = 'OSC 52 with tmux',
-  copy = {
-    ['+'] = copy('+'),
-    ['*'] = copy('*'),
-  },
-  paste = {
-    ['+'] = paste('+'),
-    ['*'] = paste('*'),
+  vim.g.clipboard = {
+    name = 'OSC 52 with tmux',
+    copy = {
+      ['+'] = copy('+'),
+      ['*'] = copy('*'),
+    },
+    paste = {
+      ['+'] = paste('+'),
+      ['*'] = paste('*'),
+    }
   }
-}
+end
 
 -- don't continue comment on newline
 vim.cmd("autocmd BufEnter * setlocal formatoptions-=cro")
