@@ -59,7 +59,7 @@ function setup_open_any_terminal() {
   if [ "$DESKTOP_SESSION" != "ubuntu" ]; then
     return
   fi
-  # to open from nautilus with default terminal
+  # to open from nautilus with wezterm
   # if /home/jorbik/.local/share/nautilus-python/extensions/nautilus_open_any_terminal.py does not exist
   if [ ! -f ~/.local/share/nautilus-python/extensions/nautilus_open_any_terminal.py ]; then
     cwd=$(pwd)
@@ -70,9 +70,9 @@ function setup_open_any_terminal() {
     make
 
     make install schema # User install
-    gsettings set com.github.stunkymonkey.nautilus-open-any-terminal terminal alacritty
+    gsettings set com.github.stunkymonkey.nautilus-open-any-terminal terminal wezterm
     sudo apt install python3-nautilus -y
-    echo "To make the 'Open with <terminal>' work restart nautilus: 'nautilus -q'"
+    echo "To make the 'Open with Wezterm' work restart nautilus: 'nautilus -q'"
     cd "$cwd"
   fi
 }
@@ -102,64 +102,12 @@ function setup_wezterm() {
   fi
 }
 
-function setup_alacritty_source() {
-  sudo apt install cmake pkg-config libfreetype6-dev libfontconfig1-dev libxcb-xfixes0-dev libxkbcommon-dev python3 gzip scdoc -y
-  # install from source
-  install_rust
-  rustup override set stable
-  rustup update stable
-  cd /tmp
-  rm -rf alacritty
-  git clone https://github.com/alacritty/alacritty.git
-  cd alacritty
-
-  highest_tag=$(get_highest_tag_version)
-  git checkout "$highest_tag"
-
-  cargo build --release
-  # terminfo
-  infocmp alacritty || sudo tic -xe alacritty,alacritty-direct extra/alacritty.info
-  # desktop entry
-  sudo cp target/release/alacritty /usr/local/bin # or anywhere else in $PATH
-  sudo cp extra/logo/alacritty-term.svg /usr/share/pixmaps/Alacritty.svg
-  sudo cp extra/linux/Alacritty.desktop /usr/share/applications
-  sudo desktop-file-install /usr/share/applications/Alacritty.desktop || echo "WARNING: Setting alacritty desktop entry failed."
-  sudo update-desktop-database || echo "WARNING: Setting alacritty desktop entry failed."
-  # manual page
-  sudo mkdir -p /usr/local/share/man/man1
-  sudo mkdir -p /usr/local/share/man/man5
-  scdoc < extra/man/alacritty.1.scd | gzip -c | sudo tee /usr/local/share/man/man1/alacritty.1.gz > /dev/null
-  scdoc < extra/man/alacritty-msg.1.scd | gzip -c | sudo tee /usr/local/share/man/man1/alacritty-msg.1.gz > /dev/null
-  scdoc < extra/man/alacritty.5.scd | gzip -c | sudo tee /usr/local/share/man/man5/alacritty.5.gz > /dev/null
-  scdoc < extra/man/alacritty-bindings.5.scd | gzip -c | sudo tee /usr/local/share/man/man5/alacritty-bindings.5.gz > /dev/null
-  # completion
-  mkdir -p ~/.zsh_functions
-  grep -qxF 'fpath+=~/.zsh_functions' "$HOME"/.zshrc || echo 'fpath+=~/.zsh_functions' >>"$HOME"/.zshrc
-  cp extra/completions/_alacritty ~/.zsh_functions/_alacritty
-}
-
-function setup_alacritty() {
-  if ! [ -x "$(command -v alacritty)" ]; then
-    sudo apt install alacritty -y || setup_alacritty_source
-  fi
-  if [ "$DESKTOP_SESSION" == "ubuntu" ]; then
-    # ubuntu specific - set up tdrop for wezterm activation with hotkey
-    if [[ ! -e "$HOME/.local/bin/tdrop/tdrop" ]]; then
-      setup_trdop
-    fi
-    echo "Consider running these to set the default terminal"
-    echo "sudo update-alternatives --install /usr/bin/x-terminal-emulator x-terminal-emulator /usr/bin/alacritty 50"
-    echo "sudo update-alternatives --config x-terminal-emulator"
-  fi
-}
-
 setup_nerdfont
 setup_powerlevel10k
 setup_sublimetext
 setup_wezterm
 setup_open_any_terminal
 sudo apt install copyq -y
-setup_alacritty
 
 if [ "$DESKTOP_SESSION" == "ubuntu" ]; then
   # disable meta+number key bindings - it interferes with wezterm
