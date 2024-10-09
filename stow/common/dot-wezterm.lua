@@ -102,6 +102,7 @@ config.mouse_bindings = {
     action = act.OpenLinkAtMouseCursor,
   },
 }
+config.enable_osc52_clipboard_reading = true
 
 -- and finally, return the configuration to wezterm
 return config
