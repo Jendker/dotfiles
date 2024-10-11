@@ -126,6 +126,12 @@ vim.cmd([[
     autocmd BufRead,BufNewFile *.launch set filetype=xml
   augroup end
 ]])
+vim.cmd([[
+  augroup FileAssociations
+    autocmd!
+    autocmd BufRead,BufNewFile *.envrc set filetype=sh
+  augroup end
+]])
 -- lsp config
 vim.api.nvim_create_autocmd({"BufReadPre", "BufNewFile"}, {
   group = augroup("misc_aucmds"),

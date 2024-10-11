@@ -64,5 +64,12 @@
       "done",
       "shift \\$((\\$OPTIND-1))"
     ]
+  },
+  "Conda in .envrc": {
+    "prefix": ["conda", "envrc"],
+    "body": [
+      "eval \"$(conda \"shell.$(basename \"\\${SHELL\\}\")\" hook)\"",
+      "conda activate $1"
+    ]
   }
 }
