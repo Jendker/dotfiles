@@ -228,10 +228,10 @@
     ]
   },
     "IPython embed": {
-    "prefix": ["ipy", "embed"],
-    "body": ["from IPython import embed; embed()"],
-    "description": "Insert IPython embed"
-  },
+      "prefix": ["ipy", "embed"],
+      "body": ["__import__(\"IPython\").embed()  # FIXME"],
+      "description": "Insert IPython embed"
+    },
   "With tempdir": {
     "prefix": ["tempdir"],
     "body": ["with tempfile.TemporaryDirectory() as tmpdirname:"]
