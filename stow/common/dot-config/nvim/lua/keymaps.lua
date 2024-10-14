@@ -63,8 +63,6 @@ end, { desc = "[t]oggle [m]ouse" })
 -- don't enter command history
 map("n", "Q", "<nop>")
 map("n", "q:", "<nop>")
-map("n", "q/", "<nop>")
-map("n", "q?", "<nop>")
 
 -- don't break scrolling. If you need join, use gJ instead
 map({"n", "x"}, "J", "j")
