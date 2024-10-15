@@ -30,12 +30,6 @@ if ! grep -qxF 'typeset -g POWERLEVEL9K_INSTANT_PROMPT=quiet' "$HOME"/.zshrc; th
 typeset -g POWERLEVEL9K_INSTANT_PROMPT=quiet
 EOT
 fi
-if ! grep -qxF 'typeset -g POWERLEVEL9K_NODE_VERSION_PROJECT_ONLY=true' "$HOME"/.zshrc; then
-  tee -a "$HOME"/.zshrc >/dev/null <<'EOT'
-# show the node version only if it's set as a project version
-typeset -g POWERLEVEL9K_NODE_VERSION_PROJECT_ONLY=true
-EOT
-fi
 mkdir -p ~/.config/direnv
 echo '[global]
 load_dotenv = true
