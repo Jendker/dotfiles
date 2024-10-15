@@ -194,7 +194,12 @@ function install_conda() {
   git clone https://github.com/esc/conda-zsh-completion ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/conda-zsh-completion
   conda init zsh
   conda config --set auto_activate_base false
-  sed -i 's/git-auto-fetch)/conda-zsh-completion git-auto-fetch)/g' $HOME/.zshrc
+  sed -i 's/git-auto-fetch)/git-auto-fetch conda-zsh-completion)/g' $HOME/.zshrc
+  # check if conda-zsh-completion is now somewhere in $HOME/.zshrc
+  if ! grep -q "conda-zsh-completion" $HOME/.zshrc; then
+    echo "conda-zsh-completion was not added successfully to $HOME/.zshrc"
+    exit 1
+  fi
 }
 
 function install_direnv() {
