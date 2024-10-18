@@ -80,28 +80,38 @@ config.keys = {
     mods = 'CMD|CTRL',
     action = wezterm.action.ToggleFullScreen,
   },
-}
-config.mouse_bindings = {
-  -- Change the default click behavior so that it only selects
-  -- text and doesn't open hyperlinks
   {
-    event = { Up = { streak = 1, button = 'Left' } },
-    mods = 'NONE',
-    action = act.CompleteSelection 'ClipboardAndPrimarySelection',
+    key = "LeftArrow",
+    mods = "CTRL|SHIFT",
+    action = wezterm.action.DisableDefaultAssignment,
   },
+  {
+    key = "RightArrow",
+    mods = "CTRL|SHIFT",
+    action = wezterm.action.DisableDefaultAssignment,
+  },
+}
+-- config.mouse_bindings = {
+--   -- Change the default click behavior so that it only selects
+--   -- text and doesn't open hyperlinks
+--   {
+--     event = { Up = { streak = 1, button = 'Left' } },
+--     mods = 'NONE',
+--     action = act.CompleteSelection 'ClipboardAndPrimarySelection',
+--   },
 
-  -- and make CTRL-Click or CMD open hyperlinks
-  {
-    event = { Up = { streak = 1, button = 'Left' } },
-    mods = 'CTRL',
-    action = act.OpenLinkAtMouseCursor,
-  },
-  {
-    event = { Up = { streak = 1, button = 'Left' } },
-    mods = 'CMD',
-    action = act.OpenLinkAtMouseCursor,
-  },
-}
+--   -- and make CTRL-Click or CMD open hyperlinks
+--   {
+--     event = { Up = { streak = 1, button = 'Left' } },
+--     mods = 'CTRL',
+--     action = act.OpenLinkAtMouseCursor,
+--   },
+--   {
+--     event = { Up = { streak = 1, button = 'Left' } },
+--     mods = 'CMD',
+--     action = act.OpenLinkAtMouseCursor,
+--   },
+-- }
 config.enable_osc52_clipboard_reading = true
 
 -- and finally, return the configuration to wezterm
