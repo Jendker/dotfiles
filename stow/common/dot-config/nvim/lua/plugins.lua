@@ -1314,11 +1314,11 @@ local plugins = {
       merge_keywords = false, -- to make sure that the keywords above override the default
       highlight = {
         -- multiline = false, -- rarely useful
-        pattern = [[.*<(KEYWORDS)>:?\s\s*]],
+        pattern = [[.*<(KEYWORDS)>:?\s*]],
         keyword = "fg", -- make it less flashy
       },
       search = {
-        pattern = [[\b(KEYWORDS)(\s|:)]],
+        pattern = [[\b(KEYWORDS)]],
       },
     },
     cond = not_vscode
