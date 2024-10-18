@@ -289,7 +289,7 @@ export ZPWR_EXPAND_TO_HISTORY=true # expand to history also on enter
 .
 wq
 IN
-  sed -i 's/plugins=(git)/plugins=(git ubuntu zsh-syntax-highlighting zsh-expand git-auto-fetch)/g' $HOME/.zshrc
+  sed -i 's/plugins=(git)/plugins=(git ubuntu zsh-syntax-highlighting zsh-expand zsh-vim-mode git-auto-fetch)/g' $HOME/.zshrc
   sed -i '/mode auto/s/^# //g' $HOME/.zshrc
 fi
 

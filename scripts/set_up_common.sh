@@ -11,6 +11,7 @@ else
   sudo chsh -s "$(which zsh)" "$(whoami)" || true
   git clone https://github.com/zsh-users/zsh-syntax-highlighting.git "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"/plugins/zsh-syntax-highlighting
   git clone https://github.com/MenkeTechnologies/zsh-expand.git "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"/plugins/zsh-expand
+  git clone https://github.com/softmoth/zsh-vim-mode "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"/plugins/zsh-vim-mode
 fi
 
 # auto setup remote for new branches
