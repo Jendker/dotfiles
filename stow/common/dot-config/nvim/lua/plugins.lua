@@ -548,23 +548,24 @@ local plugins = {
           { "<leader>sfp", "<Cmd>lua require('telescope').extensions.frecency.frecency({ workspace = 'CWD' })<CR>", "n",
             noremap = true, silent = true, desc = "Telescope frecency" },
         },
-        cond = not_vscode
       },
       {
         "nvim-telescope/telescope-live-grep-args.nvim",
         keys = {
           {"<leader>sa", "<Cmd>lua require('telescope').extensions.live_grep_args.live_grep_args()<CR>", "n", noremap = true, silent = true, desc = "[S]earch with ripgrep [a]rgs"},
         },
-        cond = not_vscode
       },
+      { "Jendker/telescope-dap.nvim", keys = { {"<leader>el", "<Cmd>lua require('telescope').extensions.dap.list_breakpoints()<CR>", desc = "List breakpoints"} }},
     },
     config = function()
       require 'config_plugins.telescope'
       -- extensions
-      require("telescope").load_extension("zf-native")
-      require("telescope").load_extension("frecency")
-      require('telescope').load_extension('menufacture')
-      require("telescope").load_extension("live_grep_args")
+      local telescope = require("telescope")
+      telescope.load_extension("zf-native")
+      telescope.load_extension("frecency")
+      telescope.load_extension('menufacture')
+      telescope.load_extension("live_grep_args")
+      telescope.load_extension("dap")
     end,
     cond = not_vscode
   },
@@ -853,18 +854,18 @@ local plugins = {
       wk.add({
         {
           mode = { "n", "v" },
-          { "<leader>a",  group = "tab" },
-          { "<leader>b",  group = "buffer/bookmarks" },
-          { "<leader>e",  group = "debug" },
-          { "<leader>g",  group = "diffview" },
-          { "<leader>h",  group = "hunks" },
-          { "<leader>o",  group = "overseer/noice" },
-          { "<leader>s",  group = "search" },
-          { "<leader>sb", group = "bookmarks" },
-          { "<leader>sf", group = "go to file" },
-          { "<leader>t",  group = "toogle" },
+          { "<leader>a",  group = "t[a]b" },
+          { "<leader>b",  group = "[b]uffer/[b]ookmarks" },
+          { "<leader>e",  group = "d[e]bug" },
+          { "<leader>g",  group = "[g]it diffview" },
+          { "<leader>h",  group = "[h]unks" },
+          { "<leader>o",  group = "[o]verseer/n[o]ice" },
+          { "<leader>s",  group = "[s]earch" },
+          { "<leader>sb", group = "[b]ookmarks" },
+          { "<leader>sf", group = "[f]ile" },
+          { "<leader>t",  group = "[t]oggle" },
           { "<leader>v",  group = "compare" },
-          { "<leader>w",  group = "workspace" },
+          { "<leader>w",  group = "[w]orkspace" },
           { "<leader>x",  group = "trouble" },
         },
       })
@@ -1641,7 +1642,6 @@ local plugins = {
   -- {
   --   '3rd/image.nvim',
   --   ft = { "markdown", "norg", "oil" },
-  --   -- Disable on Windows system
   --   dependencies = {
   --     'leafo/magick',
   --   },
