@@ -6,8 +6,8 @@
         "path": "global.code-snippets"
       },
       {
-        "language": "sh",
-        "path": "shellscript.json"
+        "language": "lua",
+        "path": "lua.json"
       },
       {
         "language": "markdown",
@@ -16,6 +16,10 @@
       {
         "language": "python",
         "path": "python.json"
+      },
+      {
+        "language": "sh",
+        "path": "shellscript.json"
       }
     ]
   }
