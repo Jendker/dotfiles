@@ -15,7 +15,7 @@ else
 fi
 
 # auto setup remote for new branches
-git config --global --add --bool push.autoSetupRemote true
+git config --global --bool push.autoSetupRemote true
 # always rebase on pull
 git config --global pull.rebase true
 
