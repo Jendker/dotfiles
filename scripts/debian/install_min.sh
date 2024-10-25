@@ -69,7 +69,7 @@ function install_node() {
     [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
     # add nvm to .zshrc with string does not exists after the installation
     if ! grep -Fxq 'export NVM_DIR="$HOME/.nvm"' $HOME/.zshrc; then
-      sudo tee -a $HOME/.zshrc >/dev/null <<'EOT'
+      tee -a $HOME/.zshrc >/dev/null <<'EOT'
 # Load nvm
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
@@ -169,7 +169,7 @@ function install_yazi_source() {
   cd .. && rm -rf yazi
 
   if ! grep -Fxq 'function ya() {' $HOME/.zshrc; then
-    sudo tee -a $HOME/.zshrc >/dev/null <<'EOT'
+    tee -a $HOME/.zshrc >/dev/null <<'EOT'
 function ya() {
   tmp="$(mktemp -t "yazi-cwd.XXXXX")"
   yazi "$@" --cwd-file="$tmp"
@@ -259,7 +259,7 @@ sudo apt install ripgrep -y || true
 "$SCRIPT_DIR/../set_up_common.sh"
 
 if ! grep -q "unsetopt BEEP" $HOME/.zshrc; then
-  sudo tee -a $HOME/.zshrc >/dev/null <<'EOT'
+  tee -a $HOME/.zshrc >/dev/null <<'EOT'
 if command -v nvim &> /dev/null; then
   alias vim=nvim
   export EDITOR=nvim
@@ -297,7 +297,12 @@ sudo locale-gen en_US
 sudo locale-gen en_US.UTF-8
 
 # .tmux.conf
-grep -qxF 'set-option -g default-shell /bin/zsh' $HOME/.tmux.conf || echo "set-option -g history-limit 125000\nset-option -g default-shell /bin/zsh" >>$HOME/.tmux.conf
+grep -qF 'default-shell /bin/zsh' "$HOME/.tmux.conf" || cat << EOF >> "$HOME/.tmux.conf"
+set -g history-limit 125000
+set -g default-shell /bin/zsh
+set -g mouse on
+set -g status-right " \"#{=21:host}\" %H:%M %d-%b-%y"
+EOF
 
 # set up thefuck
 if ! command -v thefuck &>/dev/null; then
