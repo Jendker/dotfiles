@@ -689,15 +689,13 @@ local plugins = {
   {
     'Bekaboo/dropbar.nvim',
     opts = {
-      general = {
+      bar = {
         enable = function(buf, win, _)
           return not vim.api.nvim_win_get_config(win).zindex
               and (vim.bo[buf].buftype == '' or vim.bo[buf].buftype == 'acwrite' or vim.bo[buf].buftype == 'nowrite' or vim.bo[buf].buftype == 'terminal')
               and vim.api.nvim_buf_get_name(buf) ~= ''
               and not vim.wo[win].diff
         end,
-      },
-      bar = {
         sources = function(buf, _)
           local sources = require('dropbar.sources')
           local utils = require('dropbar.utils')
@@ -999,14 +997,15 @@ local plugins = {
       vim.api.nvim_create_autocmd({ 'User' }, {
         group = persistence_group,
         pattern = 'PersistenceSavePre',
-        callback = vim.schedule_wrap(function()
+        callback = function()
           local tabpages = vim.api.nvim_list_tabpages()
           for _, tabpage in ipairs(tabpages) do
             local windows = vim.api.nvim_tabpage_list_wins(tabpage)
             for _, window in ipairs(windows) do
               local buffer = vim.api.nvim_win_get_buf(window)
+              local buf_ft = vim.api.nvim_get_option_value("ft", {buf = buffer})
               local file_name = vim.api.nvim_buf_get_name(buffer)
-              if string.find(file_name, "diffview:") then
+              if buf_ft == "DiffviewFiles" then
                 -- close all windows in this tab
                 for _, this_window in ipairs(windows) do
                   vim.api.nvim_win_close(this_window, false)
@@ -1019,7 +1018,7 @@ local plugins = {
               end
             end
           end
-        end),
+        end,
       })
     end,
     cond = not_vscode
