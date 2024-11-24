@@ -62,3 +62,6 @@ killall Dock
 # defaults -currentHost delete -globalDomain NSStatusItemSelectionPadding
 defaults -currentHost write -globalDomain NSStatusItemSpacing -int 14
 defaults -currentHost write -globalDomain NSStatusItemSelectionPadding -int 8
+
+# Disable double space to period substitution
+defaults write -g NSAutomaticPeriodSubstitutionEnabled -int 0
