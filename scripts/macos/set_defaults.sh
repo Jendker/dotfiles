@@ -64,4 +64,17 @@ defaults -currentHost write -globalDomain NSStatusItemSpacing -int 14
 defaults -currentHost write -globalDomain NSStatusItemSelectionPadding -int 8
 
 # Disable double space to period substitution
-defaults write -g NSAutomaticPeriodSubstitutionEnabled -int 0
+defaults write -g NSAutomaticPeriodSubstitutionEnabled -bool false
+# Prevent Safari from opening ‘safe’ files automatically after downloading
+defaults write com.apple.Safari AutoOpenSafeDownloads -bool false
+
+# Automatically quit printer app once the print jobs complete
+defaults write com.apple.print.PrintingPrefs "Quit When Finished" -bool true
+
+# some stuff from https://github.com/mathiasbynens/dotfiles/blob/master/.macos
+###############################################################################
+# Finder                                                                      #
+###############################################################################
+# Avoid creating .DS_Store files on network or USB volumes
+defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
+defaults write com.apple.desktopservices DSDontWriteUSBStores -bool true
