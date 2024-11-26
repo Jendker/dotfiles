@@ -1210,15 +1210,17 @@ local plugins = {
     opts = {},
     cond = not_vscode
   },
+  { "zbirenbaum/copilot.lua", cmd = {"Copilot"}, opts = {suggestion = {keymap = {accept_word = "<M-k>"}}}},
   {
     "CopilotC-Nvim/CopilotChat.nvim",
-    cmd = {"Copilot", "CopilotChat"},
+    cmd = {"CopilotChat"},
     event = "InsertEnter",
     branch = "canary",
     dependencies = {
-      { "zbirenbaum/copilot.lua", opts = {suggestion = {keymap = {accept_word = "<M-k>"}}}}, -- or github/copilot.vim
-      { "nvim-lua/plenary.nvim" }, -- for curl, log wrapper
+      {"zbirenbaum/copilot.lua"}, -- or github/copilot.vim
+      {"nvim-lua/plenary.nvim"}, -- for curl, log wrapper
     },
+    build = "make tiktoken",
     opts = {
       mappings = {
         close = {
@@ -1227,10 +1229,6 @@ local plugins = {
       },
       context = 'buffer',
     },
-    config = function(_, opts)
-      require("CopilotChat").setup(opts)
-      require("CopilotChat.integrations.cmp").setup()
-    end,
     cond = not_vscode
   },
   {
