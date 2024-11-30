@@ -651,6 +651,10 @@ local plugins = {
       },
     },
     config = function(_, opts)
+      -- FIXME workaround the conform loading in package.preload somewhere when using vscode
+      if vscode then
+        return
+      end
       local conform = require('conform')
       conform.setup(opts)
       vim.api.nvim_create_user_command("Format", function(args)
@@ -685,7 +689,8 @@ local plugins = {
         conform.format({ async = true, lsp_fallback = true })
       end, { desc = "Run [b]uffer [f]ormatting" })
     end,
-    cond = not_vscode
+    -- FIXME workaround the conform loading in package.preload somewhere when using vscode
+    -- cond = not_vscode
   },
   {
     'Bekaboo/dropbar.nvim',
