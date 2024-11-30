@@ -304,44 +304,23 @@ end
 ---- end of statuscolumn stuff
 
 -- folding
-local skip_foldexpr = {} ---@type table<number,boolean>
-local skip_check = assert(vim.loop.new_check())
-
 -- TODO maybe make it a separate module similarly like folke?
--- https://github.com/LazyVim/LazyVim/blob/68ff818a5bb7549f90b05e412b76fe448f605ffb/lua/lazyvim/util/ui.lua#L147
+-- https://github.com/LazyVim/LazyVim/blob/2fc7697786e72e02db91dd2242d1407f5b80856b/lua/lazyvim/util/ui.lua#L10-L25
 function Foldexpr()
   local buf = vim.api.nvim_get_current_buf()
-
-  -- still in the same tick and no parser
-  if skip_foldexpr[buf] then
-    return "0"
+  if vim.b[buf].ts_folds == nil then
+    -- as long as we don't have a filetype, don't bother
+    -- checking if treesitter is available (it won't)
+    if vim.bo[buf].filetype == "" then
+      return "0"
+    end
+    if vim.bo[buf].filetype:find("dashboard") then
+      vim.b[buf].ts_folds = false
+    else
+      vim.b[buf].ts_folds = pcall(vim.treesitter.get_parser, buf)
+    end
   end
-
-  -- don't use treesitter folds for non-file buffers
-  if vim.bo[buf].buftype ~= "" then
-    return "0"
-  end
-
-  -- as long as we don't have a filetype, don't bother
-  -- checking if treesitter is available (it won't)
-  if vim.bo[buf].filetype == "" then
-    return "0"
-  end
-
-  local ok = pcall(vim.treesitter.get_parser, buf)
-
-  if ok then
-    return vim.treesitter.foldexpr()
-  end
-
-  -- no parser available, so mark it as skip
-  -- in the next tick, all skip marks will be reset
-  skip_foldexpr[buf] = true
-  skip_check:start(function()
-    skip_foldexpr = {}
-    skip_check:stop()
-  end)
-  return "0"
+  return vim.b[buf].ts_folds and vim.treesitter.foldexpr() or "0"
 end
 
 -- use tree-sitter for folding. If needed to use normal folding, run :set foldmethod=syntax
