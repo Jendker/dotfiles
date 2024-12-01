@@ -1,12 +1,5 @@
-if vscode then
-  return
-end
-
-local status_ok, lsp_zero = pcall(require, 'lsp-zero')
-if not status_ok then
-  return
-end
 local common = require('common')
+local lsp_zero = require('lsp-zero')
 
 -- List LSP servers that will be automatically installed upon entering filetype for the first time.
 -- LSP servers will be installed locally via mason at: ~/.local/share/nvim/mason/packages/

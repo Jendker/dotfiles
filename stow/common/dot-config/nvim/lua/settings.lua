@@ -133,14 +133,6 @@ vim.cmd([[
     autocmd BufRead,BufNewFile *.envrc set filetype=sh
   augroup end
 ]])
--- lsp config
-vim.api.nvim_create_autocmd({"BufReadPre", "BufNewFile"}, {
-  group = augroup("misc_aucmds"),
-  callback = function()
-    require 'config_plugins.lsp-zero'
-  end,
-  once = true,
-})
 
 -- improve file reloads
 vim.api.nvim_create_autocmd({ "FocusGained", "TermClose", "TermLeave" }, {

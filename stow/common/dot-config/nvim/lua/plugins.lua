@@ -602,6 +602,7 @@ local plugins = {
   },
   {
     'VonHeikemen/lsp-zero.nvim', branch = 'v4.x',
+    event = {"BufReadPre", "BufNewFile"},
     dependencies = {
       -- LSP Support
       {'neovim/nvim-lspconfig'},
@@ -630,6 +631,9 @@ local plugins = {
       {'jay-babu/mason-null-ls.nvim'},
       {'folke/neoconf.nvim', opts = {}},  -- autoload settings.json
     },
+    config = function()
+      require 'config_plugins.lsp-zero'
+    end,
     cond = not_vscode
   },
   {
