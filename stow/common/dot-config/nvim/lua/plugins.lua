@@ -329,7 +329,6 @@ local plugins = {
           IlluminatedWordText = {bg = '$bg2'},
           IlluminatedWordRead = {bg = '$bg2'},
           IlluminatedWordWrite = {bg = '$bg2'},
-          IblIndent = { fg = '$bg3', fmt = "nocombine" },
           MsgArea = { fg = '$fg' },
           MatchParen = {fg = '$orange', bg = 'none', fmt = "bold" },
           -- winbar needs to be set on current nightly
@@ -485,7 +484,7 @@ local plugins = {
           "TelescopeResults",
         },
       },
-      scope = { enabled = false },
+      scope = {show_start = false, show_end = false},
     },
     cond = not_vscode
   },
