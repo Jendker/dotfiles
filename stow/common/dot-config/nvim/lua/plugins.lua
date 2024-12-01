@@ -1681,8 +1681,8 @@ local plugins = {
       words = { enabled = false },
     },
     keys = {
-      { "<leader>.",  function() require("snacks").scratch() end,                 desc = "Toggle Scratch Buffer" },
-      { "<leader>S",  function() require("snacks").scratch.select() end,          desc = "Select Scratch Buffer" },
+      { "<leader>.", function() require("snacks").scratch({ ft = vim.bo.filetype }) end, desc = "Toggle Scratch Buffer" },
+      { "<leader>S", function() require("snacks").scratch.select() end,                  desc = "Select Scratch Buffer" },
       -- this doesn't seem to work, that's coupled with commented line above
       -- { "]]",         function() require("snacks").words.jump(vim.v.count1) end,  desc = "Next Reference",       mode = { "n", "t" } },
       -- { "[[",         function() require("snacks").words.jump(-vim.v.count1) end, desc = "Prev Reference",       mode = { "n", "t" } },
