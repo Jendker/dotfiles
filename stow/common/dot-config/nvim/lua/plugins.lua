@@ -1640,11 +1640,6 @@ local plugins = {
     },
     cond = not_vscode
   },
-  {
-    "LunarVim/bigfile.nvim",
-    opts = {},
-    cond = not_vscode
-  },
   -- {
   --   '3rd/image.nvim',
   --   ft = { "markdown", "norg", "oil" },
@@ -1670,6 +1665,28 @@ local plugins = {
       {'<C-w><C-j>', '<CMD>NavigatorDown<CR>'},
     },
     opts = {},
+    cond = not_vscode
+  },
+  {
+    "folke/snacks.nvim",
+    priority = 1000,
+    lazy = false,
+    opts = {
+      bigfile = { enabled = true },
+      dashboard = { enabled = false },
+      notifier = { enabled = false },
+      quickfile = { enabled = true },
+      statuscolumn = { enabled = false },
+      -- this doesn't seem to work, if it does, remove RRethy/vim-illuminate
+      words = { enabled = false },
+    },
+    keys = {
+      { "<leader>.",  function() require("snacks").scratch() end,                 desc = "Toggle Scratch Buffer" },
+      { "<leader>S",  function() require("snacks").scratch.select() end,          desc = "Select Scratch Buffer" },
+      -- this doesn't seem to work, that's coupled with commented line above
+      -- { "]]",         function() require("snacks").words.jump(vim.v.count1) end,  desc = "Next Reference",       mode = { "n", "t" } },
+      -- { "[[",         function() require("snacks").words.jump(-vim.v.count1) end, desc = "Prev Reference",       mode = { "n", "t" } },
+    },
     cond = not_vscode
   },
   require('debugging'),
