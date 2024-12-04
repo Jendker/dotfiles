@@ -116,7 +116,8 @@ require('mason-lspconfig').setup({
         cmd = {
           "clangd",
           "--background-index",
-          "--header-insertion=never"
+          "--header-insertion=never",
+          "--offset-encoding=utf-16",
         },
       })
     end,
