@@ -78,3 +78,12 @@ defaults write com.apple.print.PrintingPrefs "Quit When Finished" -bool true
 # Avoid creating .DS_Store files on network or USB volumes
 defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
 defaults write com.apple.desktopservices DSDontWriteUSBStores -bool true
+
+###############################################################################
+# Safari
+###############################################################################
+# from https://gist.github.com/alanzeino/42b6d983c7aa2f29d64ea2749621f7cf
+# Show status bar in Safari
+defaults write com.apple.Safari ShowOverlayStatusBar -bool true
+# Don't open files in Safari after downloading
+defaults write com.apple.Safari AutoOpenSafeDownloads -bool false
