@@ -1,5 +1,10 @@
 clipboard-read = allow
-theme = dracula
+theme = Dracula
 font-family = Monaco
 font-family = SFMono Nerd Font
 background-opacity = 0.99
+cursor-style = block
+cursor-style-blink = false
+shell-integration-features = no-cursor
+window-padding-x = 5
+window-padding-y = 5
