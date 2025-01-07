@@ -25,12 +25,12 @@ function setup_nerdfont() {
   fc-cache -f
 }
 
-function setup_powerlevel10k() {
+function install_powerlevel10k() {
   git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k" || true
   sed -i 's/ZSH_THEME=\"robbyrussell\"/ZSH_THEME=\"powerlevel10k\/powerlevel10k\"/g' "$HOME/.zshrc"
 }
 
-function setup_sublimetext() {
+function install_sublimetext() {
   if ! [ -x "$(command -v subl)" ]; then
     wget -qO - https://download.sublimetext.com/sublimehq-pub.gpg | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/sublimehq-archive.gpg >/dev/null
     echo "deb https://download.sublimetext.com/ apt/stable/" | sudo tee /etc/apt/sources.list.d/sublime-text.list
@@ -39,7 +39,7 @@ function setup_sublimetext() {
   fi
 }
 
-function setup_spotify() {
+function install_spotify() {
   if ! [ -x "$(command -v spotify)" ]; then
     curl -sS https://download.spotify.com/debian/pubkey_6224F9941A8AA6D1.gpg | sudo gpg --dearmor --yes -o /etc/apt/trusted.gpg.d/spotify.gpg
     echo "deb http://repository.spotify.com stable non-free" | sudo tee /etc/apt/sources.list.d/spotify.list
@@ -47,14 +47,14 @@ function setup_spotify() {
   fi
 }
 
-function setup_flatpak() {
+function install_flatpak() {
   if ! [ -x "$(command -v flatpak)" ]; then
     sudo apt install flatpak -y
     sudo flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
   fi
 }
 
-function setup_open_any_terminal() {
+function install_open_any_terminal() {
   # ubuntu specific
   if [ "$DESKTOP_SESSION" != "ubuntu" ]; then
     return
@@ -78,15 +78,47 @@ function setup_open_any_terminal() {
   fi
 }
 
-function setup_ghostty() {
+function install_ghostty_source() {
+  # based on https://ghostty.org/docs/install/build
+  sudo rm -rf /tmp/ghostty
+  rm -rf /tmp/zig
+  # dependencies
+  sudo apt install libgtk-4-dev libadwaita-1-dev git
+  # currently ghostty depends on zig 0.13
+  zig_version=0.13.0
+  # download zig to temp
+  wget -O /tmp/zig.tar "https://ziglang.org/download/0.13.0/zig-linux-$(uname -m)-${zig_version}.tar.xz" && mkdir -p /tmp/zig && tar -xf /tmp/zig.tar -C /tmp/zig
+  zig_path=/tmp/zig/zig-linux-$(uname -m)-${zig_version}
+  # download ghostty
+  git clone https://github.com/ghostty-org/ghostty /tmp/ghostty
+  cd /tmp/ghostty
+  highest_tag=$(get_highest_tag_version)
+  git checkout "$highest_tag"
+
+  # build and install
+  sudo env PATH="$PATH:$zig_path" zig build -p /usr -Doptimize=ReleaseFast
+
+  # cleanup
+  sudo rm -rf /tmp/ghostty
+  rm -rf /tmp/zig
+}
+
+function install_ghostty_ubuntu_package() {
   if ! [ -x "$(command -v ghostty)" ]; then
     LATEST_VERSION=$(curl -s "https://api.github.com/repos/mkasberg/ghostty-ubuntu/releases/latest" | grep -Po '"tag_name": "\K[^"]+')
-    # TODO: get it to work with Debian and not only Ubuntu
-    wget -O /tmp/ghostty.deb "https://github.com/mkasberg/ghostty-ubuntu/releases/download/${LATEST_VERSION}/ghostty_${LATEST_VERSION//-ppa/.ppa}_$(dpkg --print-architecture)_$(lsb_release -rs).deb" && sudo dpkg -i /tmp/ghostty.deb && sudo apt install -y /tmp/ghostty.deb
+    wget -O /tmp/ghostty.deb "https://github.com/mkasberg/ghostty-ubuntu/releases/download/${LATEST_VERSION}/ghostty_${LATEST_VERSION//-ppa/.ppa}_$(dpkg --print-architecture)_$(lsb_release -rs).deb" && sudo dpkg -i /tmp/ghostty.deb && sudo apt -f install -y /tmp/ghostty.deb || return 1
   fi
 }
 
-function setup_trdop() {
+function install_ghostty() {
+  if [ "$DESKTOP_SESSION" == "ubuntu" ]; then
+    install_ghostty_ubuntu_package || install_ghostty_source
+  else
+    install_ghostty_source
+  fi
+}
+
+function install_trdop() {
   cwd=$(pwd)
   mkdir -p ~/.local/bin/
   cd ~/.local/bin/
@@ -99,7 +131,7 @@ function setup_trdop() {
   cd "$cwd"
 }
 
-function setup_wezterm() {
+function install_wezterm() {
   curl -fsSL https://apt.fury.io/wez/gpg.key | sudo gpg --yes --dearmor -o /usr/share/keyrings/wezterm-fury.gpg
   echo 'deb [signed-by=/usr/share/keyrings/wezterm-fury.gpg] https://apt.fury.io/wez/ * *' | sudo tee /etc/apt/sources.list.d/wezterm.list
   sudo apt update
@@ -107,15 +139,15 @@ function setup_wezterm() {
 
   if [ "$DESKTOP_SESSION" == "ubuntu" ] && [[ ! -e "$HOME/.local/bin/tdrop/tdrop" ]]; then
     # ubuntu specific - set up tdrop for wezterm activation with hotkey
-    setup_trdop
+    install_trdop
   fi
 }
 
 setup_nerdfont
-setup_powerlevel10k
-setup_sublimetext
-setup_ghostty
-setup_open_any_terminal
+install_powerlevel10k
+install_sublimetext
+install_ghostty
+install_open_any_terminal
 sudo apt install copyq -y
 
 if [ "$DESKTOP_SESSION" == "ubuntu" ]; then
@@ -126,6 +158,6 @@ fi
 
 if [ "$optional_provided" == true ]; then
   echo "--optional was provided, installing optional tools."
-  setup_flatpak
-  setup_spotify
+  install_flatpak
+  install_spotify
 fi
