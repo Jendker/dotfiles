@@ -9,3 +9,5 @@ function install_rust() {
     echo "Please source ~/.zshrc or ~/.bashrc"
   fi
 }
+
+distro_name=$(cat /etc/*-release | grep ID | head -n1 | cut -d '=' -f2)

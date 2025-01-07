@@ -56,7 +56,7 @@ function install_flatpak() {
 
 function install_open_any_terminal() {
   # ubuntu specific
-  if [ "$DESKTOP_SESSION" != "ubuntu" ]; then
+  if [ "$distro_name" = "Ubuntu" ]; then
     return
   fi
   # to open from nautilus with default terminal
@@ -91,6 +91,7 @@ function install_ghostty_source() {
   zig_path=/tmp/zig/zig-linux-$(uname -m)-${zig_version}
   # download ghostty
   git clone https://github.com/ghostty-org/ghostty /tmp/ghostty
+  cwd=$(pwd)
   cd /tmp/ghostty
   highest_tag=$(get_highest_tag_version)
   git checkout "$highest_tag"
@@ -101,17 +102,18 @@ function install_ghostty_source() {
   # cleanup
   sudo rm -rf /tmp/ghostty
   rm -rf /tmp/zig
+  cd "$cwd"
 }
 
 function install_ghostty_ubuntu_package() {
   if ! [ -x "$(command -v ghostty)" ]; then
     LATEST_VERSION=$(curl -s "https://api.github.com/repos/mkasberg/ghostty-ubuntu/releases/latest" | grep -Po '"tag_name": "\K[^"]+')
-    wget -O /tmp/ghostty.deb "https://github.com/mkasberg/ghostty-ubuntu/releases/download/${LATEST_VERSION}/ghostty_${LATEST_VERSION//-ppa/.ppa}_$(dpkg --print-architecture)_$(lsb_release -rs).deb" && sudo dpkg -i /tmp/ghostty.deb && sudo apt -f install -y /tmp/ghostty.deb || return 1
+    wget -O /tmp/ghostty.deb "https://github.com/mkasberg/ghostty-ubuntu/releases/download/${LATEST_VERSION}/ghostty_${LATEST_VERSION//-ppa/.ppa}_$(dpkg --print-architecture)_$(lsb_release -rs).deb" && sudo apt -f install -y /tmp/ghostty.deb || return 1
   fi
 }
 
 function install_ghostty() {
-  if [ "$DESKTOP_SESSION" == "ubuntu" ]; then
+  if [ "$distro_name" = "Ubuntu" ]; then
     install_ghostty_ubuntu_package || install_ghostty_source
   else
     install_ghostty_source
@@ -137,7 +139,7 @@ function install_wezterm() {
   sudo apt update
   sudo apt install wezterm -y
 
-  if [ "$DESKTOP_SESSION" == "ubuntu" ] && [[ ! -e "$HOME/.local/bin/tdrop/tdrop" ]]; then
+  if [ "$distro_name" = "Ubuntu" ] && [[ ! -e "$HOME/.local/bin/tdrop/tdrop" ]]; then
     # ubuntu specific - set up tdrop for wezterm activation with hotkey
     install_trdop
   fi
@@ -150,10 +152,10 @@ install_ghostty
 install_open_any_terminal
 sudo apt install copyq -y
 
-if [ "$DESKTOP_SESSION" == "ubuntu" ]; then
+if [ "$distro_name" = "Ubuntu" ]; then
   # disable meta+number key bindings - it interferes with wezterm
-  gsettings set org.gnome.shell.extensions.dash-to-dock hot-keys false
-  for i in $(seq 1 9); do gsettings set org.gnome.shell.keybindings "switch-to-application-${i}" '[]'; done
+  gsettings set org.gnome.shell.extensions.dash-to-dock hot-keys false || true
+  for i in $(seq 1 9); do gsettings set org.gnome.shell.keybindings "switch-to-application-${i}" '[]' || true; done
 fi
 
 if [ "$optional_provided" == true ]; then
