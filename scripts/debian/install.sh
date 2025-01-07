@@ -79,7 +79,7 @@ function setup_open_any_terminal() {
 }
 
 function setup_ghostty() {
-  if ! [ -x "$(command -v gh)" ]; then
+  if ! [ -x "$(command -v ghostty)" ]; then
     LATEST_VERSION=$(curl -s "https://api.github.com/repos/mkasberg/ghostty-ubuntu/releases/latest" | grep -Po '"tag_name": "\K[^"]+')
     # TODO: get it to work with Debian and not only Ubuntu
     wget -O /tmp/ghostty.deb "https://github.com/mkasberg/ghostty-ubuntu/releases/download/${LATEST_VERSION}/ghostty_${LATEST_VERSION//-ppa/.ppa}_$(dpkg --print-architecture)_$(lsb_release -rs).deb" && sudo dpkg -i /tmp/ghostty.deb && sudo apt install -y /tmp/ghostty.deb

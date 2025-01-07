@@ -1,4 +1,6 @@
 clipboard-read = allow
+
+# Appearance
 theme = Dracula
 font-family = Monaco
 font-family = SFMono Nerd Font
@@ -8,4 +10,13 @@ cursor-style-blink = false
 shell-integration-features = no-cursor
 window-padding-x = 5
 window-padding-y = 5
+
+# Use platform-specific config if available
 config-file = ?platform_config
+
+# Disable ligatures
+font-feature = -liga
+font-feature = -dlig
+
+# Keys
+macos-option-as-alt = left
