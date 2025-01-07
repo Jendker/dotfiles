@@ -59,7 +59,7 @@ function setup_open_any_terminal() {
   if [ "$DESKTOP_SESSION" != "ubuntu" ]; then
     return
   fi
-  # to open from nautilus with wezterm
+  # to open from nautilus with default terminal
   # if /home/jorbik/.local/share/nautilus-python/extensions/nautilus_open_any_terminal.py does not exist
   if [ ! -f ~/.local/share/nautilus-python/extensions/nautilus_open_any_terminal.py ]; then
     cwd=$(pwd)
@@ -70,10 +70,19 @@ function setup_open_any_terminal() {
     make
 
     make install schema # User install
-    gsettings set com.github.stunkymonkey.nautilus-open-any-terminal terminal wezterm
+    default_terminal=ghostty
+    gsettings set com.github.stunkymonkey.nautilus-open-any-terminal terminal ${default_terminal}
     sudo apt install python3-nautilus -y
-    echo "To make the 'Open with Wezterm' work restart nautilus: 'nautilus -q'"
+    echo "To make the 'Open with ${default_terminal}' work restart nautilus: 'nautilus -q'"
     cd "$cwd"
+  fi
+}
+
+function setup_ghostty() {
+  if ! [ -x "$(command -v gh)" ]; then
+    LATEST_VERSION=$(curl -s "https://api.github.com/repos/mkasberg/ghostty-ubuntu/releases/latest" | grep -Po '"tag_name": "\K[^"]+')
+    # TODO: get it to work with Debian and not only Ubuntu
+    wget -O /tmp/ghostty.deb "https://github.com/mkasberg/ghostty-ubuntu/releases/download/${LATEST_VERSION}/ghostty_${LATEST_VERSION//-ppa/.ppa}_$(dpkg --print-architecture)_$(lsb_release -rs).deb" && sudo dpkg -i /tmp/ghostty.deb && sudo apt install -y /tmp/ghostty.deb
   fi
 }
 
@@ -105,7 +114,7 @@ function setup_wezterm() {
 setup_nerdfont
 setup_powerlevel10k
 setup_sublimetext
-setup_wezterm
+setup_ghostty
 setup_open_any_terminal
 sudo apt install copyq -y
 
