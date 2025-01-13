@@ -1650,18 +1650,18 @@ local plugins = {
     },
     cond = not_vscode
   },
-  -- {
-  --   '3rd/image.nvim',
-  --   ft = { "markdown", "norg", "oil" },
-  --   dependencies = {
-  --     'leafo/magick',
-  --   },
-  --   opts = {
-  --     editor_only_render_when_focused = true,
-  --     tmux_show_only_in_active_window = true,
-  --   },
-  --   cond = not_vscode
-  -- },
+  {
+    '3rd/image.nvim',
+    ft = { "markdown", "norg", "oil" },
+    dependencies = {
+      'leafo/magick',
+    },
+    opts = {
+      editor_only_render_when_focused = true,
+      tmux_show_only_in_active_window = true,
+    },
+    cond = not_vscode
+  },
   {
     'numToStr/Navigator.nvim',
     keys = {
@@ -1684,8 +1684,11 @@ local plugins = {
     opts = {
       bigfile = { enabled = true },
       dashboard = { enabled = false },
+      indent = { enabled = false, char = "┊", animate = {enabled=false}, scope = {char = "┊"} },
+      input = { enabled = false },
       notifier = { enabled = false },
       quickfile = { enabled = true },
+      scroll = { enabled = false },
       statuscolumn = { enabled = false },
       -- this doesn't seem to work, if it does, remove RRethy/vim-illuminate
       words = { enabled = false },
