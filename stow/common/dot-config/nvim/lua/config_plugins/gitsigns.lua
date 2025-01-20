@@ -56,7 +56,6 @@ gitsigns.setup {
     map({'n', 'v'}, '<leader>hs', ':Gitsigns stage_hunk<CR>', { desc = "[s]tage hunk", silent = true })
     map({'n', 'v'}, '<leader>hr', ':Gitsigns reset_hunk<CR>', { desc = "[r]eset hunk", silent = true })
     map('n', '<leader>hS', gs.stage_buffer, { desc = "[S]tage buffer", silent = true })
-    map('n', '<leader>hu', gs.undo_stage_hunk, { desc = "[u]ndo stage hunk", silent = true })
     map('n', '<leader>hU', gs.reset_buffer_index, { desc = "[u]ndo stage buffe", silent = true })
     map('n', '<leader>hR', gs.reset_buffer, { desc = "[r]eset buffer", silent = true })
     map('n', '<leader>hp', gs.preview_hunk, { desc = "[p]review hunk", silent = true })
@@ -74,7 +73,6 @@ gitsigns.setup {
     end, { desc = "Change base to main", silent = true })
     map('n', '<leader>hB', function() gs.reset_base(true) end, { desc = "Reset [B]ase to index", silent = true })
     map('n', '<leader>hD', function() gs.diffthis('~') end, { desc = "Diff to previous commit", silent = true })
-    -- map('n', '<leader>td', gs.toggle_deleted, { desc = "[t]oggle [d]eleted", silent = true })
 
     -- Text object
     map({'o', 'x'}, 'ih', ':<C-U>Gitsigns select_hunk<CR>', { desc = "select hunk", silent = true} )
