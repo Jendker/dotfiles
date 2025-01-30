@@ -872,7 +872,7 @@ local plugins = {
       wk.add({
         {
           mode = { "n", "v" },
-          { "<leader>a",  group = "t[a]b" },
+          { "<leader>a",  group = "t[a]b/[a]vante" },
           { "<leader>b",  group = "[b]uffer/[b]ookmarks" },
           { "<leader>e",  group = "d[e]bug" },
           { "<leader>g",  group = "[g]it diffview" },
@@ -1067,7 +1067,7 @@ local plugins = {
   {
     "MeanderingProgrammer/render-markdown.nvim",
     opts = {
-      file_types = { "markdown", "norg", "rmd", "org" },
+      file_types = { "markdown", "norg", "rmd", "org", "Avante" },
       code = {
         sign = false,
         width = "block",
@@ -1085,7 +1085,7 @@ local plugins = {
         },
       },
     },
-    ft = { "markdown", "norg", "rmd", "org" },
+    ft = { "markdown", "norg", "rmd", "org", "Avante" },
     config = function(_, opts)
       require("render-markdown").setup(opts)
       vim.keymap.set("n", "<leader>tk", require("render-markdown").toggle, { desc = "[t]oggle mar[k]down" })
@@ -1246,6 +1246,50 @@ local plugins = {
         },
       },
       context = 'buffer',
+    },
+    cond = not_vscode
+  },
+  {
+    "yetone/avante.nvim",
+    cmd = {"AvanteAsk", "AvanteChat"},
+    keys = {
+      {"<leader>aa", desc="avante: ask"},
+      {"<leader>ar", desc="avante: refresh"},
+      {"<leader>af", desc="avante: focus"},
+      {"<leader>at", desc="avante: toggle"},
+      {"<leader>as", desc="avante: toggle suggestions"},
+      {"<leader>ab", desc="avante: toggle debug"},
+      {"<leader>aR", desc="avante: toggle repo map"},
+      {"<leader>ah", desc="avante: toggle hint"},
+    },
+    opts = {
+      provider = "copilot",
+    },
+    -- if you want to build from source then do `make BUILD_FROM_SOURCE=true`
+    build = "make",
+    dependencies = {
+      "stevearc/dressing.nvim",
+      "nvim-lua/plenary.nvim",
+      "MunifTanjim/nui.nvim",
+      --- The below dependencies are optional,
+      "hrsh7th/nvim-cmp",          -- autocompletion for avante commands and mentions
+      "nvim-tree/nvim-web-devicons", -- or echasnovski/mini.icons
+      "zbirenbaum/copilot.lua",    -- for providers='copilot'
+      {
+        -- support for image pasting
+        "HakonHarnes/img-clip.nvim",
+        opts = {
+          -- recommended settings
+          default = {
+            embed_image_as_base64 = false,
+            prompt_for_file_name = false,
+            drag_and_drop = {
+              insert_mode = true,
+            },
+          },
+        },
+      },
+      'MeanderingProgrammer/render-markdown.nvim',
     },
     cond = not_vscode
   },
