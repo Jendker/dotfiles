@@ -156,58 +156,6 @@ local plugins = {
     commit = "1ea1c79372",
     config = true
   },
-  {
-    "RRethy/vim-illuminate",
-    event = { "BufReadPost", "BufNewFile" },
-    opts = {
-      delay = 200,
-      large_file_cutoff = 2000,
-      large_file_overrides = {
-        providers = { "lsp" },
-      },
-      filetypes_denylist = {
-        "dirvish",
-        "fugitive",
-        "lazy",
-        "Trouble",
-        "Outline",
-        "spectre_panel",
-        "toggleterm",
-        "TelescopePrompt",
-        "oil",
-      },
-    },
-    config = function(_, opts)
-      require("illuminate").configure(opts)
-
-      local function map(key, dir, buffer)
-        vim.keymap.set("n", key, function()
-          require("illuminate")["goto_" .. dir .. "_reference"](false)
-        end, { desc = dir:sub(1, 1):upper() .. dir:sub(2) .. " Reference", buffer = buffer })
-      end
-
-      map("]]", "next")
-      map("[[", "prev")
-
-      -- also set it after loading ftplugins, since a lot overwrite [[ and ]]
-      vim.api.nvim_create_autocmd("FileType", {
-        callback = function()
-          local buffer = vim.api.nvim_get_current_buf()
-          map("]]", "next", buffer)
-          map("[[", "prev", buffer)
-        end,
-      })
-      if vscode then
-        vim.api.nvim_set_hl(0, "IlluminatedWordText", { fg = "none", bg = "none" })
-        vim.api.nvim_set_hl(0, "IlluminatedWordRead", { fg = "none", bg = "none" })
-        vim.api.nvim_set_hl(0, "IlluminatedWordWrite", { fg = "none", bg = "none" })
-      end
-    end,
-    keys = {
-      { "]]", desc = "Next Reference" },
-      { "[[", desc = "Prev Reference" },
-    },
-  },
   -- without VSCode
   -- auto trail whitespace
   {
@@ -297,10 +245,10 @@ local plugins = {
       overrides = function(colors)
         local theme = colors.theme
         return {
-          -- vim-illuminate highlights
-          IlluminatedWordText = { bg = theme.ui.bg_p2 },
-          IlluminatedWordRead = { bg = theme.ui.bg_p2 },
-          IlluminatedWordWrite = { bg = theme.ui.bg_p2 },
+          -- snacks reference highlights
+          LspReferenceText = { bg = theme.ui.bg_p2, underline = false },
+          LspReferenceRead = { bg = theme.ui.bg_p2, underline = false },
+          LspReferenceWrite = { bg = theme.ui.bg_p2, underline = false },
 
           -- This will make floating windows look nicer with default borders
           NormalFloat = { bg = "none" },
@@ -326,9 +274,6 @@ local plugins = {
           undercurl = false,
         },
         highlights = {
-          IlluminatedWordText = {bg = '$bg2'},
-          IlluminatedWordRead = {bg = '$bg2'},
-          IlluminatedWordWrite = {bg = '$bg2'},
           MsgArea = { fg = '$fg' },
           MatchParen = {fg = '$orange', bg = 'none', fmt = "bold" },
           -- winbar needs to be set on current nightly
@@ -1690,16 +1635,27 @@ local plugins = {
       quickfile = { enabled = true },
       scroll = { enabled = false },
       statuscolumn = { enabled = false },
-      -- this doesn't seem to work, if it does, remove RRethy/vim-illuminate
-      words = { enabled = false },
+      words = { enabled = true },
     },
-    keys = {
-      { "<leader>.", function() require("snacks").scratch({ ft = vim.bo.filetype }) end, desc = "Toggle Scratch Buffer" },
-      { "<leader>S", function() require("snacks").scratch.select() end,                  desc = "Select Scratch Buffer" },
-      -- this doesn't seem to work, that's coupled with commented line above
-      -- { "]]",         function() require("snacks").words.jump(vim.v.count1) end,  desc = "Next Reference",       mode = { "n", "t" } },
-      -- { "[[",         function() require("snacks").words.jump(-vim.v.count1) end, desc = "Prev Reference",       mode = { "n", "t" } },
-    },
+    config = function(_, opts)
+      local snacks = require("snacks")
+      snacks.setup(opts)
+
+      vim.keymap.set("n", "<leader>.", function() snacks.scratch({ ft = vim.bo.filetype }) end, { desc = "Toggle Scratch Buffer" })
+      vim.keymap.set("n", "<leader>S", function() snacks.scratch.select() end, { desc = "Select Scratch Buffer" })
+
+      vim.keymap.set({"n", "t"}, "]]", function() snacks.words.jump(vim.v.count1) end, {desc = "Next reference"})
+      vim.keymap.set({"n", "t"}, "[[", function() snacks.words.jump(-vim.v.count1) end, {desc = "Prev reference"})
+      -- also set it after loading ftplugins, since a lot overwrite [[ and ]]
+      vim.api.nvim_create_autocmd("FileType", {
+        callback = function()
+          local buffer = vim.api.nvim_get_current_buf()
+          vim.keymap.set({"n", "t"}, "]]", function() snacks.words.jump(vim.v.count1) end, {desc = "Next reference", buffer = buffer})
+          vim.keymap.set({"n", "t"}, "[[", function() snacks.words.jump(-vim.v.count1) end, {desc = "Prev reference", buffer = buffer})
+        end,
+      })
+
+    end,
     cond = not_vscode
   },
   require('debugging'),
