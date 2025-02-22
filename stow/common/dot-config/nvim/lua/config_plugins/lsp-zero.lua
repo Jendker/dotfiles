@@ -56,7 +56,7 @@ local lsp_attach = function(client, bufnr)
   nmap('gi', "<cmd>Glance implementations<cr>", '[G]oto [I]mplementation')
   nmap('gH', "<cmd>Glance references<cr>", 'Goto references')
   nmap('go', "<cmd>Glance type_definitions<cr>", 'Goto type lsp_definitions')
-  nmap('gR', "<cmd>Glance resume<cr>", 'Goto type lsp_definitions')
+  nmap('<leader>gR', "<cmd>Glance resume<cr>", 'Goto type lsp_definitions')
   nmap('gh', vim.lsp.buf.hover, '[G][H]over documentation')
   nmap('gl', vim.diagnostic.open_float, 'Open diagnostics under cursor')
 
