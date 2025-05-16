@@ -41,7 +41,7 @@ function install_nvim_source() {
 function install_nvim_tarball() {
   nvim_download_path=/tmp/nvim-linux64.tar.gz
   nvim_target=/opt/nvim
-  curl -Lo "$nvim_download_path" https://github.com/neovim/neovim/releases/latest/download/nvim-linux64.tar.gz
+  curl -Lo "$nvim_download_path" https://github.com/neovim/neovim/releases/latest/download/nvim-linux-"$(uname -m)".tar.gz
   sudo rm -rf "${nvim_target}"
   sudo mkdir -p "${nvim_target}"
   sudo tar -C "${nvim_target}" --strip-components=1 -xzf "$nvim_download_path"
@@ -135,7 +135,7 @@ function install_nvim_binary() {
   if [ -n "$1" ]; then
     branch="$1"
   fi
-  if [ "$branch" == "stable" ] && [ "$(uname -m)" == "x86_64" ]; then
+  if [[ "$branch" == "stable" && ( "$(uname -m)" == "x86_64" || "$(uname -m)" == "arm64" ) ]]; then
     install_nvim_tarball || install_nvim_source $branch
   else
     install_nvim_source $branch
