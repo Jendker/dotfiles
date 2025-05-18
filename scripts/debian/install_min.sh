@@ -41,7 +41,12 @@ function install_nvim_source() {
 function install_nvim_tarball() {
   nvim_download_path=/tmp/nvim-linux64.tar.gz
   nvim_target=/opt/nvim
-  curl -Lo "$nvim_download_path" https://github.com/neovim/neovim/releases/latest/download/nvim-linux-"$(uname -m)".tar.gz
+  architecture=$(uname -m)
+  if [[ "$architecture" == "aarch64" ]]; then
+    # I don't know why neovim devs do it but they force aarch64 build to be named arm64
+    architecture="arm64"
+  fi
+  curl -Lo "$nvim_download_path" https://github.com/neovim/neovim/releases/latest/download/nvim-linux-"${architecture}".tar.gz
   sudo rm -rf "${nvim_target}"
   sudo mkdir -p "${nvim_target}"
   sudo tar -C "${nvim_target}" --strip-components=1 -xzf "$nvim_download_path"
@@ -135,7 +140,7 @@ function install_nvim_binary() {
   if [ -n "$1" ]; then
     branch="$1"
   fi
-  if [[ "$branch" == "stable" && ( "$(uname -m)" == "x86_64" || "$(uname -m)" == "arm64" ) ]]; then
+  if [[ "$branch" == "stable" && ( "$(uname -m)" == "x86_64" || "$(uname -m)" == "arm64"|| "$(uname -m)" == "aarch64" ) ]]; then
     install_nvim_tarball || install_nvim_source $branch
   else
     install_nvim_source $branch
