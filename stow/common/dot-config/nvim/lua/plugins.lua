@@ -1174,26 +1174,6 @@ local plugins = {
     opts = {},
     cond = not_vscode
   },
-  { "zbirenbaum/copilot.lua", cmd = {"Copilot"}, opts = {suggestion = {keymap = {accept_word = "<M-k>"}}}},
-  {
-    "CopilotC-Nvim/CopilotChat.nvim",
-    cmd = {"CopilotChat"},
-    event = "InsertEnter",
-    dependencies = {
-      {"zbirenbaum/copilot.lua"}, -- or github/copilot.vim
-      {"nvim-lua/plenary.nvim"}, -- for curl, log wrapper
-    },
-    build = "make tiktoken",
-    opts = {
-      mappings = {
-        close = {
-          insert = false,
-        },
-      },
-      context = 'buffer',
-    },
-    cond = not_vscode
-  },
   {
     'stevearc/aerial.nvim',
     cmd = { "AerialToggle", "AerialOpen", "AerialNavToogle", "AerialNavOpen", "AerialNext", "AerialPrev" },

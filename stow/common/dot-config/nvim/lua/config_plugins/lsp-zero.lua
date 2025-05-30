@@ -273,8 +273,8 @@ end
 -- Install auto_lsp_servers on demand (FileType)
 local function ensure_mason_installed()
   local augroup = vim.api.nvim_create_augroup('mason_autoinstall', { clear = true })
-  local lspconfig_to_package = require("mason-lspconfig.mappings.server").lspconfig_to_package
-  local filetype_mappings = require("mason-lspconfig.mappings.filetype")
+  local lspconfig_to_package = require("mason-lspconfig.mappings").get_all().lspconfig_to_package
+  local filetype_mappings = require("mason-lspconfig.mappings").get_all().filetypes
   local formatter_filetype_mappings = require("mason-null-ls.mappings.filetype")
   filetype_mappings = mergeTablesWithLists(filetype_mappings, formatter_filetype_mappings)
   local debugger_filetype_mappings_flipped = require("mason-nvim-dap.mappings.filetypes")
